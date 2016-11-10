@@ -43,8 +43,7 @@ function main(filePathIn, filePathOut)
     run(file_rayinvr_com);
 
     %% 1.4 为r.in中的所有变量赋值
-    % 将r.in文件转化为r_in.m脚本
-    file_rin_m = fun_trans_rin2m(file_rin);
+    file_rin_m = fun_trans_rin2m(file_rin); % 将r.in文件转化为r_in.m脚本
     run(file_rin_m); % 载入脚本，为r.in中所有变量赋值
 
     %% 2 main
@@ -54,7 +53,8 @@ function main(filePathIn, filePathOut)
     end
     % 如果imodf不等于1，表面速度模型保存在r.in文件的最后部分；否则，有专门的v.in文件保存
     if imodf ~= 1
-        error(sprintf('\n***  此选项废弃，请使用单独的v.in文件  ***\n'));
+        % ?... iunit=10 read(10,1)
+        error(sprintf('\n***  model must be load from file v.in, not r.in  ***\n'));
     end
     if mod(ppcntr,10) ~= 0 | mod(ppvel,10) ~= 0
         % ?...将4个namelist中的所有变量保存到n.out文件
@@ -62,8 +62,8 @@ function main(filePathIn, filePathOut)
     end
 
     % 2.1 读入v.in
-    % [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError]=fun_load_vin(file_vin);
-    [model,ncont,~,~,~,~,~,~,~,mError]=fun_load_vin(file_vin);
+    % [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
+    [model,ncont,~,~,~,~,~,~,~,mError] = fun_load_vin(file_vin);
     error(mError);
     % 将得到的模型（model）转为源程序中的形式：xm,zm,ivarz；xvel,vf,ivarv
     % 由于模型每层存储的数组是不等长的，所以通过cell来保存，而不是二维矩阵。
