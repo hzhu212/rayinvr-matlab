@@ -16,6 +16,8 @@ function main(filePathIn, filePathOut)
     file_vin = fullfile(filePathIn,'v.in');
     file_txin = fullfile(filePathIn,'tx.in');
     file_fin = fullfile(filePathIn,'f.in');
+    file_rayinvr_par = fullfile(filePathIn,'rayinvr.par');
+    file_rayinvr_com = fullfile(filePathIn,'rayinvr.com');
 
     file_r1out = fullfile(filePathOut,'r1.out');
     file_r2out = fullfile(filePathOut,'r2.out');
@@ -31,14 +33,7 @@ function main(filePathIn, filePathOut)
 
     %% 1 variables
     %% 1.1 声明rayinvr.par文件中的变量并赋值
-    rayinvrPar = [
-        'player ppcntr ptrap pshot prayf ptrayf ppray pnrayf pray prefl ',...
-        'preflt pconv pconvt pnsmth papois pnvar prayi ppvel pncntr picv ',...
-        'pinvel prayt pshot2 pfrefl ppfref pn2pt pnobsf pr2pt pcol pxgrid ',...
-        'pzgrid pitan pitan2 piray pi pi4 pi2 pi34 pi18 pit2 ',...
-    ];
-    eval(['global ',rayinvrPar]);
-    init_rayinvr_par(rayinvrPar);
+    run(file_rayinvr_par);
 
     %% 1.2 声明main函数中的变量
     mainPar1 = [
@@ -52,37 +47,7 @@ function main(filePathIn, filePathOut)
     eval(['global ',mainPar1]);
 
     %% 1.3 声明rayinvr.com文件中的变量并赋值
-    rayinvrCom = [
-        'refll nblk ivarz idray partyp iheadf nzed icbnd ivg izv ivv ivray ',...
-        'ipinv nvel ivarv ldvmax ldsmax ipf ilshot icalc npfref colour mcol ',...
-        'ivarf ircalc nbnda sample ',... % integer
-        'c s b vm xbnd xshtar xm zm fidarr vf xr zr parorg ar vr tr tfinv ',...
-        'vp vs rayid xfinv ray vsvp cv tt cz tang cosmth range apart fpart ',...
-        'tobs uobs tcalc xvel xpf tpf upf xcalc xscalc xfrefl zfrefl mtan ',...
-        'btan mcotan bcotan ',... %real
-        'title ',... %character
-    ];
-    % rayinvr.com 的 common blocks中的变量
-    rayinvrCom_common = [
-        'layer iblk id fid fid1 c ivg s b vm xbnd nblk nlayer xm zm vf nzed ',...
-        'nvel xvel xr zr ar vr tr vp vs refll ircbnd irkc tol hdenom hmin ',...
-        'idump isrkc ifast itx vred time timer step smin smax range tt rayid ',...
-        'xshtar fidarr idray ntt ray xmin xmax xtmin xtmax xmm ndecix xscale ',...
-        'ntickx xmint xmaxt xtmint xtmaxt xmmt ndecxt xscalt ntckxt zmin zmax ',...
-        'ztmin ztmax zmm ndeciz zscale ntickz tmin tmax ttmin ttmax tmm ndecit ',...
-        'tscale ntickt symht albht iplots orig sep title ititle xtitle ytitle ',...
-        'ircol mcol irrcol itcol ncol colour icasel dstepf n2 n3 istop nstepr ',...
-        'iwave nccbnd iccbnd icbnd vsvp isrch tang ntray ntpts ibsmth nbsmth ',...
-        'npbnd cosmth xsinc nptbnd ivarz ivarv ivarf ivv izv cz cv partyp ',...
-        'nvar parorg apart fpart tobs uobs tcalc xcalc xscalc ipinv ivray ',...
-        'narinv icalc ircalc ninv xfinv tfinv iheadf hws crit dhw tdhw ihdwf ',...
-        'ihdw nhskip idiff idifff dvmax dsmax idvmax idsmax ldvmax ldsmax ',...
-        'xpf tpf upf ipf ilshot nfrefl npfref xfrefl zfrefl ifcbnd sample ',...
-        'nbnd nbnda npskip npskp mtan btan mcotan bcotan factan iplot isep ',...
-        'iseg nseg xwndow ywndow ibcol ifcol sf ',...
-    ];
-    eval(['global ',rayinvrCom,' ',rayinvrCom_common]);
-    init_rayinvr_com(strjoin({rayinvrPar,rayinvrCom,rayinvrCom_common},' '));
+    run(file_rayinvr_com);
 
     %% 1.4 声明namelist/r.in中的变量
     pltpar = [
@@ -539,54 +504,6 @@ function [col1,col2,col3,col4] = fun_load_txin(file_txin)
     [col1,col2,col3,col4] = deal(txData(:,1),txData(:,2),txData(:,3),txData(:,4));
 end
 
-function init_rayinvr_par(globalParams)
-    %声明rayinvr.par文件中的参数
-
-    eval(['global ',globalParams]);
-
-    pi = 3.141592654;
-    pi4 = .785398163;
-    pi2 = 1.570796327;
-    pi34 = 2.35619449;
-    pi18 = 57.29577951;
-    pit2 = -6.283185307;
-    player = 42;      % model layers
-    ppcntr = 300;     % points defining a single model layer(must be a multiple of 10)
-    ptrap = 300;      % trapezoids within a layer
-    pshot = 200;      % shot points
-    prayf = 30;       % ray groups for a single shot
-    ptrayf = 3000;    % ray groups for all shots
-    ppray = 500;      % points defining a single ray
-    pnrayf = 1000;    % rays in a single group
-    pray = 100000;    % rays reaching the surface (not including the search mode)
-    prefl = 20;       % reflecting boundaries for a single group
-    preflt = 150;     % reflecting boundaries for all groups
-    pconv = 10;       % converting boundaries for a single group
-    pconvt = 100;     % converting boundaries for all groups
-    pnsmth = 500;     % points defining smooth layer boundary
-    papois = 50;      % blocks within which Poisson's ratio is altered
-    pnvar = 400;      % model parameters varied in inversion
-    prayi = 25000;    % travel times used in inversion
-    ppvel = 300;      % points at which upper & lower layer velocities defined(must be a multiple of 10)
-    pfrefl = 10;      % floating refectors
-    ppfref = 10;      % points defining a single floating reflector
-    pn2pt = 15;       % iterations in two-point ray tracing search
-    pnobsf = 1200;    % travel times with the same integer code for a single shot
-    pcol = 20;        % colours for ray groups & observed travel times
-    pxgrid = 1000;    % number of grid points in x-direction for output of uniformly sampled velocity model
-    pzgrid = 500;     % number of grid points in z-direction for output of uniformly sampled velocity model
-    pitan = 1000;     % number of intervals at which tangent function is pre-evaluated & used for interpolation
-    piray = 100;      % intersections with model boundaries for a single ray
-
-    pncntr = player + 1;
-    picv = player * ptrap * 20;
-    pinvel = player * 2;
-    pshot2 = pshot * 2;
-    prayt = pshot2 * prayf;
-    pitan2 = pitan * 2;
-    pr2pt = pnrayf + (pn2pt-1) * pnobsf;
-end
-
 function init_main(globalParams)
     %声明main函数中的参数
     eval(['global ',globalParams]);
@@ -721,91 +638,3 @@ function init_main(globalParams)
     ximax=-1.;
     i33=0;
 end
-
-function init_rayinvr_com(globalParams)
-    %声明rayinvr.com文件中的参数
-    eval(['global ',globalParams]);
-
-    %integer
-    refll = zeros(1,prefl+1);
-    nblk = zeros(1,player);
-    ivarz = zeros(player,ppcntr);
-    idray = zeros(1,2);
-    partyp = zeros(1,pnvar);
-    iheadf = zeros(1,player);
-    nzed = zeros(1,pncntr);
-    icbnd = zeros(1,pconv+1);
-    ivg = zeros(player,ptrap);
-    izv = zeros(player,ptrap,4);
-    ivv = zeros(player,ptrap,4);
-    ivray = zeros(1,prayf);
-    ipinv = zeros(1,prayi);
-    nvel = zeros(player,2);
-    ivarv = zeros(player,ppvel,2);
-    ldvmax = zeros(1,player);
-    ldsmax = zeros(1,pncntr);
-    ipf = zeros(1,prayi+pshot2+1);
-    ilshot = zeros(1,pshot2+1);
-    icalc = zeros(1,prayi);
-    npfref = zeros(1,pfrefl);
-    colour = zeros(1,pcol);
-    mcol = zeros(1,5);
-    ivarf = zeros(pfrefl,ppfref);
-    ircalc = zeros(1,prayi);
-    nbnda = zeros(1,piray);
-    sample = zeros(pzgrid,pxgrid);
-
-    %real*4
-    c = zeros(player,ptrap,11);
-    s = zeros(player,ptrap,2);
-    b = zeros(player,ptrap,2);
-    vm = zeros(player,ptrap,4);
-    xbnd = zeros(player,ptrap,2);
-    xshtar = zeros(1,pray);
-    xm = zeros(pncntr,ppcntr);
-    zm = zeros(pncntr,ppcntr);
-    fidarr = zeros(1,pray);
-    vf = zeros(player,ppvel,2);
-    xr = zeros(1,ppray);
-    zr = zeros(1,ppray);
-    parorg = zeros(1,pnvar);
-    ar = zeros(ppray,2);
-    vr = zeros(ppray,2);
-    tr = zeros(1,ppray);
-    tfinv = zeros(1,pnrayf);
-    vp = zeros(ppray,2);
-    vs = zeros(ppray,2);
-    rayid = zeros(1,pray);
-    xfinv = zeros(1,pnrayf);
-    ray = zeros(1,prayf);
-    vsvp = zeros(player,ptrap);
-    cv = zeros(player,ptrap,4,5);
-    tt = zeros(1,pray);
-    cz = zeros(player,ptrap,4,2);
-    tang = zeros(player,4);
-    cosmth = zeros(pncntr,pnsmth);
-    range = zeros(1,pray);
-    apart = zeros(prayi,pnvar);
-    fpart = zeros(pnrayf,pnvar);
-    tobs = zeros(1,prayi);
-    uobs = zeros(1,prayi);
-    tcalc = zeros(1,prayi);
-    xvel = zeros(player,ppvel,2);
-    xpf = zeros(1,prayi+pshot2+1);
-    tpf = zeros(1,prayi+pshot2+1);
-    upf = zeros(1,prayi+pshot2+1);
-    xcalc = zeros(1,prayi);
-    xscalc = zeros(1,prayi);
-    xfrefl = zeros(pfrefl,ppfref);
-    zfrefl = zeros(pfrefl,ppfref);
-    mtan = zeros(1,pitan2);
-    btan = zeros(1,pitan2);
-    mcotan = zeros(1,pitan2);
-    bcotan = zeros(1,pitan2);
-
-    %character
-    title = '';
-end
-
-
-%
