@@ -17,9 +17,10 @@ function main(filePathIn, filePathOut)
     file_txin = fullfile(filePathIn,'tx.in');
     file_fin = fullfile(filePathIn,'f.in');
     
-    file_rayinvr_par = fullfile(filePathIn,'rayinvr_par.m');
-    file_rayinvr_com = fullfile(filePathIn,'rayinvr_com.m');
-    file_main_par = fullfile(filePathIn,'main_par.m');
+    global file_rayinvr_par file_rayinvr_com;
+    file_rayinvr_par = 'rayinvr_par.m';
+    file_rayinvr_com = 'rayinvr_com.m';
+    file_main_par = 'main_par.m';
 
     file_r1out = fullfile(filePathOut,'r1.out');
     file_r2out = fullfile(filePathOut,'r2.out');
@@ -64,17 +65,40 @@ function main(filePathIn, filePathOut)
 
     % 2.1 读入v.in
     % [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
-    [model,ncont,~,~,~,~,~,~,~,mError] = fun_load_vin(file_vin);
+    [model,LN,~,~,~,~,~,~,~,mError] = fun_load_vin(file_vin);
     error(mError);
     % 将得到的模型（model）转为源程序中的形式：xm,zm,ivarz；xvel,vf,ivarv
     % 由于模型每层存储的数组是不等长的，所以通过cell来保存，而不是二维矩阵。
-    xm = arrayfun(@(x) x.bd(1,:),model,'UniformOutput',false);
-    zm = arrayfun(@(x) x.bd(2,:),model,'UniformOutput',false);
-    ivarz = arrayfun(@(x) x.bd(3,:),model(1:end-1),'UniformOutput',false);
+    % xm = arrayfun(@(x) x.bd(1,:),model,'UniformOutput',false);
+    % zm = arrayfun(@(x) x.bd(2,:),model,'UniformOutput',false);
+    % ivarz = arrayfun(@(x) x.bd(3,:),model(1:end-1),'UniformOutput',false);
 
-    xvel = arrayfun(@(x) [x.tv(1,:);x.bv(1,:)],model(1:end-1),'UniformOutput',false);
-    vf = arrayfun(@(x) [x.tv(2,:);x.bv(2,:)],model(1:end-1),'UniformOutput',false);
-    ivarv = arrayfun(@(x) [x.tv(3,:);x.bv(3,:)],model(1:end-1),'UniformOutput',false);
+    % xvel = arrayfun(@(x) [x.tv(1,:);x.bv(1,:)],model(1:end-1),'UniformOutput',false);
+    % vf = arrayfun(@(x) [x.tv(2,:);x.bv(2,:)],model(1:end-1),'UniformOutput',false);
+    % ivarv = arrayfun(@(x) [x.tv(3,:);x.bv(3,:)],model(1:end-1),'UniformOutput',false);
+    for ii = 1:length(model)-1
+        thisLayer = model(ii);
+        xlen = length(thisLayer.bd(1,:));
+        tvlen = length(thisLayer.tv(1,:));
+        bvlen = length(thisLayer.bv(1,:));
+
+        xm(ii,1:xlen) = thisLayer.bd(1,:);
+        zm(ii,1:xlen) = thisLayer.bd(2,:);
+        ivarz(ii,1:xlen) = thisLayer.bd(3,:);
+
+        xvel(ii,1:tvlen,1) = thisLayer.tv(1,:);
+        xvel(ii,1:bvlen,2) = thisLayer.bv(1,:);
+        vf(ii,1:tvlen,1) = thisLayer.tv(2,:);
+        vf(ii,1:bvlen,2) = thisLayer.bv(2,:);
+        ivarv(ii,1:tvlen,1) = thisLayer.tv(3,:);
+        ivarv(ii,1:bvlen,2) = thisLayer.bv(3,:);
+    end
+    indexLast = length(model);
+    xlen = length(model(end).bd(1,:));
+    xm(indexLast,1:xlen) = model(end).bd(1,:);
+    zm(indexLast,1:xlen) = model(end).bd(2,:);
+
+    ncont = LN;
     nlayer = ncont - 1; % 20
 
 
@@ -281,7 +305,7 @@ function main(filePathIn, filePathOut)
 
 
     % calculation of smooth layer boundaries
-    size(cosmth),size(xsinc),size(zsmth)
+    % size(cosmth),size(xsinc),size(zsmth)
     if ibsmth > 0 
         for ii = 1:nlayer+1
             zsmth(1) = (cosmth(ii,2)-cosmth(ii,1)) / xsinc;
