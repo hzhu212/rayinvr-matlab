@@ -16,9 +16,10 @@ function main(filePathIn, filePathOut)
     file_vin = fullfile(filePathIn,'v.in');
     file_txin = fullfile(filePathIn,'tx.in');
     file_fin = fullfile(filePathIn,'f.in');
-    file_rayinvr_par = fullfile(filePathIn,'rayinvr.par');
-    file_rayinvr_com = fullfile(filePathIn,'rayinvr.com');
-    file_main_par = fullfile(filePathIn,'main.par');
+    
+    file_rayinvr_par = fullfile(filePathIn,'rayinvr_par.m');
+    file_rayinvr_com = fullfile(filePathIn,'rayinvr_com.m');
+    file_main_par = fullfile(filePathIn,'main_par.m');
 
     file_r1out = fullfile(filePathOut,'r1.out');
     file_r2out = fullfile(filePathOut,'r2.out');
@@ -159,11 +160,11 @@ function main(filePathIn, filePathOut)
     end
 
 
-    % calculate velocity model parameters
-    % ?...
-    calmodPar = strjoin({rayinvrPar,rayinvrCom,rayinvrCom_common},' ');
-    [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,...
-        xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(calmodPar);
+    %% calculate velocity model parameters
+    % 输入参数中，只有iflagm并未声明过
+    iflagm = 0;
+    [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
+    = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
 
     if abs(modout) ~= 0 | ifd > 1
         if xmmin < -999998, xmmin = xmin; end
@@ -358,22 +359,6 @@ function [outputs] = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,...
     outputs = 0;
 end
 
-%% fun_calmod: function description
-function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(globalParams)
-
-    % temp = num2cell(zeros(1,13));
-    % [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,...
-    %     xmin1d,xmax1d,insmth,xminns,xmaxns] = deal(temp{:});
-    eval(['global ',globalParams]);
-    global pois poisbl poisb poisl insmth
-
-    xa = zeros(1,2*(ppcntr+ppvel));
-    zsmth = zeros(1,pnsmth);
-    % pois = zeros(1,player);
-    % poisbl = zeros(1,papois);
-    % zsmth = zeros(pnsmth);
-
-end
 
 %% fun_load_fin: read in floating reflectors
 %% f.in文件结构与v.in类似，只不过每个小节前面增加了一个描述本层节点数目的整数

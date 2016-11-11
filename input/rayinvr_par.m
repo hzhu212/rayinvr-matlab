@@ -1,5 +1,50 @@
 %% initialize all parameters in rayinvr.par 
 
+
+%% use "global" variables to substitute the common blocks
+%% these variables should have been in rayinvr_com.m, 
+%% but global variables must initialize first in matlab.
+
+% common
+global layer iblk id fid fid1;  %  blk1 
+global c ivg;  %  blk2 
+global s b vm;  %  blk3 
+global xbnd nblk nlayer;  %  blk4 
+global xm zm vf nzed nvel xvel;  %  blk5 
+global xr zr ar vr tr vp vs;  %  blk6 
+global refll ircbnd;  %  blk7 
+global irkc tol hdenom hmin idump isrkc ifast;  %  blk8 
+global itx vred time timer;  %  blk9 
+global step smin smax;  %  blk10
+global range tt rayid xshtar fidarr idray ntt ray;  %  blk11
+global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
+       xtmaxt xmmt ndecxt xscalt ntckxt zmin zmax ztmin ztmax zmm ndeciz ...
+       zscale ntickz tmin tmax ttmin ttmax tmm ndecit tscale ntickt symht ...
+       albht iplots orig sep title ititle xtitle ytitle ircol mcol irrcol ...
+       itcol ncol colour;  %  blk12
+global icasel dstepf n2 n3 istop nstepr;  %  blk13
+global iwave nccbnd iccbnd icbnd vsvp;  %  blk14
+global isrch tang;  %  blk15
+global ntray ntpts;  %  blk16
+global ibsmth nbsmth npbnd cosmth xsinc;  %  blk17
+global nptbnd;  %  blk18
+global ivarz ivarv ivarf ivv izv cz cv partyp nvar parorg;  %  blk19
+global apart fpart tobs uobs tcalc xcalc xscalc ipinv ivray narinv icalc ...
+       ircalc;  %  blk20
+global ninv xfinv tfinv;  %  blk21
+global iheadf hws crit dhw tdhw ihdwf ihdw nhskip idiff idifff;  %  blk22
+global dvmax dsmax idvmax idsmax ldvmax ldsmax;  %  blk23
+global xpf tpf upf ipf ilshot;  %  blk24
+global nfrefl npfref xfrefl zfrefl ifcbnd;  %  blk25
+global sample;  %  blk26
+global nbnd nbnda npskip npskp;  %  blk27
+global mtan btan mcotan bcotan factan;  %  blktan
+global iplot isep iseg nseg xwndow ywndow ibcol ifcol sf;  %  cplot
+
+
+
+%% these parameters are all constant.
+
 % pi = 3.141592654;
 % pi4 = 0.785398163;
 % pi2 = 1.570796327;
