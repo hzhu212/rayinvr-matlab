@@ -17,7 +17,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     idvmax = 0;
     idsmax = 0;
 
-    size(xm),xm(1:3,1:20)
+    % xm(1:3,1:10),ncont
 
     % 1. 检查形状模型是否有误
     for ii = 1:ncont
@@ -28,11 +28,11 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if nzed(ii) > 1
             isError1 = xm(ii,1:nzed(ii)-1) >= xm(ii,2:nzed(ii));
             if any(isError1)
-                disp(sprintf('xmodel error 1: %d, %d',ii,find(isError1,1)));
+                disp(sprintf('%11d %11d %11d',1,ii,find(isError1,1)));
                 fun_goto999(); return;
             end
             if abs(xm(ii,1)-xmin)>0.001 | abs(xm(ii,nzed(ii))-xmax)>0.001
-                disp(sprintf('xmodel error 2: %d',ii));
+                disp(sprintf('%11d %11d',2,ii));
                 fun_goto999(); return;
             end
         else
@@ -49,17 +49,17 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if nvel(ii,1) > 1
             isError3 = xvel(ii,1:nvel(ii,1)-1,1) >= xvel(ii,2:nvel(ii,1),1);
             if any(isError3)
-                disp(sprintf('vmodel error 3: %d, %d',ii,find(isError3,1)));
+                disp(sprintf('%11d %11d %11d',3,ii,find(isError3,1)));
                 fun_goto999(); return;
             end
             if abs(xvel(ii,1,1)-xmin)>0.001 | abs(xvel(ii,nvel(ii,1),1)-xmax)>0.001
-                disp(sprintf('vmodel error 4: %d',ii));
+                disp(sprintf('%11d %11d',4,ii));
                 fun_goto999(); return;
             end
         else
             if vf(ii,1,1)>0, xvel(ii,1,1)=xmax;
             else
-                if ii == 1, disp('vmodel error 5'); fun_goto999(); return;
+                if ii == 1, disp('%11d',5); fun_goto999(); return;
                 else nvel(ii,1) = 0; end
             end
         end
@@ -74,11 +74,11 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if nvel(ii,2) > 1
             isError6 = xvel(ii,1:nvel(ii,2)-1,2) >= xvel(ii,2:nvel(ii,2),2);
             if any(isError6)
-                disp(sprintf('vmodel error 6: %d, %d',ii,find(isError6,1)));
+                disp(sprintf('%11d %11d %11d',6,ii,find(isError6,1)));
                 fun_goto999(); return;
             end
             if abs(xvel(ii,1,2)-xmin)>0.001 | abs(xvel(ii,nvel(ii,2),2)-xmax)>0.001
-                disp(sprintf('vmodel error 7: %d',ii));
+                disp(sprintf('%11d %11d',7,ii));
                 fun_goto999(); return;
             end
         else

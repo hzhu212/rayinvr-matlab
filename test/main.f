@@ -235,9 +235,11 @@ c
          read(iunit,15,end=999) ilyr,(xm(icont,j),j=j1,j2)
          read(iunit,15,end=999) icnt,(zm(icont,j),j=j1,j2)
          read(iunit,235,end=99) (ivarz(icont,j),j=j1,j2)
-15       format(i2,1x,10f7.2)
+C 15       format(i2,1x,10f7.2)
+15       format(i2,1x,10f8.3)
 c235      format(3x,10i7)
-235      format(3x,10(5x,i2))
+C 235      format(3x,10(5x,i2))
+235      format(3x,10(6x,i2))
          nrz=nrz+1
          if(icnt.ne.1) go to 211
          j1=j1+10
@@ -415,8 +417,8 @@ c 575     format(3x,<npfref(nfrefl)>i7)
       end if
 c                 
 c     calculate velocity model parameters
-C       call calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,
-C      +            xmin1d,xmax1d,insmth,xminns,xmaxns)
+      call calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,
+     +            xmin1d,xmax1d,insmth,xminns,xmaxns)
 C c
       if(abs(modout).ne.0.or.ifd.gt.1) then
 c

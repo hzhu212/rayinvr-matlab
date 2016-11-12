@@ -12,6 +12,8 @@ function main(filePathIn, filePathOut)
         end
     end
 
+    clear('global');
+
     file_rin = fullfile(filePathIn,'r.in');
     file_vin = fullfile(filePathIn,'v.in');
     file_txin = fullfile(filePathIn,'tx.in');
