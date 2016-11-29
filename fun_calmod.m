@@ -2,11 +2,18 @@
 function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
  = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
  % calculate model
-
-    % temp = num2cell(zeros(1,13));
-    % [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,...
-    %     xmin1d,xmax1d,insmth,xminns,xmaxns] = deal(temp{:});
-    % global pois poisbl poisb poisl insmth
+ % ncont: 模型总层数（包括最后一层）
+ % pois: Poisson's ratio，数组，保存模型中每一层的泊松比
+ % poisl: Poisson layer, 数组，泊松比的层索引
+ % poisb: Poisson block, 数组，泊松比的块索引（模型中每层包含许多小块）
+ % poisbl: 数组，按照poisl和poisb两个索引来存储的泊松比，将会覆盖pois数组的内容
+ % iflagm: i-flag-model,代表模型是否有误，0-正常，1-模型错误
+ % invr: 计算所选定模型参数的偏微分，并把结果写入到i.out文件
+ % ifrbnd: 为1说明读取了f.in文件
+ % insmth: 非-smooth，数组，列出未使用光滑边界模拟的层面
+ % xminns,xmaxns: 限定最小模型距离和最大模型距离，当ibsmth=1或2时，insmth
+ %   中所列出的层一旦超出该范围将不做光滑处理
+ % pncntr: player+1，player为模型分层数，pncntr则为模型层界面数
 
     global file_rayinvr_par file_rayinvr_com;
     run(file_rayinvr_par);
@@ -16,8 +23,6 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     iflagm = 0;
     idvmax = 0;
     idsmax = 0;
-
-    % xm(1:3,1:10),ncont
 
     % 1. 检查形状模型是否有误
     for ii = 1:ncont
@@ -87,7 +92,6 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         end
     end
 
-
     % 4. 将模型的每一层都切分成小梯形
     for ii = 1:nlayer
         xa(1) = xmin;
@@ -136,15 +140,473 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
             return;
         end
 
-        size(xa);
+        xa = sort(xa);
 
+        nblk(ii) = ib - 1;
+        xbnd(ii,1:nblk(ii),1) = xa(1:nblk(ii))
+        xbnd(ii,1:nblk(ii),2) = xa(2:nblk(ii)+1) % 90
+    end % 50
+
+
+    if invr == 1
+        for ii = 1:nlayer
+            ivlyr = 0;
+            for jj = 1:nzed(ii)
+                if ivarz(ii,jj)~=1 & ivarz(ii,jj)~=-1, ivarz(ii,jj) = 0; end
+                if ivarz(ii,jj)==-1, ivlyr=1; end
+            end % 320
+            if ivlyr == 1
+                if ii==1
+                    disp(sprintf('%12d',8)); fun_goto999(); return;
+                end
+                if nzed(ii) ~= nzed(ii-1)
+                    disp(sprintf('%12d%12d',9,ii)); fun_goto999(); return;
+                end
+                for jj = 1:nzed(ii)
+                    if xm(ii,jj) ~= xm(ii-1,jj)
+                        disp(sprintf('%12d%12d%12d',10,ii,jj));
+                        fun_goto999(); return;
+                    end
+                    if zm(ii,jj) ~= zm(ii-1,jj)
+                        disp(sprintf('%12d%12d%12d',11,ii,jj));
+                        fun_goto999(); return;
+                    end
+                    if ivarz(ii-1,jj)==0 & ivarz(ii,jj)==-1
+                        ivarz(ii,jj) = 0;
+                    end
+                end % 327
+            end
+            for jj = 1:nvel(ii,1)
+                if ivarv(ii,jj,1)~=1, ivarv(ii,jj,1)=0; end
+            end % 321
+            ivgrad = 0;
+            if nvel(ii,2) > 0
+                for jj = 1:nvel(ii,2)
+                    if ivarv(ii,jj,2)~=1 & ivarv(ii,jj,2)~=-1
+                        ivarv(ii,jj,2) = 0;
+                    end
+                    if ivarv(ii,jj,2)==-1, ivgrad=1; end
+                end % 322
+                if ivgrad == 1
+                    iflag = 0;
+                    isGoto326 = false;
+                    if nvel(ii,1) > 0
+                        iflag = 1; ig = ii; jg = 1;
+                        isGoto326 = true;
+                    end
+                    if ~isGoto326 & i>1 & nvel(ii,1)==0
+                        for jj = ii-1 : -1 : 1
+                            if nvel(jj,2) > 0
+                                iflag = 1; ig = jj; jg = 2;
+                                break; % go to 326
+                            end
+                            if nvel(jj,1) > 0
+                                iflag = 1; ig = jj; jg = 1;
+                                break; % go to 326
+                            end
+                        end % 324
+                    end
+                    % 326
+                    if iflag==1 & nvel(ig,jg)==nvel(ii,2)
+                        for jj = 1:nvel(ig,jg)
+                            if xvel(ig,jj,jg) ~= xvel(ii,jj,2)
+                                disp(sprintf('%12d',12,ii,jj,ig,jg));
+                                fun_goto999(); return;
+                            end
+                            if ivarv(ig,jj,jg)==0 & ivarv(ii,jj,2)==-1
+                                ivarv(ii,jj,2) = 0;
+                            end
+                        end % 323
+                    else
+                        disp(sprintf('%12d',13,ii,ig,jg));
+                        fun_goto999(); return;
+                    end
+                end
+            end
+        end % 310
+
+        nvar = 0;
+        for ii = 1:nlayer
+            for jj = 1:nzed(ii)
+                % check for layer pinchouts
+                iflag = 0;
+                if ii > 1
+                    for k = 1:ii-1
+                        isGoto429 = false;
+                        for l = 1:nzed(k)
+                            if abs(xm(ii,jj)-xm(k,l))<0.005 & abs(zm(ii,jj)-zm(k,l))<0.005
+                                iflag = 1;
+                                iv = ivarz(k,l);
+                                isGoto429 = true; break; % go to 429
+                            end
+                        end % 428
+                        if isGoto429, break; end
+                    end % 427
+                end
+                % 429
+                if ivarz(ii,jj)==1 & iflag==0
+                    nvar = nvar + 1;
+                    ivarz(ii,jj) = nvar;
+                    partyp(nvar) = 1;
+                    parorg(nvar) = zm(ii,jj);
+                else
+                    if iflag==1, ivarz(ii,jj)=iv;
+                    else
+                        if ivarz(ii,jj)~=-1, ivarz(ii,jj)=0; end
+                    end
+                end
+            end % 420
+
+            for jj = 1:nvel(ii,1)
+                if ivarv(ii,jj,1) == 1
+                    nvar = nvar + 1;
+                    ivarv(ii,jj,1) = nvar;
+                    partyp(nvar) = 2;
+                    parorg(nvar) = vf(ii,jj,1);
+                else
+                    ivarv(ii,jj,1) = 0;
+                end
+            end % 421
+            if nvel(ii,2) > 0
+                for jj = 1:nvel(ii,2)
+                    if ivarv(ii,jj,2) == 1
+                        nvar = nvar + 1;
+                        ivarv(ii,jj,2) = nvar;
+                        partyp(nvar) = 2;
+                        parorg(nvar) = vf(ii,jj,2);
+                    end
+                end % 422
+            end
+        end % 410
+
+
+        % check for inverting floating reflectors
+        for ii = 1:nfrefl
+            for jj = 1:npfref(ii)
+                if ivarf(ii,jj) == 1
+                    nvar = nvar + 1;
+                    ivarf(ii,jj) = nvar;
+                    partyp(nvar) = 3;
+                    parorg(nvar) = zfrefl(ii,jj);
+                end
+            end % 431
+        end % 426
+
+        if nvar == 0
+            disp(sprintf('\n***  no parameters varied for inversion  ***\n'));
+            invr = 0;
+        end
+
+        if nvar > pnvar
+            disp(sprintf('\n***  too many parameters varied for inversion  ***\n'));
+            iflagm = 1; return;
+        end
     end
 
+
+    % calculate slopes and intercepts of each block boundary
+    for ii = 1:nlayer
+        for jj = 1:nblk(ii)
+            xbndc = xbnd(ii,jj,1) + 0.001;
+            if nzed(ii) > 1
+                for k = 1 : nzed(ii)-1
+                    if xbndc>=xm(ii,k) & xbndc<=xm(ii,k+1)
+                        dx = xm(ii,k+1) - xm(ii,k);
+                        c1 = (xm(ii,k+1)-xbnd(ii,jj,1)) / dx;
+                        c2 = (xbnd(ii,jj,1)-xm(ii,k)) / dx;
+                        z1 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
+                        if ivarz(ii,k) > 0
+                            iv = ivarz(ii,k);
+                        else
+                            iv = ivarz(ii-1,k);
+                        end
+                        izv(ii,jj,1) = iv;
+                        if iv > 0
+                            cz(ii,jj,1,1) = xm(ii,k+1);
+                            cz(ii,jj,1,2) = xm(ii,k+1) - xm(ii,k);
+                        end
+
+                        c1 = (xm(ii,k+1)-xbnd(ii,jj,2)) / dx;
+                        c2 = (xbnd(ii,jj,2)-xm(ii,k)) / dx;
+                        z2 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
+                        if ivarz(ii,k+1) > 0
+                            iv = ivarz(ii,k+1);
+                        else
+                            iv = ivarz(ii-1,k+1);
+                        end
+                        izv(ii,jj,2) = iv;
+                        if iv > 0
+                            cz(ii,jj,2,1) = xm(ii,k);
+                            cz(ii,jj,2,2) = xm(ii,k+1) - xm(ii,k);
+                        end
+                        break; % go to 130
+                    end
+                end % 120
+            else
+                z1 = zm(ii,1);
+                if ivarz(ii,1) > 0
+                    iv = ivarz(ii,1);
+                else
+                    iv = ivarz(ii-1,1);
+                end
+                izv(ii,jj,1) = iv;
+                if iv > 0
+                    cz(ii,jj,1,1) = 0.0;
+                    cz(ii,jj,1,2) = 0.0;
+                end
+                z2 = zm(ii,1);
+                izv(ii,jj,2) = 0;
+            end
+            % 130
+            s(ii,jj,1) = (z2-z1) / (xbnd(ii,jj,2)-xbnd(ii,jj,1));
+            b(ii,jj,1) = z1 - s(ii,jj,1) * xbnd(ii,jj,1);
+            if nzed(ii+1) > 1
+                for k = 1: nzed(ii+1)-1
+                    if xbndc>=xm(ii+1,k) & xbndc<=xm(ii+1,k+1)
+                        dx = xm(ii+1,k+1) - xm(ii+1,k);
+                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,1)) / dx;
+                        c2 = (xbnd(ii,jj,1)-xm(ii+1,k)) / dx;
+                        z3 = c1 * zm(ii+1,k) + c2 * zm(ii+1,k+1);
+                        if ii == nlayer
+                            izv(ii,jj,3) = 0;
+                        else
+                            if ivarz(ii+1,k) >= 0
+                                iv = ivarz(ii+1,k);
+                            else
+                                iv = ivarz(ii,k);
+                            end
+                            izv(ii,jj,3) = iv;
+                            if iv > 0
+                                cz(ii,jj,3,1) = xm(ii+1,k+1);
+                                cz(ii,jj,3,2) = xm(ii+1,k+1) - xm(ii+1,k);
+                            end
+                        end
+
+                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,2)) / dx;
+                        c2 = (xbnd(ii,jj,2)-xm(ii+1,k)) / dx;
+                        z4 = c1 * zm(ii+1,k) + c2 * zm(ii+1,k+1);
+                        if ii == nlayer
+                            izv(ii,jj,4) = 0;
+                        else
+                            if ivarz(ii+1,k+1) >= 0
+                                iv = ivarz(ii+1,k+1);
+                            else
+                                iv = ivarz(ii,k+1);
+                            end
+                            izv(ii,jj,4) = iv;
+                            if iv > 0
+                                cz(ii,jj,4,1) = xm(ii+1,k);
+                                cz(ii,jj,4,2) = xm(ii+1,k+1) - xm(ii+1,k);
+                            end
+                        end
+                        break; % go to 150
+                    end
+                end % 140
+            else
+                z3 = zm(ii+1,1);
+                if ii == nlayer
+                    izv(ii,jj,3) = 0;
+                else
+                    if ivarz(ii+1,1) >= 0
+                        iv = ivarz(ii+1,1);
+                    else
+                        iv = ivarz(ii,1);
+                    end
+                    izv(ii,jj,3) = iv;
+                    if iv > 0
+                        cz(ii,jj,3,1) = 0.0;
+                        cz(ii,jj,3,2) = 0.0;
+                    end
+                end
+                z4 = zm(ii+1,1);
+                izv(ii,jj,4) = 0;
+            end
+            % 150
+            s(ii,jj,2) = (z4-z3) / (xbnd(ii,jj,2)-xbnd(ii,jj,1));
+            b(ii,jj,2) = z3 - s(ii,jj,2) * xbnd(ii,jj,1);
+
+            % check for layer pinchouts
+            ivg(ii,jj) = 1;
+            if abs(z3-z1)<0.0005, ivg(ii,jj)=2; end
+            if abs(z4-z2)<0.0005, ivg(ii,jj)=3; end
+            if abs(z3-z1)<0.0005 & abs(z4-z2)<0.0005, ivg(ii,jj)=-1; end
+        end % 110
+    end % 100
+
+
+    % assign velocities to each model block
+    for ii = 1:nlayer
+        if nvel(ii,1) == 0
+            for jj = ii-1 : -1 : 1
+                if nvel(jj,2) > 0
+                    ig = j; jg = 2; n1g = nvel(jj,2);
+                    break; % go to 162
+                end
+                if nvel(jj,1) > 0
+                    ig = jj; jg = 1; n1g = nvel(jj,1);
+                    break; % go to 162
+                end
+            end % 161
+        else
+            ig = ii; jg = 1; n1g = nvel(ii,1);
+        end
+
+        % 162
+        if n1g> 1 & nvel(ii,2)> 1, ivcase=1; end
+        if n1g> 1 & nvel(ii,2)==1, ivcase=2; end
+        if n1g==1 & nvel(ii,2)> 1, ivcase=3; end
+        if n1g==1 & nvel(ii,2)==1, ivcase=4; end
+        if n1g> 1 & nvel(ii,2)==0, ivcase=5; end
+        if n1g==1 & nvel(ii,2)==0, ivcase=6; end
+
+        for jj = 1:nblk(ii)
+            if ivg(ii,jj) == -1 continue; end % go to 170
+
+            xbndcl = xbnd(ii,jj,1) + 0.001;
+            xbndcr = xbnd(ii,jj,2) - 0.001;
+
+            % go to (1001,1002,1003,1004,1005,1006), ivcase
+            
+            % 1001
+            if ivcase == 1
+                for k = 1: n1g-1
+                    if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
+                        c2 = xbnd(ii,jj,1) - xvel(ig,k,jg);
+                        vm(ii,jj,1) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,1)=vm(ii,jj,1)+0.001; end
+                        if invr == 1
+                            iv = ivarv(ig,k,jg);
+                            ivv(ii,jj,1) = iv;
+                            if iv > 0
+                                cf = c1 / dxx;
+                                fun_cvcalc(ii,jj,1,1,cf); % call cvcalc(i,j,1,1,cf)
+                                if ivg(ii,jj) == 2
+                                    fun_cvcalc(ii,jj,1,3,cf); % call cvcalc(i,j,1,3,cf)
+                                end
+                            end
+                            if c2 > 0.001
+                                iv = ivarv(ig,k+1,jg);
+                                ivv(ii,jj,2) = iv;
+                                if iv > 0
+                                    cf = c2 / dxx;
+                                    fun_cvcalc(ii,jj,2,1,cf); % call cvcalc(i,j,2,1,cf)
+                                    if ivg(ii,jj) == 2
+                                        fun_cvcalc(ii,jj,2,3,cf); % call cvcalc(i,j,2,3,cf)
+                                    end
+                                end
+                            end
+                        end
+                        break; % go to 1811
+                    end
+                end % 180
+
+                % 1811
+                for k = 1: n1g-1
+                    if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
+                        c2 = xbnd(ii,jj,2) - xvel(ig,k,jg);
+                        vm(ii,jj,2) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,2)=vm(ii,jj,2)+0.001; end
+                        if invr == 1
+                            iv = ivarv(ig,k,jg);
+                            ivv(ii,jj,2) = iv;
+                            if iv > 0
+                                cf = c2 / dxx;
+                                fun_cvcalc(ii,jj,2,2,cf); % call cvcalc(i,j,1,1,cf)
+                                if ivg(ii,jj) == 3
+                                    fun_cvcalc(ii,jj,2,4,cf); % call cvcalc(i,j,1,3,cf)
+                                end
+                            end
+                            if c1 > 0.001
+                                iv = ivarv(ig,k,jg);
+                                ivv(ii,jj,1) = iv;
+                                if iv > 0
+                                    cf = c1 / dxx;
+                                    fun_cvcalc(ii,jj,1,2,cf); % call cvcalc(i,j,2,1,cf)
+                                    if ivg(ii,jj) == 3
+                                        fun_cvcalc(ii,jj,1,4,cf); % call cvcalc(i,j,2,3,cf)
+                                    end
+                                end
+                            end
+                        end
+                        break; % go to 181
+                    end
+                end % 1812
+
+                % 181
+                
+            end
+
+            % 1002
+            if ivcase <= 2
+
+            end
+            
+            % 1003
+            if ivcase <= 3
+
+            end
+            
+            % 1004
+            if ivcase <= 4
+
+            end
+            
+            % 1005
+            if ivcase <= 5
+
+            end
+            
+            % 1006
+            if ivcase <= 6
+
+            end
+
+        end
+    end
+
+
+    %% fun_goto999: calculate end for model error
+    function fun_goto999()
+        disp(sprintf('\n***  error in velocity model 2 ***\n'));
+        iflagm = 1;
+    end
+
+    function fun_cvcalc(ii,jj,ipos,itype,cf)
+    % calculate coefficients of velocity partial derivatives
+        if itype == 1
+            ssign = 1.0;
+            sb = s(ii,jj,2);
+            xb = xbnd(ii,jj,2);
+            bb = b(ii,jj,2);
+        elseif itype == 2
+            ssign = -1.0;
+            sb = s(ii,jj,2);
+            xb = xbnd(ii,jj,1);
+            bb = b(ii,jj,2);
+        elseif itype == 3
+            ssign = -1.0;
+            sb = s(ii,jj,1);
+            xb = xbnd(ii,jj,2);
+            bb = b(ii,jj,1);
+        elseif itype == 4
+            ssign = 1.0;
+            sb = s(ii,jj,1);
+            xb = xbnd(ii,jj,1);
+            bb = b(ii,jj,1);
+        end
+
+        cv(ii,jj,ipos,1) = cv(ii,jj,ipos,1) + cf * ssign * (sb*xb-bb);
+        cv(ii,jj,ipos,2) = cv(ii,jj,ipos,2) - cf * ssign * sb;
+        cv(ii,jj,ipos,3) = cv(ii,jj,ipos,3) - cf * ssign * xb;
+        cv(ii,jj,ipos,4) = cv(ii,jj,ipos,4) + cf * ssign;
+        cv(ii,jj,ipos,5) = cv(ii,jj,ipos,5) + cf * ssign * bb * xb;
+
+        return;
+    end
 end
 
 
-%% fun_goto999: calculate end for model error
-function fun_goto999()
-    disp(sprintf('\n***  error in velocity model 2 ***\n'));
-    iflagm = 1;
-end
