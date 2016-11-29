@@ -460,7 +460,9 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if n1g==1 & nvel(ii,2)==0, ivcase=6; end
 
         for jj = 1:nblk(ii)
-            if ivg(ii,jj) == -1 continue; end % go to 170
+            if ivg(ii,jj)==-1, continue; end % go to 170
+            
+            isGoto171 = false;
 
             xbndcl = xbnd(ii,jj,1) + 0.001;
             xbndcr = xbnd(ii,jj,2) - 0.001;
@@ -511,14 +513,12 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                         vm(ii,jj,2) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
                         if ig~=ii, vm(ii,jj,2)=vm(ii,jj,2)+0.001; end
                         if invr == 1
-                            iv = ivarv(ig,k,jg);
+                            iv = ivarv(ig,k+1,jg);
                             ivv(ii,jj,2) = iv;
                             if iv > 0
                                 cf = c2 / dxx;
                                 fun_cvcalc(ii,jj,2,2,cf); % call cvcalc(i,j,1,1,cf)
-                                if ivg(ii,jj) == 3
-                                    fun_cvcalc(ii,jj,2,4,cf); % call cvcalc(i,j,1,3,cf)
-                                end
+                                if ivg(ii,jj)==3, fun_cvcalc(ii,jj,2,4,cf); end
                             end
                             if c1 > 0.001
                                 iv = ivarv(ig,k,jg);
@@ -526,9 +526,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                                 if iv > 0
                                     cf = c1 / dxx;
                                     fun_cvcalc(ii,jj,1,2,cf); % call cvcalc(i,j,2,1,cf)
-                                    if ivg(ii,jj) == 3
-                                        fun_cvcalc(ii,jj,1,4,cf); % call cvcalc(i,j,2,3,cf)
-                                    end
+                                    if ivg(ii,jj)==3, fun_cvcalc(ii,jj,1,4,cf); end
                                 end
                             end
                         end
@@ -537,37 +535,562 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 end % 1812
 
                 % 181
-                
+                for k = 1: nvel(ii,2)-1
+                    if xbndcl>=xvel(ii,k,2) & xbndcl<=xvel(ii,k+1,2)
+                        dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
+                        c1 = xvel(ii,k+1,2) - xbnd(ii,jj,1);
+                        c2 = xbnd(ii,jj,1) - xvel(ii,k,2);
+                        if ivg(ii,jj) ~= 2
+                            vm(ii,jj,3) = (c1*vf(ii,k,2)+c2*vf(ii,k+1,2)) / dxx;
+                        else
+                            vm(ii,jj,3) = vm(ii,jj,1);
+                        end
+                        if invr == 1
+                            if ivg(ii,jj) == 2
+                                ivv(ii,jj,3) = 0;
+                                icorn = 0;
+                            else
+                                iv = ivarv(ii,k,2);
+                                if iv > 0
+                                    ivv(ii,jj,3) = iv;
+                                    icorn = 3;
+                                else
+                                    ivv(ii,jj,3) = 0;
+                                    if iv<0, icorn=1;
+                                    else icorn=0; end
+                                end
+                            end 
+                            if icorn > 0
+                                cf = c1 / dxx;
+                                fun_cvcalc(ii,jj,icorn,3,cf);
+                            end
+
+                            if c2 > 0.001
+                                if ivg(ii,jj) == 2
+                                    ivv(ii,jj,4) = 0;
+                                    icorn = 0;
+                                else
+                                    iv = ivarv(ii,k+1,2);
+                                    if iv > 0
+                                        ivv(ii,jj,4) = iv;
+                                        icorn = 4;
+                                    else
+                                        ivv(ii,jj,4) = 0;
+                                        if iv<0, icorn=2;
+                                        else icorn=0; end
+                                    end
+                                end
+                                if icorn > 0
+                                    cf = c2 / dxx;
+                                    fun_cvcalc(ii,jj,icorn,3,cf);
+                                end
+                            end
+                        end
+                        break; % go to 187
+                    end
+                end % 182
+
+                % 187
+                for k = 1: nvel(ii,2)-1
+                    if xbndcr>=xvel(ii,k,2) & xbndcr<=xvel(ii,k+1,2)
+                        dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
+                        c1 = xvel(ii,k+1,2) - xbnd(ii,jj,2);
+                        c2 = xbnd(ii,jj,2) - xvel(ii,k,2);
+                        if ivg(ii,jj) ~= 3
+                            vm(ii,jj,4) = (c1*vf(ii,k,2)+c2*vf(ii,k+1,2)) / dxx;
+                        else
+                            vm(ii,jj,4) = vm(ii,jj,2);
+                        end
+                        if invr == 1
+                            if ivg(ii,jj) == 3
+                                ivv(ii,jj,4) = 0;
+                                icorn = 0;
+                            else
+                                iv = ivarv(ii,k+1,2);
+                                if iv > 0
+                                    ivv(ii,jj,4) = iv;
+                                    icorn = 4;
+                                else
+                                    ivv(ii,jj,4) = 0;
+                                    if iv<0, icorn=2;
+                                    else icorn=0; end
+                                end
+                            end 
+                            if icorn > 0
+                                cf = c2 / dxx;
+                                fun_cvcalc(ii,jj,icorn,4,cf);
+                            end
+
+                            if c1 > 0.001
+                                if ivg(ii,jj) == 3
+                                    ivv(ii,jj,3) = 0;
+                                    icorn = 0;
+                                else
+                                    iv = ivarv(ii,k,2);
+                                    if iv > 0
+                                        ivv(ii,jj,3) = iv;
+                                        icorn = 3;
+                                    else
+                                        ivv(ii,jj,3) = 0;
+                                        if iv<0, icorn=1;
+                                        else icorn=0; end
+                                    end
+                                end
+                                if icorn > 0
+                                    cf = c1 / dxx;
+                                    fun_cvcalc(ii,jj,icorn,4,cf);
+                                end
+                            end
+                        end
+                        isGoto171 = true; break; % go to 171
+                    end
+                end % 1822
             end
 
             % 1002
-            if ivcase <= 2
+            if ~isGoto171 & ivcase<=2
+                for k = 1: n1g-1
+                    if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
+                        c2 = xbnd(ii,jj,1) - xvel(ig,k,jg);
+                        vm(ii,jj,1) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,1)=vm(ii,jj,1)+0.001; end
+                        if invr == 1
+                            iv = ivarv(ig,k,jg);
+                            ivv(ii,jj,1) = iv;
+                            if iv > 0
+                                cf = c1 / dxx;
+                                fun_cvcalc(ii,jj,1,1,cf); % call cvcalc(i,j,1,1,cf)
+                            end
+                            if c2 > 0.001
+                                iv = ivarv(ig,k+1,jg);
+                                ivv(ii,jj,2) = iv;
+                                if iv > 0
+                                    cf = c2 / dxx;
+                                    fun_cvcalc(ii,jj,2,1,cf); % call cvcalc(i,j,2,1,cf)
+                                end
+                            end
+                        end
+                        break; % go to 1833
+                    end
+                end % 183
 
+                % 1833
+                for k = 1: n1g-1
+                    if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
+                        c2 = xbnd(ii,jj,2) - xvel(ig,k,jg);
+                        vm(ii,jj,2) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,2)=vm(ii,jj,2)+0.001; end
+                        if invr == 1
+                            iv = ivarv(ig,k+1,jg);
+                            ivv(ii,jj,2) = iv;
+                            if iv > 0
+                                cf = c2 / dxx;
+                                fun_cvcalc(ii,jj,2,2,cf); % call cvcalc(i,j,1,1,cf)
+                            end
+                            if c1 > 0.001
+                                iv = ivarv(ig,k,jg);
+                                ivv(ii,jj,1) = iv;
+                                if iv > 0
+                                    cf = c1 / dxx;
+                                    fun_cvcalc(ii,jj,1,2,cf); % call cvcalc(i,j,2,1,cf)
+                                end
+                            end
+                        end
+                        break; % go to 184
+                    end
+                end % 1832
+
+                % 184
+                vm(ii,jj,3) = vf(ii,1,2);
+                if ivg(ii,jj)==2, vm(ii,jj,3)=vm(ii,jj,1); end
+                vm(ii,jj,4) = vf(ii,1,2);
+                if ivg(ii,jj)==3, vm(ii,jj,4)=vm(ii,jj,2); end
+                if invr == 1
+                    iv = ivarv(ii,1,2);
+                    ivv(ii,jj,3) = iv;
+                    ivv(ii,jj,4) = 0;
+                    if iv > 0
+                        if ivg(ii,jj)~=2, fun_cvcalc(ii,jj,3,3,1.0);
+                        if ivg(ii,jj)~=3, fun_cvcalc(ii,jj,3,4,1.0);
+                    end
+                end
+                isGoto171 = true; % go to 171
             end
             
             % 1003
-            if ivcase <= 3
+            if ~isGoto171 & ivcase<=3
+                vm(ii,jj,1) = vf(ig,1,jg);
+                vm(ii,jj,2) = vf(ig,1,jg);
+                if ig ~= ii
+                    vm(ii,jj,1) = vm(ii,jj,1) + 0.001;
+                    vm(ii,jj,2) = vm(ii,jj,2) + 0.001;
+                end
+                if invr == 1
+                    iv = ivarv(ig,1,jg);
+                    ivv(ii,jj,1) = iv;
+                    ivv(ii,jj,2) = 0;
+                    if iv > 0
+                        fun_cvcalc(ii,jj,1,1,1.0);
+                        fun_cvcalc(ii,jj,1,2,1.0);
+                    end
+                end
 
+                for k = 1: nvel(ii,2)-1
+                    if xbndcl>=xvel(ii,k,2) & xbndcl<=xvel(ii,k+1,2)
+                        dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
+                        c1 = xvel(ii,k+1,2) - xbnd(ii,jj,1);
+                        c2 = xbnd(ii,jj,1) - xvel(ii,k,2);
+                        if ivg(ii,jj) ~= 2
+                            vm(ii,jj,3) = (c1*vf(ii,k,2)+c2*vf(ii,k+1,2)) / dxx;
+                        else
+                            vm(ii,jj,3) = vm(ii,jj,1);
+                        end
+                        if invr == 1
+                            if ivg(ii,jj) == 2
+                                ivv(ii,jj,3) = 0;
+                                icorn = 1;
+                            else
+                                iv = ivarv(ii,k,2);
+                                if iv > 0
+                                    ivv(ii,jj,3) = iv;
+                                    icorn = 3;
+                                else
+                                    ivv(ii,jj,3) = 0;
+                                    icorn = 0;
+                                end
+                            end 
+                            if icorn > 0
+                                cf = c1 / dxx;
+                                fun_cvcalc(ii,jj,icorn,3,cf);
+                            end
+
+                            if c2 > 0.001
+                                if ivg(ii,jj) == 2
+                                    ivv(ii,jj,3) = 0;
+                                    icorn = 2;
+                                else
+                                    iv = ivarv(ii,k+1,2);
+                                    if iv > 0
+                                        ivv(ii,jj,4) = iv;
+                                        icorn = 4;
+                                    else
+                                        ivv(ii,jj,4) = 0;
+                                        icorn = 0;
+                                    end
+                                end
+                                if icorn > 0
+                                    cf = c2 / dxx;
+                                    fun_cvcalc(ii,jj,icorn,3,cf);
+                                end
+                            end
+                        end
+                        break; % go to 188
+                    end
+                end % 185
+
+                % 188
+                for k = 1: nvel(ii,2)-1
+                    if xbndcr>=xvel(ii,k,2) & xbndcr<=xvel(ii,k+1,2)
+                        dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
+                        c1 = xvel(ii,k+1,2) - xbnd(ii,jj,2);
+                        c2 = xbnd(ii,jj,2) - xvel(ii,k,2);
+                        if ivg(ii,jj) ~= 3
+                            vm(ii,jj,4) = (c1*vf(ii,k,2)+c2*vf(ii,k+1,2)) / dxx;
+                        else
+                            vm(ii,jj,4) = vm(ii,jj,2);
+                        end
+                        if invr == 1
+                            if ivg(ii,jj) == 3
+                                ivv(ii,jj,4) = 0;
+                                icorn = 2;
+                            else
+                                iv = ivarv(ii,k+1,2);
+                                if iv > 0
+                                    ivv(ii,jj,4) = iv;
+                                    icorn = 4;
+                                else
+                                    ivv(ii,jj,4) = 0;
+                                    icorn = 0;
+                                end
+                            end 
+                            if icorn > 0
+                                cf = c2 / dxx;
+                                fun_cvcalc(ii,jj,icorn,4,cf);
+                            end
+
+                            if c1 > 0.001
+                                if ivg(ii,jj) == 3
+                                    ivv(ii,jj,4) = 0;
+                                    icorn = 1;
+                                else
+                                    iv = ivarv(ii,k,2);
+                                    if iv > 0
+                                        ivv(ii,jj,3) = iv;
+                                        icorn = 3;
+                                    else
+                                        ivv(ii,jj,3) = 0;
+                                        icorn = 0;
+                                    end
+                                end
+                                if icorn > 0
+                                    cf = c1 / dxx;
+                                    fun_cvcalc(ii,jj,icorn,4,cf);
+                                end
+                            end
+                        end
+                        isGoto171 = true; break; % go to 171
+                    end
+                end % 1851
             end
             
             % 1004
-            if ivcase <= 4
+            if ~isGoto171 & ivcase<=4
+                vm(ii,jj,1) = vf(ig,1,jg);
+                vm(ii,jj,2) = vf(ig,1,jg);
+                if ig ~= ii
+                    vm(ii,jj,1) = vm(ii,jj,1) + 0.001;
+                    vm(ii,jj,2) = vm(ii,jj,2) + 0.001;
+                end
+                if invr == 1
+                    iv = ivarv(ig,1,jg);
+                    ivv(ii,jj,1) = iv;
+                    ivv(ii,jj,2) = 0;
+                    if iv > 0
+                        fun_cvcalc(ii,jj,1,1,1.0);
+                        fun_cvcalc(ii,jj,1,2,1.0);
+                    end
+                end
 
+                vm(ii,jj,3) = vf(ii,1,2);
+                if ivg(ii,jj)==2, vm(ii,jj,3)=vm(ii,jj,1); end
+                vm(ii,jj,4) = vf(ii,1,2);
+                if ivg(ii,jj)==3, vm(ii,jj,4)=vm(ii,jj,2); end
+                if invr == 1
+                    iv = ivarv(ii,1,2);
+                    if iv > 0
+                        ivv(ii,jj,3) = iv;
+                        icorn = 3;
+                    else
+                        ivv(ii,jj,3) = 0;
+                        if iv<0, icorn=1;
+                        else icorn=0; end
+                    end
+                    ivv(ii,jj,4) = 0;
+                    if icorn > 0
+                        if ivg(ii,jj)~=2, fun_cvcalc(ii,jj,icorn,3,1.0); end
+                        if ivg(ii,jj)~=3, fun_cvcalc(ii,jj,icorn,4,1.0); end
+                    end
+                end
+                isGoto171 = true; % go to 171
             end
             
             % 1005
-            if ivcase <= 5
+            if ~isGoto171 & ivcase<=5
+                for k = 1: n1g-1
+                    if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
+                        c2 = xbnd(ii,jj,1) - xvel(ig,k,jg);
+                        vm(ii,jj,1) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,1)=vm(ii,jj,1)+0.001; end
+                        vm(ii,jj,3) = vm(ii,jj,1);
+                        if invr == 1
+                            iv = ivarv(ig,k,jg);
+                            ivv(ii,jj,1) = iv;
+                            if iv > 0
+                                cf = c1 / dxx;
+                                fun_cvcalc(ii,jj,1,1,cf); % call cvcalc(i,j,1,1,cf)
+                                if ivg(ii,jj) ~= 2
+                                    fun_cvcalc(ii,jj,1,3,cf); % call cvcalc(i,j,1,3,cf)
+                                end
+                            end
+                            if c2 > 0.001
+                                iv = ivarv(ig,k+1,jg);
+                                ivv(ii,jj,2) = iv;
+                                if iv > 0
+                                    cf = c2 / dxx;
+                                    fun_cvcalc(ii,jj,2,1,cf); % call cvcalc(i,j,2,1,cf)
+                                    if ivg(ii,jj) ~= 2
+                                        fun_cvcalc(ii,jj,2,3,cf); % call cvcalc(i,j,2,3,cf)
+                                    end
+                                end
+                            end
+                        end
+                        break; % go to 1861
+                    end
+                end % 186
 
+                % 1861
+                for k = 1: n1g-1
+                    if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
+                        dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
+                        c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
+                        c2 = xbnd(ii,jj,2) - xvel(ig,k,jg);
+                        vm(ii,jj,2) = (c1*vf(ig,k,jg)+c2*vf(ig,k+1,jg)) / dxx;
+                        if ig~=ii, vm(ii,jj,2)=vm(ii,jj,2)+0.001; end
+                        vm(ii,jj,4) = vm(ii,jj,2);
+                        if invr == 1
+                            iv = ivarv(ig,k+1,jg);
+                            ivv(ii,jj,2) = iv;
+                            if iv > 0
+                                cf = c2 / dxx;
+                                fun_cvcalc(ii,jj,2,2,cf); % call cvcalc(i,j,1,1,cf)
+                                if ivg(ii,jj)~=3, fun_cvcalc(ii,jj,2,4,cf); end
+                            end
+                            if c1 > 0.001
+                                iv = ivarv(ig,k,jg);
+                                ivv(ii,jj,1) = iv;
+                                if iv > 0
+                                    cf = c1 / dxx;
+                                    fun_cvcalc(ii,jj,1,2,cf); % call cvcalc(i,j,2,1,cf)
+                                    if ivg(ii,jj)~=3, fun_cvcalc(ii,jj,1,4,cf); end
+                                end
+                            end
+                            ivv(ii,jj,3) = 0;
+                            ivv(ii,jj,4) = 0;
+                        end
+                        isGoto171 = true; break; % go to 171
+                    end
+                end % 1862
             end
             
             % 1006
-            if ivcase <= 6
-
+            if ~isGoto171 & ivcase<=6
+                vm(ii,jj,1) = vf(ig,1,jg);
+                if ig~=ii, vm(ii,jj,1)=vm(ii,jj,1)+0.001; end
+                vm(ii,jj,2:4) = vm(ii,jj,1); % ?...
+                if invr == 1
+                    iv = ivarv(ig,1,jg);
+                    ivv(ii,jj,1) = iv;
+                    ivv(ii,jj,2:4) = 0; % ?...
+                    if iv > 0
+                        fun_cvcalc(ii,jj,1,1,1.0);
+                        fun_cvcalc(ii,jj,1,2,1.0);
+                        fun_cvcalc(ii,jj,1,3,1.0);
+                        fun_cvcalc(ii,jj,1,4,1.0);
+                    end
+                end
             end
 
+
+            % calculate velocity coefficients
+            % 171
+            s1 = s(ii,jj,1);
+            s2 = s(ii,jj,2);
+            b1 = b(ii,jj,1);
+            b2 = b(ii,jj,2);
+            xb1 = xbnd(ii,jj,1);
+            xb2 = xbnd(ii,jj,2);
+            if ivg(ii,jj) == 2
+                z3 = s(ii,jj,2)*xb1 + b(ii,jj,2) + 0.001;
+                z4 = s(ii,jj,2)*xb2 + b(ii,jj,2);
+                s2 = (z4-z3) / (xb2-xb1);
+                b2 = z3 - s2*xb1;
+            end
+            if ivg(ii,jj) == 3
+                z3 = s(ii,jj,2)*xb1 + b(ii,jj,2);
+                z4 = s(ii,jj,2)*xb2 + b(ii,jj,2) + 0.001;
+                s2 = (z4-z3) / (xb2-xb1);
+                b2 = z3 - s2*xb1;
+            end
+            v1 = vm(ii,jj,1);
+            v2 = vm(ii,jj,2);
+            v3 = vm(ii,jj,3);
+            v4 = vm(ii,jj,4);
+
+            c(ii,jj, 1) = s2*(xb2*v1-xb1*v2) + b2*(v2-v1) - s1*(xb2*v3-xb1*v4) - b1*(v4-v3);
+            c(ii,jj, 2) = s2*(v2-v1) - s1*(v4-v3);
+            c(ii,jj, 3) = - xb2*v1 + xb1*v2 + xb2*v3 - xb1*v4;
+            c(ii,jj, 4) = - v2 + v1 + v4 - v3;
+            c(ii,jj, 5) = b2*(xb2*v1-xb1*v2) - b1*(xb2*v3-xb1*v4);
+            c(ii,jj, 6) = (s2-s1) * (xb2-xb1);
+            c(ii,jj, 7) = (b2-b1) * (xb2-xb1);
+            c(ii,jj, 8) = 2.0 * c(ii,jj,2) * c(ii,jj,7);
+            c(ii,jj, 9) = c(ii,jj,2) * c(ii,jj,6);
+            c(ii,jj,10) = c(ii,jj,4)*c(ii,jj,7) - c(ii,jj,3)*c(ii,jj,6);
+            c(ii,jj,11) = c(ii,jj,1)*c(ii,jj,7) - c(ii,jj,5)*c(ii,jj,6);
+
+            if ivg(ii,jj) == -1
+                vm(ii,jj,1:4) = 0.0; % ?...
+                for k = 1:11
+                    c(ii,jj,1) = 0.0; % ?...
+                end % 172
+            end
+            if abs(vm(ii,jj,1)-vm(ii,jj,2))<0.001 & abs(vm(ii,jj,2)-vm(ii,jj,3))<0.001 ...
+                & abs(vm(ii,jj,3)-vm(ii,jj,4))<0.001 & ivg(ii,jj)~=-1
+                ivg(ii,jj) = 0;
+            end
+        end % 170
+    end % 160
+
+    % assign values to array vsvp
+    if pois(1) < -10.0
+        for ii = 1:nlayer
+            vsvp(ii,1:nblk(ii)) = 0.57735;
+        end % 190
+    else
+        if nlayer > 1
+            if pois(2) < -10.0
+                % 210
+                vsvp(1,1:nblk(1)) = sqrt( (1.0-2.0*pois(1))/(2.0*(1.0-pois(1))) );
+                for ii = 2:nlayer
+                    vsvp(ii,1:nblk(ii)) = vsvp(1,1);
+                end % 220
+            else
+                for ii = 1:nlayer
+                    if pois(ii) < -10.0
+                        vsvp(ii,1:nblk(ii)) = 0.57735; % 250
+                    else
+                        vsvp(ii,1:nblk(ii)) = sqrt( (1.0-2.0*pois(ii))/(2.0*(1.0-pois(ii))) );
+                    end
+                end % 240
+            end
         end
     end
 
+    % calculate velocity ratios for specific model blocks specified
+    % through the arrays poisbl, poisl and poisb
+
+    % 270
+    for ii = 1:papois
+        if poisbl(ii)<-10.0, break; end % go to 400
+        vsvp(poisl(ii),poisb(ii)) = sqrt((1.0-2.0*poisbl(ii))/(2.0*(1.0-poisbl(ii))));
+    end
+
+    % calculation of smooth layer boundaries
+
+    % 400
+    if ibsmth > 0
+        xsinc = (xmax-xmin) / (npbnd-1);
+        for ii = 1: nlayer+1
+            if ii < nlayer+1
+                il = ii; ib = 1;
+            else
+                il = ii-1; ib = 2;
+            end
+            iblk = 1;
+            for jj = 1:npbnd
+                x = xmin + (jj-1)*xsinc;
+                if x<xmin, x=xmin+0.001; end
+                if x>xmax, x=xmax-0.001; end
+                while true
+                    % 620
+                    if x>=xbnd(il,iblk,1) & x<=xbnd(il,iblk,2)
+                        cosmth(ii,jj) = s(il,iblk,ib)*x + b(il,iblk,ib);
+                        break; % go to 610
+                    else
+                        iblk = iblk + 1;
+                    end
+                end
+            end % 610
+        end % 600
+
+        
+    end
 
     %% fun_goto999: calculate end for model error
     function fun_goto999()
