@@ -13,13 +13,14 @@ function main(filePathIn, filePathOut)
     end
 
     clear('global');
+    global file_rayinvr_par file_rayinvr_com;
+    global fID_12;
 
     file_rin = fullfile(filePathIn,'r.in');
     file_vin = fullfile(filePathIn,'v.in');
     file_txin = fullfile(filePathIn,'tx.in');
     file_fin = fullfile(filePathIn,'f.in');
-    
-    global file_rayinvr_par file_rayinvr_com;
+
     file_rayinvr_par = 'rayinvr_par.m';
     file_rayinvr_com = 'rayinvr_com.m';
     file_main_par = 'main_par.m';
@@ -308,7 +309,7 @@ function main(filePathIn, filePathOut)
 
     % calculation of smooth layer boundaries
     % size(cosmth),size(xsinc),size(zsmth)
-    if ibsmth > 0 
+    if ibsmth > 0
         for ii = 1:nlayer+1
             zsmth(1) = (cosmth(ii,2)-cosmth(ii,1)) / xsinc;
             zsmth(2:npbnd-1) = (cosmth(ii,3:npbnd)-cosmth(ii,0:npbnd-2)) / (2.0*xsinc);

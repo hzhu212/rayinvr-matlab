@@ -1,20 +1,20 @@
-%% initialize all parameters in rayinvr.par 
+%% initialize all parameters in rayinvr.par
 
 
 %% use "global" variables to substitute the common blocks
-%% these variables should have been in rayinvr_com.m, 
+%% these variables should have been in rayinvr_com.m,
 %% but global variables must initialize first in matlab.
 
 % common
-global layer iblk id fid fid1;  %  blk1 
-global c ivg;  %  blk2 
-global s b vm;  %  blk3 
-global xbnd nblk nlayer;  %  blk4 
-global xm zm vf nzed nvel xvel;  %  blk5 
-global xr zr ar vr tr vp vs;  %  blk6 
-global refll ircbnd;  %  blk7 
-global irkc tol hdenom hmin idump isrkc ifast;  %  blk8 
-global itx vred time timer;  %  blk9 
+global layer iblk id fid fid1;  %  blk1
+global c ivg;  %  blk2
+global s b vm;  %  blk3
+global xbnd nblk nlayer;  %  blk4
+global xm zm vf nzed nvel xvel;  %  blk5
+global xr zr ar vr tr vp vs;  %  blk6
+global refll ircbnd;  %  blk7
+global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
+global itx vred time timer;  %  blk9
 global step smin smax;  %  blk10
 global range tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
