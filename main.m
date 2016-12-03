@@ -388,7 +388,6 @@ function main(filePathIn, filePathOut)
 
     if ~isGoto1000
     for is = 1:nshot
-        isGoto69 = false;
         ist = ist + 1;
         id = idr(is);
         fid = id;
@@ -437,6 +436,7 @@ function main(filePathIn, filePathOut)
         ictbnd = 0;
 
         for ii = 1:ngroup
+            isGoto69 = false;
             if iraysl == 1
                 irpos = (ishotr(is)-1) .* ngroup + ii;
                 if irayt(irpos) == 0
@@ -512,7 +512,293 @@ function main(filePathIn, filePathOut)
 
             if nrayr <= 0, isGoto69=true; end
             if ~isGoto69 % --2.1
+            if i2pt > 0
+                isGoto1200 = false;
+                iflag2 = 0;
+                nsfc = 1;
+                isf = ilshot(nsfc);
+                while true
+                    xf = xpf(isf);
+                    tf = fpf(isf);
+                    uf = upf(isf);
+                    irayf = ipf(isf);
+                    if irayf==0, break; end % go to 1200
+                    if irayf == 0
+                        xshotf = xf;
+                        idf = sign(tf);
+                        if abs(xshotr-xshotf)<0.001 & idr(is)==idf
+                            i2flag = 1;
+                            isf = isf + 1;
+                        else
+                            i2flag = 0;
+                            nsfc = nsfc + 1;
+                            isf = ilshot(nsfc);
+                        end
+                    else
+                        if i2flag==1 & ivray(ii)==irayf
+                            iflag2 = 1;
+                            break; % go to 1200
+                        end
+                        isf = isf + 1;
+                    end
+                end % 1110
+                % 1200
+                if iflag2 == 0
+                    nrayr = 0;
+                    isGoto69 = true;
+                end
+            end
+            if ~isGoto69 % --2.1.1
+            % ?... call auto()
+            if iflag ~= 0
+                fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n',ishotw(is),ray(ii));
+                nrayr = 0;
+                nrayl = nrayl + 1;
+                iflagl = 1;
+                isGoto69 = true;
+            end
+            if ~isGoto69 % --2.1.1.1
+            if amaxr==aminr & ihdwf~=1
+                if nrayr > 1
+                    fprintf(fID_11,'***  shot#%4d ray code%5.1f 1 ray traced  ***\n',ishotw(is),ray(ii));
+                    nrayl = nrayl + 1;
+                    iflagl = 1;
+                end
+                nrayr = 1;
+            end
+            if nrayr > 1
+                if idt == 2
+                    if amaxr<=aminr, amaxr=90.0; end
+                end
+                if space(ii) > 0
+                    pinc = space(ii);
+                else
+                    if idt==2, pinc=2.0;
+                    else pinc=1.0; end
+                end
+                ainc = (amaxr-aminr) ./ (nrayr-1).^pinc;
+            else
+                pinc = 1.0; ainc = 0.0;
+            end
+            iend = 0;
+            ninv = 0;
+            ifcbnd = frbnd(ii);
+            nc2pt = 0;
 
+            if i2pt>0 & nrayr>1
+                ii2pt = i2pt;
+                ni2pt = 1; no2pt = 0; nco2pt = 0; ic2pt = 0;
+                nsfc = 1;
+                isf = ilshot(nsfc);
+                while true % 1100
+                    xf = xpf(isf);
+                    tf = tpf(isf);
+                    uf = upf(isf);
+                    irayf = ipf(isf);
+                    if irayf<0, break; end % go to 1199
+                    if irayf == 0
+                        xshotf = xf;
+                        idf = sign(tf);
+                        if abs(xshotr-xshotf)<0.001 & idr(is)==idf
+                            i2flag = 1;
+                            isf = isf + 1;
+                        else
+                            i2flag = 0;
+                            nsfc = nsfc + 1;
+                            isf = ilshot(nsfc);
+                        end
+                    else
+                        if i2flag==1 & ivray(ii)==irayf
+                            no2pt = no2pt + 1;
+                            if no2pt > min(pnrayf,pnobsf)
+                                fprintf('***  pnrayf or pnobsf exceeded  ***\n');
+                                break; % go to 1199
+                            end
+                            xo2pt(no2pt) = xf;
+                            ifo2pt(no2pt) = 0;
+                        end
+                        isf = isf + 1;
+                    end
+                end % 1100
+                % 1199
+                if no2pt==0, ni2pt=0; end
+            else
+                ni2pt = 0; ii2pt = 0;
+            end
+            while true % 91
+            ir = 0; nrg = 0;
+            ihdwf = ihdwm;
+            tdhw = 0.0; dhw = 0.0;
+            i1ray = 1;
+            while true % 90
+                ir = ir + 1;
+                if ir>nrayr & ni2pt<=1, break; end % go to 890
+                if i2pt==0 & iend==1, break; end % go to 890
+                ircbnd = 1; iccbnd = 1;
+                iwave = 1; ihdw = 0;
+                if icbnd(1) == 0
+                    iwave = -iwave;
+                    iccbnd = 2;
+                end
+                nptbnd = 0; nbnd = 0;
+                npskp = npskip;
+                nccbnd = 0;
+                id = idr(is);
+                fid = id;
+                fid1 = fid;
+                iturnt = 0;
+                if nc2pt <= 1
+                    angled = aminr + ainc .* (ir-1).^pinc;
+                    if amaxr > aminr
+                        if angled > amaxr
+                            angled = amaxr;
+                            iend = 1;
+                        end
+                    else
+                        if angled < amaxr
+                            angled = amaxr;
+                            iend = 1;
+                        end
+                    end
+                    if ir==nrayr & nrayr>1, angled=amaxr; end
+                else
+                    isGoto890 = false;
+                    while true % 891
+                        nco2pt = nco2pt + 1;
+                        if nco2pt>no2pt, isGoto890=true; break; end % go to 890
+                        if ifo2pt(nco2pt)~=0 & ii2pt>0, continue; end % go to 891
+                        xobs = xo2pt(nco2pt);
+                        tt2min = 1.0e10;
+                        for jj = 1: nc2pt-1
+                            if (ra2pt(jj)>=xobs & ra2pt(jj+1)<=xobs) | (ra2pt(jj)<=xobs & ra2pt(jj+1)>=xobs)
+                                denom = ra2pt(jj+1) - ra2pt(jj);
+                                if denom ~= 0
+                                    tpos = (tt2pt(jj+1)-tt2pt(jj)) ./ denom .* (xobs-ra2pt(jj)) + tt2pt(jj);
+                                else
+                                    tpos = (tt2pt(jj+1)+tt2pt(jj)) ./ 2.0;
+                                end
+                                if tpos < tt2min
+                                    tt2min = tpos;
+                                    if denom ~= 0.0
+                                        aort = (ta2pt(jj+1)-ta2pt(jj)) ./ denom .* (xobs-ra2pt(jj)) + ta2pt(jj);
+                                    else
+                                        aort = (ta2pt(jj+1)+ta2pt(jj)) ./ 2.0;
+                                    end
+                                    if ihdwf ~= 1
+                                        angled = aort;
+                                    else
+                                        tdhw = aort;
+                                        hws = tdhw;
+                                    end
+                                    xdiff = min(abs(xobs-ra2pt(jj)),abs(xobs-ra2pt(jj+1)));
+                                    if xdiff<x2pt, ifo2pt(nco2pt)=1; end
+                                end
+                            end
+                        end % 892
+                        if tt2min > 1.0e9 | (ifo2pt(nco2pt)~=0 & ii2pt>0), continue; % go to 891
+                        else break; end
+                    end % 891
+                    if isGoto890, break; end % go to 890
+                end
+                angle = fid .* (90.0-angled) ./ pi18;
+                if ir>1 & ihdwf~=1
+                    if angle == am, continue; end % go to 90
+                end
+                am = angle;
+                if fid1 .* angle < 0.0
+                    id = -id; fid = id;
+                end
+                layer = layer1;
+                iblk = iblk1;
+                npt = 1;
+                xr(1) = xshotr;
+                zr(1) = zshotr;
+                ar(1,1) = 0.0;
+                ar(1,2) = angle;
+                vr(1,1) = 0.0;
+                vp(1,1) = 0.0;
+                vs(1,1) = 0.0;
+                vp(1,2) = vel(xshotr,zshotr);
+                vs(1,2) = vp(1,2) .* vsvp(layer1,iblk1);
+                if iwave == 1, vr(1,2) = vp(1,2);
+                else vr(1,2) = vs(1,2); end
+                idray(1) = layer1;
+                idray(2) = 1;
+
+                if ii2pt > 0, irs = 0;
+                else irs = ir; end
+                if invr==1 & irs>0
+                    ninv = ninv + 1;
+                    % 80
+                    fpart(ninv,1:nvar) = 0.0;
+                end
+                nrg = nrg + 1;
+                nhskip = 0;
+
+                % call trace()
+
+                % call ttime()
+
+                if irs == 0
+                    ic2pt = ic2pt + 1;
+                    if ihdwf ~= 1, ta2pt(ic2pt) = angled;
+                    else ta2pt(ic2pt) = tdhw-hws; end
+                    ra2pt(ic2pt) = xr(npt);
+                    tt2pt(ic2pt) = timer;
+                    if vr(npt,2)<=0.0, tt2pt(ic2pt)=1.0e20; end
+                end
+
+                if ((iray==1 | (iray==2 & vr(npt,2)>0.0)) & mod(ir-1,nrskip)==0 & irs>0) | (irays==1 & irs==0)
+                    % call pltray()
+                    if i33 == 1
+                        if iszero == 1, xwr=abs(xshtar(ntt-1)-xobs);
+                        else xwr = xobs; end
+                        fprintf(fID_33,'%12.4f%4d%4d%12.4f%12.4f%12.4f',xshtar(ntt-1),ivraya(ifam),ii,xwr,tt(ntt-1)); % 335
+                    end
+                end
+
+                if vr(npt,2)>0 & irs>0 & abs(modout)>=2
+                    % call cells()
+                end
+
+                if invr==1 & irs>0
+                    % call fxtinv(npt)
+                end
+
+                if ihdwf == 0, break; end % go to 890
+                if ntt > pray
+                    fprintf('\n***  max number of rays reaching surface exceeded  ***\n\n');
+                    break; % go to 890
+                end
+            end % 90
+
+            % 890
+            if ii2pt > 0
+                nc2pt = ic2pt;
+                if ni2pt > 1
+                    % call sort3()
+                    ho2pt(1:nc2pt) = ra2pt(1:nc2pt); % 893
+                    ra2pt(1:nc2pt) = ho2pt(ipos(1:nc2pt)); % 894
+                    ho2pt(1:nc2pt) = tt2pt(1:nc2pt); % 897
+                    tt2pt(1:nc2pt) = ho2pt(ipos(1:nc2pt)); % 898
+                end
+                ni2pt = ni2pt + 1;
+                if ni2pt > n2pt, ii2pt = 0; end
+                nco2pt = 0;
+            end
+            end % 91
+
+            if ninv > 0
+                % call calprt()
+            end
+            if iflagw == 1, iflagi = 1; end
+            if iray>0 | irays==1
+                % call empty
+            end
+
+            nrayr = nrg;
+            end % if ~isGoto69 --2.1.1.1
+            end % if ~isGoto69 --2.1.1
             end % if ~isGoto69 --2.1
             end % if ~isGoto69 --2
             % 69
@@ -531,6 +817,44 @@ function main(filePathIn, filePathOut)
     end % if ~isGoto1000
 
     % 1000
+    if (isep<2 | isep==3) & ((itx>0 & ntt>1) | idata~=0 | itxout>0)
+        if isep>0 & iplots==1
+            % call aldone
+        end
+        % call plttx()
+    end
+
+    if itxout > 0
+        fprintf(fID_17,'   %14f   %14f   %14f%12d',0.0,0.0,0.0,-1);
+    end
+
+    if irkc == 1
+        fprintf('\n***  possible inaccuracies in rngkta  ***\n');
+        fprintf(fID_11,'\n***  possible inaccuracies in rngkta  ***\n');
+    end
+
+    if nrayl > 0
+        tempstr = sprintf('\n***  less than nray rays traced for %4d ray groups  ***\n',nrayl);
+        fprintf(tempstr);
+        fprintf(fID_11, tempstr);
+    end
+
+    if i33 == 1
+        for ii = 1:narinv
+            % format(f12.4,2i4,3f12.4)
+            fprintf(fID_34,'%12.4f%4d%4d%12.4f%12.4f%12.4f\n',xscalc(ii),abs(icalc(ii)),ircalc(ii),xcalc(ii),tcalc(ii));
+        end % 1033
+    end
+
+    if abs(modout) ~= 0
+        % call modwr()
+    end
+
+    if ifd > 0
+        % call fd()
+    end
+
+    fun_goto900();
 
     fclose('all');
 % main function end
