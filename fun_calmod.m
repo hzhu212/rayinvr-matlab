@@ -140,7 +140,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
 
         if ib > (ptrap+1)
             iflagm = 1;
-            error('\n***  maximum number of blocks in layer %d exceeded  ***\n',ii);
+            error('e:test','\n***  maximum number of blocks in layer %d exceeded  ***\n',ii);
         end
 
         xa = sort(xa);
@@ -302,7 +302,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
 
         if nvar > pnvar
             iflagm = 1;
-            error('\n***  too many parameters varied for inversion  ***\n');
+            error('e:test','\n***  too many parameters varied for inversion  ***\n');
         end
     end
 
@@ -1265,13 +1265,13 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 x1 = xbnd(ii,jj,1);
                 z1 = s(ii,jj,1) * x1 + b(ii,jj,1);
                 denom = c(ii,jj,6) * x1 + c(ii,jj,7);
-                vx = (c(ii,jj,8)*x1+c(ii,jj,9)*x1^2+c(ii,jj,10)*z1+c(ii,jj,11)) / denom^2;
+                vx = (c(ii,jj,8)*x1+c(ii,jj,9)*x1.^2+c(ii,jj,10)*z1+c(ii,jj,11)) / denom.^2;
                 vz = (c(ii,jj,3)+c(ii,jj,4)*x1) / denom;
-                delv1 = (vx^2+vz^2) ^ 0.5;
+                delv1 = (vx.^2+vz.^2) .^ 0.5;
                 z3 = s(ii,jj,2) * x1 + b(ii,jj,2);
-                vx = (c(ii,jj,8)*x1+c(ii,jj,9)*x1^2+c(ii,jj,10)*z3+c(ii,jj,11)) / denom^2;
+                vx = (c(ii,jj,8)*x1+c(ii,jj,9)*x1.^2+c(ii,jj,10)*z3+c(ii,jj,11)) / denom.^2;
                 vz = (c(ii,jj,3)+c(ii,jj,4)*x1) / denom;
-                delv3 = (vx^2+vz^2) ^ 0.5;
+                delv3 = (vx.^2+vz.^2) .^ 0.5;
             end
             if ivg(ii,jj) == 3
                 delv2 = 0.0; delv4 = 0.0;
@@ -1279,13 +1279,13 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 x2 = xbnd(ii,jj,2);
                 z2 = s(ii,jj,1) * x2 + b(ii,jj,1);
                 denom = c(ii,jj,6) * x2 + c(ii,jj,7);
-                vx = (c(ii,jj,8)*x2+c(ii,jj,9)*x2^2+c(ii,jj,10)*z2+c(ii,jj,11)) / denom^2;
+                vx = (c(ii,jj,8)*x2+c(ii,jj,9)*x2.^2+c(ii,jj,10)*z2+c(ii,jj,11)) / denom.^2;
                 vz = (c(ii,jj,3)+c(ii,jj,4)*x2) / denom;
-                delv2 = (vx^2+vz^2) ^ 0.5;
+                delv2 = (vx.^2+vz.^2) .^ 0.5;
                 z4 = s(ii,jj,2) * x2 + b(ii,jj,2);
-                vx = (c(ii,jj,8)*x2+c(ii,jj,9)*x2^2+c(ii,jj,10)*z4+c(ii,jj,11)) / denom^2;
+                vx = (c(ii,jj,8)*x2+c(ii,jj,9)*x2.^2+c(ii,jj,10)*z4+c(ii,jj,11)) / denom.^2;
                 vz = (c(ii,jj,3)+c(ii,jj,4)*x2) / denom;
-                delv4 = (vx^2+vz^2) ^ 0.5;
+                delv4 = (vx.^2+vz.^2) .^ 0.5;
             end
             delm = amax1(delv1,delv2,delv3,delv4);
             if delm > delv
@@ -1337,7 +1337,7 @@ end
 
 %% fun_goto999: calculate end for model error
 function fun_goto999()
-    error('\n***  error in velocity model 2 ***\n');
+    error('e:test','\n***  error in velocity model 2 ***\n');
 end
 
 % calculate coefficients of velocity partial derivatives
