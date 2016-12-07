@@ -18,9 +18,6 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     global file_rayinvr_par file_rayinvr_com;
     global fID_12;
     run(file_rayinvr_par);
-    % [~,file_rayinvr_par,~] = fileparts(file_rayinvr_par);
-    % eval(file_rayinvr_par);
-    % rayinvr_par;
     xa = zeros(1,2*(ppcntr+ppvel));
     zsmth = zeros(1,pnsmth);
     run(file_rayinvr_com);
@@ -33,21 +30,22 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         for jj = 1:ppcntr
             if abs(xm(ii,jj)-xmax) < 0.0001, break; end
             nzed(ii) = nzed(ii) + 1;
-        end
+        end % 20
         if nzed(ii) > 1
-            isError1 = xm(ii,1:nzed(ii)-1) >= xm(ii,2:nzed(ii));
-            if any(isError1)
-                fprintf('%11d %11d %11d',1,ii,find(isError1,1));
-                iflagm=1; fun_goto999();
-            end
+            for jj = 1: nzed(ii)-1
+                if xm(ii,jj) >= xm(ii,jj+1)
+                    fprintf('%12d%12d%12d\n',1,ii,jj);
+                    iflagm=1; fun_goto999();
+                end
+            end % 40
             if abs(xm(ii,1)-xmin)>0.001 | abs(xm(ii,nzed(ii))-xmax)>0.001
-                fprintf('%11d %11d',2,ii);
+                fprintf('%11d %11d\n',2,ii);
                 iflagm=1; fun_goto999();
             end
         else
             xm(ii,1) = xmax;
         end
-    end
+    end % 10
 
     % 2. 检查速度模型（顶界面）是否有误
     for ii = 1:nlayer
@@ -58,17 +56,17 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if nvel(ii,1) > 1
             isError3 = xvel(ii,1:nvel(ii,1)-1,1) >= xvel(ii,2:nvel(ii,1),1);
             if any(isError3)
-                fprintf('%11d %11d %11d',3,ii,find(isError3,1));
+                fprintf('%11d %11d %11d\n',3,ii,find(isError3,1));
                 iflagm=1; fun_goto999();
             end
             if abs(xvel(ii,1,1)-xmin)>0.001 | abs(xvel(ii,nvel(ii,1),1)-xmax)>0.001
-                fprintf('%11d %11d',4,ii);
+                fprintf('%11d %11d\n',4,ii);
                 iflagm=1; fun_goto999();
             end
         else
             if vf(ii,1,1)>0, xvel(ii,1,1)=xmax;
             else
-                if ii == 1, fprintf('%11d',5); iflagm=1; fun_goto999();
+                if ii == 1, fprintf('%11d\n',5); iflagm=1; fun_goto999();
                 else nvel(ii,1) = 0; end
             end
         end
@@ -83,11 +81,11 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         if nvel(ii,2) > 1
             isError6 = xvel(ii,1:nvel(ii,2)-1,2) >= xvel(ii,2:nvel(ii,2),2);
             if any(isError6)
-                fprintf('%11d %11d %11d',6,ii,find(isError6,1));
+                fprintf('%11d %11d %11d\n',6,ii,find(isError6,1));
                 iflagm=1; fun_goto999();
             end
             if abs(xvel(ii,1,2)-xmin)>0.001 | abs(xvel(ii,nvel(ii,2),2)-xmax)>0.001
-                fprintf('%11d %11d',7,ii);
+                fprintf('%11d %11d\n',7,ii);
                 iflagm=1; fun_goto999();
             end
         else
@@ -160,18 +158,18 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
             end % 320
             if ivlyr == 1
                 if ii==1
-                    fprintf('%12d',8); iflagm=1; fun_goto999();
+                    fprintf('%12d\n',8); iflagm=1; fun_goto999();
                 end
                 if nzed(ii) ~= nzed(ii-1)
-                    fprintf('%12d%12d',9,ii); iflagm=1; fun_goto999();
+                    fprintf('%12d%12d\n',9,ii); iflagm=1; fun_goto999();
                 end
                 for jj = 1:nzed(ii)
                     if xm(ii,jj) ~= xm(ii-1,jj)
-                        fprintf('%12d%12d%12d',10,ii,jj);
+                        fprintf('%12d%12d%12d\n',10,ii,jj);
                         iflagm=1; fun_goto999();
                     end
                     if zm(ii,jj) ~= zm(ii-1,jj)
-                        fprintf('%12d%12d%12d',11,ii,jj);
+                        fprintf('%12d%12d%12d\n',11,ii,jj);
                         iflagm=1; fun_goto999();
                     end
                     if ivarz(ii-1,jj)==0 & ivarz(ii,jj)==-1
@@ -213,7 +211,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                     if iflag==1 & nvel(ig,jg)==nvel(ii,2)
                         for jj = 1:nvel(ig,jg)
                             if xvel(ig,jj,jg) ~= xvel(ii,jj,2)
-                                fprintf('%12d',12,ii,jj,ig,jg);
+                                fprintf('%12d\n',12,ii,jj,ig,jg);
                                 iflagm=1; fun_goto999();
                             end
                             if ivarv(ig,jj,jg)==0 & ivarv(ii,jj,2)==-1
@@ -221,7 +219,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                             end
                         end % 323
                     else
-                        fprintf('%12d',13,ii,ig,jg);
+                        fprintf('%12d\n',13,ii,ig,jg);
                         iflagm=1; fun_goto999();
                     end
                 end
@@ -296,13 +294,13 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         end % 426
 
         if nvar == 0
-            fprintf('\n***  no parameters varied for inversion  ***\n');
+            fprintf('\n***  no parameters varied for inversion  ***\n\n');
             invr = 0;
         end
 
         if nvar > pnvar
             iflagm = 1;
-            error('e:test','\n***  too many parameters varied for inversion  ***\n');
+            error('e:test','\n***  too many parameters varied for inversion  ***\n\n');
         end
     end
 
@@ -1303,7 +1301,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     end % 910
 
     if idump == 1
-        fprintf(fID_12, 'boundary   slope change (degrees)   between points');
+        fprintf(fID_12, '\nboundary   slope change (degrees)   between points\n');
     end
 
     for ii = 1:ncont

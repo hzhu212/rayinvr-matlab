@@ -1,6 +1,6 @@
   &pltpar  isep=0, itx=1, idata=1,  itxout=2, ivel=0, velht=0.7,
            imod=1, iray=1, ibnd=1, isum=3,idump=0,
-           xwndow=295., ywndow=215., nskip=0, nrskip=30, npskip=1, 
+           xwndow=295., ywndow=215., nskip=0, nrskip=10, npskip=1, 
            ibcol=0, ifcol=1,  ircol=1, itcol=1, iplot=2, iroute=4, vred=4,
    	       modout=2, dxmod=0.010, dzmod=0.010, modi=2,3,4,5,6,7,8,9, 
    	       xmmin=0., xmmax=22.981,	   	   
@@ -31,7 +31,7 @@
 				   zshot=2.1239, 2.1285, 2.1468, 2.1587, 130*0,
 				      
 				   ray=2.3,4.2,5.3,6.3,7.3,8.3,
-				   nray=1000000000,
+				   nray=1000,
 				   aamin=0.01,   aamax=120,
 				   space=1.0,0.1,   
   &end 

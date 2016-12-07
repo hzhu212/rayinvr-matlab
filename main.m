@@ -14,7 +14,7 @@ function main(filePathIn, filePathOut)
 
     clear('global');
     global file_rayinvr_par file_rayinvr_com;
-    global fID_11, fID_12;
+    global fID_11 fID_12;
 
     file_rayinvr_par = 'rayinvr_par.m';
     file_rayinvr_com = 'rayinvr_com.m';
