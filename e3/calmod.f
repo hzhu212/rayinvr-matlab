@@ -1142,6 +1142,7 @@ c
 c
 c     calculation of smooth layer boundaries
 c
+      write(*,'(20f6.2)') (xbnd(1,i,1),i=1,20)
 400   if(ibsmth.gt.0) then
         xsinc=(xmax-xmin)/float(npbnd-1)
         do 600 i=1,nlayer+1

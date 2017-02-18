@@ -18,8 +18,10 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     global file_rayinvr_par file_rayinvr_com;
     global fID_12;
     run(file_rayinvr_par);
-    xa = zeros(1,2*(ppcntr+ppvel));
+    % xa = zeros(1,2*(ppcntr+ppvel));
+    xa = [];
     zsmth = zeros(1,pnsmth);
+    % zsmth = [];
     run(file_rayinvr_com);
     iflagm = 0;
     idvmax = 0;
@@ -96,6 +98,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
 
     % 4. 将模型的每一层都切分成小梯形
     for ii = 1:nlayer
+        xa = [];
         xa(1) = xmin;
         xa(2) = xmax;
         ib = 2;
@@ -144,10 +147,12 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         xa = sort(xa);
 
         nblk(ii) = ib - 1;
-        xbnd(ii,1:nblk(ii),1) = xa(1:nblk(ii))
-        xbnd(ii,1:nblk(ii),2) = xa(2:nblk(ii)+1) % 90
+        xbnd(ii,1:nblk(ii),1) = xa(1:nblk(ii));
+        xbnd(ii,1:nblk(ii),2) = xa(2:nblk(ii)+1); % 90
     end % 50
 
+    % disp(xbnd(1,1:15,1));
+    % disp(xbnd(1,1:15,2));
 
     if invr == 1
         for ii = 1:nlayer
@@ -316,7 +321,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                         c1 = (xm(ii,k+1)-xbnd(ii,jj,1)) / dx;
                         c2 = (xbnd(ii,jj,1)-xm(ii,k)) / dx;
                         z1 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
-                        if ivarz(ii,k) > 0
+                        if ivarz(ii,k) >= 0
                             iv = ivarz(ii,k);
                         else
                             iv = ivarz(ii-1,k);
@@ -330,7 +335,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                         c1 = (xm(ii,k+1)-xbnd(ii,jj,2)) / dx;
                         c2 = (xbnd(ii,jj,2)-xm(ii,k)) / dx;
                         z2 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
-                        if ivarz(ii,k+1) > 0
+                        if ivarz(ii,k+1) >= 0
                             iv = ivarz(ii,k+1);
                         else
                             iv = ivarz(ii-1,k+1);
@@ -1285,7 +1290,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 vz = (c(ii,jj,3)+c(ii,jj,4)*x2) / denom;
                 delv4 = (vx.^2+vz.^2) .^ 0.5;
             end
-            delm = amax1(delv1,delv2,delv3,delv4);
+            delm = max([delv1,delv2,delv3,delv4]);
             if delm > delv
                 delv = delm;
                 ibd = jj;
@@ -1309,7 +1314,7 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
         [ips1,ips2] = deal(0);
         if nzed(ii) > 2
             for jj = 1: nzed(ii)-2
-                slope1 = (zm(ii,jj+1)-zm(ii,jj)) / (xm(ii,jj+1)-xm(ii,jj))
+                slope1 = (zm(ii,jj+1)-zm(ii,jj)) / (xm(ii,jj+1)-xm(ii,jj));
                 slope2 = (zm(ii,jj+2)-zm(ii,jj+1)) / (xm(ii,jj+2)-xm(ii,jj+1));
                 ds1 = atan(slope1) * pi18;
                 ds2 = atan(slope2) * pi18;

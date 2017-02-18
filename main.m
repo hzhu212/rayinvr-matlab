@@ -13,8 +13,9 @@ function main(filePathIn, filePathOut)
     end
 
     clear('global');
-    global file_rayinvr_par file_rayinvr_com;
+    global file_rayinvr_par file_rayinvr_com file_main_par;
     global fID_11 fID_12;
+    global file_iout file_nout;
 
     file_rayinvr_par = 'rayinvr_par.m';
     file_rayinvr_com = 'rayinvr_com.m';
@@ -55,21 +56,22 @@ function main(filePathIn, filePathOut)
     %% 2 main
     % 如果未指定xmax，则程序结束
     if xmax < -99998
-        error('e:test','\n***  xmax not specified  ***\n');
+        error('e:test','\n***  xmax not specified  ***\n\n');
     end
     % 如果imodf不等于1，表面速度模型保存在r.in文件的最后部分；否则，有专门的v.in文件保存
     if imodf ~= 1
         % ?... iunit=10 read(10,1)
-        error('e:test','\n***  model must be load from file v.in, not r.in  ***\n');
+        error('e:test','\n***  by HeZhu: model must be load from file v.in, not r.in  ***\n\n');
     end
     if mod(ppcntr,10) ~= 0 | mod(ppvel,10) ~= 0
-        % ?...将4个namelist中的所有变量保存到n.out文件
-        error('e:test','\n***  array size error for number of model points  ***\n');
+        fun_goto9999();
+        error('e:test','\n***  array size error for number of model points  ***\n\n');
+        return;
     end
 
     % 2.1 读入v.in
     % [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
-    [model,LN,~,~,~,~,~,~,~,mError] = fun_load_vin(file_vin);
+    [model,LN,xmin,xmax,zmin,zmax,~,~,~,mError] = fun_load_vin(file_vin);
     error(mError);
     % 将得到的模型（model）转为源程序中的形式：xm,zm,ivarz；xvel,vf,ivarv
     % 由于模型每层存储的数组是不等长的，所以通过cell来保存，而不是二维矩阵。
@@ -166,13 +168,14 @@ function main(filePathIn, filePathOut)
         ngroup = length(ray);
     end
     if ngroup == 0
-        error('e:test','\n***  no ray codes specified  ***\n');
+        fprintf('\n***  no ray codes specified  ***\n\n');
         % ?... go to 900
+        fun_goto900();
     end
 
     ifrbnd = 0;
     if any( frbnd(1:ngroup)<0 ) | any( frbnd(1:ngroup)>pfrefl )
-        error('e:test','\n***  error in array frbnd  ***\n');
+        error('e:test','\n***  error in array frbnd  ***\n\n');
     end
     if any( frbnd(1:ngroup)>0 )
         ifrbnd = 1;
@@ -183,7 +186,7 @@ function main(filePathIn, filePathOut)
         [nfrefl,xfrefl,zfrefl,ivarf] = fun_load_fin(file_fin);
 
         if any( frbnd(1:ngroup)>nfrefl )
-            error('e:test','\n***  error in array frbnd  ***\n');
+            error('e:test','\n***  error in array frbnd  ***\n\n');
         end
     end
 
@@ -193,6 +196,19 @@ function main(filePathIn, filePathOut)
     iflagm = 0;
     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
     = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
+    % disp(ncont);
+    % disp(pois(1:10));
+    % disp(poisb(1:10));
+    % disp(poisl(1:10));
+    % disp(poisbl(1:10));
+    % disp(invr);
+    % disp(iflagm);
+    % disp(ifrbnd);
+    % disp(xmin1d);
+    % disp(xmax1d);
+    % disp(insmth(1:10));
+    % disp(xminns);
+    % disp(xmaxns);
 
     if abs(modout) ~= 0 | ifd > 1
         if xmmin < -999998, xmmin = xmin; end
@@ -206,7 +222,7 @@ function main(filePathIn, filePathOut)
         nz = round((zmax-zmin)./dzmod);
 
         if abs(modout) >= 2
-            sample(1:nz,1:nx) = 0;
+            sample(1:nz,1:nx) = 0; % 4020 4010
         end
     end
 
@@ -218,21 +234,25 @@ function main(filePathIn, filePathOut)
     end
 
     if idvmax > 0 | idsmax > 0
-        disp(' ');
+        fprintf(' \n');
         fprintf(fID_11,' \n');
         if idvmax > 0
-            disp(ldvmax(1:idvmax));
-            fprintf(fID_11,'large velocity gradient in layers: \n');
+            fprintf('large velocity gradient in layers: '); % 865
+            fprintf('%4d',ldvmax(1:idvmax));
+            fprintf('\n');
+            fprintf(fID_11,'large velocity gradient in layers: ');
             fprintf(fID_11,'%4d',ldvmax(1:idvmax));
             fprintf(fID_11,'\n');
         end
         if idsmax > 0
-            disp(ldsmax(1:idsmax));
-            fprintf(fID_11,'large slope change in boundaries:  \n');
+            fprintf('large slope change in boundaries:  '); % 875
+            fprintf('%4d',ldsmax(1:idsmax));
+            fprintf('\n');
+            fprintf(fID_11,'large slope change in boundaries:  ');
             fprintf(fID_11,'%4d',ldsmax(1:idsmax));
             fprintf(fID_11,'\n');
         end
-        disp(' ');
+        fprintf(' \n');
         fprintf(fID_11,' \n');
     end
 
@@ -255,7 +275,7 @@ function main(filePathIn, filePathOut)
             ishotw(nshot) = ii;
             ishotr(nshot) = 2 * ii;
         end
-    end
+    end % 290
 
 
     % calculate the z coordinate of shot points if not specified by the
@@ -270,22 +290,22 @@ function main(filePathIn, filePathOut)
                 if xshota(ii)>=xbnd(1,jj,1) & xshota(ii)<=xbnd(1,jj,2)
                     zshota(ii) = s(1,jj,1)*xshota(ii)+b(1,jj,1)+zshift;
                 end
-            end
+            end % 310
         end
-    end
+    end % 300
 
 
     % assign default value to nray if not specified or nray(1) if only
     % it is specified and also ensure that nray<=pnrayf
     if nray(1) < 0
-        nray(1:prayf) = 10;
+        nray(1:prayf) = 10; % 320
     else
         if nray(2) < 0
             if nray(1) > pnrayf, nray(1) = pnrayf; end
-            nray(2:prayf) = nray(1);
+            nray(2:prayf) = nray(1); % 330
         else
             nray(nray(1:prayf)<0) = 10;
-            nray(nray(1:prayf)>pnrayf) = pnrayf;
+            nray(nray(1:prayf)>pnrayf) = pnrayf; % 340
         end
     end
 
@@ -296,10 +316,10 @@ function main(filePathIn, filePathOut)
 
     % check array ncbnd for array values greater than pconv
     if any(ncbnd(1:prayf)>pconv)
+        fprintf('\n***  max converting boundaries exceeded  ***\n\n'); % 135
         % ?... go to 900
-        error('e:test','\n***  max converting boundaries exceeded  ***\n');
-    end
-    % 470
+        fun_goto900();
+    end % 470
 
 
     % plot velocity model
@@ -307,22 +327,21 @@ function main(filePathIn, filePathOut)
         fun_pltmod();
     end
 
-
     % calculation of smooth layer boundaries
     % size(cosmth),size(xsinc),size(zsmth)
     if ibsmth > 0
         for ii = 1:nlayer+1
             zsmth(1) = (cosmth(ii,2)-cosmth(ii,1)) ./ xsinc;
-            zsmth(2:npbnd-1) = (cosmth(ii,3:npbnd)-cosmth(ii,0:npbnd-2)) ./ (2.0*xsinc);
+            zsmth(2:npbnd-1) = (cosmth(ii,3:npbnd)-cosmth(ii,1:npbnd-2)) ./ (2.0*xsinc);
             zsmth(npbnd) = (cosmth(ii,npbnd)-cosmth(ii,npbnd-1)) ./ xsinc;
             cosmth(ii,1:npbnd) = atan(zsmth(1:npbnd));
         end % 680
     end
     if(isep>1 & ibsmth==2), ibsmth=1; end
 
-    disp('shot  ray i.angle  f.angle   dist     depth red.time  npts code');
+    fprintf(fID_11,'shot  ray i.angle  f.angle   dist     depth red.time  npts code\n'); % 35
     if idump == 1
-        fprintf('\ngr ray npt   x       z      ang1    ang2    v1     v2  lyr bk id iw\n');
+        fprintf(fID_12,'\ngr ray npt   x       z      ang1    ang2    v1     v2  lyr bk id iw\n'); % 45
     end
 
     if nrskip<1, nrskip=1; end
@@ -331,12 +350,13 @@ function main(filePathIn, filePathOut)
     crit = crit ./ pi18;
 
     if any(nrbnd(1:prayf)>prefl)
+        fprintf('\n***  max reflecting boundaries exceeded  ***\n\n');
         % ?... go to 900
-        error('e:test','\n***  max reflecting boundaries exceeded  ***\n');
+        fun_goto900();
     end % 260
 
     if any(rbnd(1:preflt)>nlayer)
-        disp(sprintf('\n***  reflect boundary greater than # of layers  ***\n'));
+        fprintf('\n***  reflect boundary greater than # of layers  ***\n\n');
     end % 710
 
     if nsmax(1) < 0
@@ -387,7 +407,7 @@ function main(filePathIn, filePathOut)
     if nshot==0, isGoto1000=true; end
 
     if ~isGoto1000
-    for is = 1:nshot
+    for is = 1:nshot % 60
         ist = ist + 1;
         id = idr(is);
         fid = id;
@@ -418,9 +438,10 @@ function main(filePathIn, filePathOut)
             end
         end
         if ics == 1
-            [xpt,zpt,layers,iblks,iflag] = fun_xzpt(xpt,zpt,layers,iblks,iflag);
+            [layer1,iblk1,iflags] = deal([]);
+            [xshotr,zshotr,layer1,iblk1,iflags] = fun_xzpt(xshotr,zshotr,layer1,iblk1,iflags);
             if iflags == 1
-                fprintf(fID_11,'***  location of shot point outside model  ***\n');
+                fprintf(fID_11,'***  location of shot point outside model  ***\n\n');
                 continue;
             end
 
@@ -465,7 +486,7 @@ function main(filePathIn, filePathOut)
             if idt == 2
                 if nrbnd(ii) > (prefl-1)
                     fprintf('\n***  max reflecting boundaries exceeded  ***\n\n');
-                    fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n',ishotw(is),ray(ii));
+                    fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n\n',ishotw(is),ray(ii));
                     nrayr = 0;
                     isGoto69 = true;
                 end
@@ -549,9 +570,17 @@ function main(filePathIn, filePathOut)
                 end
             end
             if ~isGoto69 % --2.1.1
+
             % ?... call auto()
+            [xshotr,zshotr,ii,ifam,idl,idt,aminr,amaxr,aamin,aamax,...
+                layer1,iblk1,aainc,aaimin,nsmax(ii),iflag,iturn(ii),amin(ia0),...
+                amax(ia0),ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin(ii)] = ...
+            fun_auto(xshotr,zshotr,ii,ifam,idl,idt,aminr,amaxr,aamin,aamax,...
+                layer1,iblk1,aainc,aaimin,nsmax(ii),iflag,iturn(ii),amin(ia0),...
+                amax(ia0),ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin(ii));
+
             if iflag ~= 0
-                fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n',ishotw(is),ray(ii));
+                fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n\n',ishotw(is),ray(ii));
                 nrayr = 0;
                 nrayl = nrayl + 1;
                 iflagl = 1;
@@ -560,7 +589,7 @@ function main(filePathIn, filePathOut)
             if ~isGoto69 % --2.1.1.1
             if amaxr==aminr & ihdwf~=1
                 if nrayr > 1
-                    fprintf(fID_11,'***  shot#%4d ray code%5.1f 1 ray traced  ***\n',ishotw(is),ray(ii));
+                    fprintf(fID_11,'***  shot#%4d ray code%5.1f 1 ray traced  ***\n\n',ishotw(is),ray(ii));
                     nrayl = nrayl + 1;
                     iflagl = 1;
                 end
@@ -611,7 +640,7 @@ function main(filePathIn, filePathOut)
                         if i2flag==1 & ivray(ii)==irayf
                             no2pt = no2pt + 1;
                             if no2pt > min(pnrayf,pnobsf)
-                                fprintf('***  pnrayf or pnobsf exceeded  ***\n');
+                                fprintf('***  pnrayf or pnobsf exceeded  ***\n\n');
                                 break; % go to 1199
                             end
                             xo2pt(no2pt) = xf;
@@ -829,12 +858,12 @@ function main(filePathIn, filePathOut)
     end
 
     if irkc == 1
-        fprintf('\n***  possible inaccuracies in rngkta  ***\n');
-        fprintf(fID_11,'\n***  possible inaccuracies in rngkta  ***\n');
+        fprintf('\n***  possible inaccuracies in rngkta  ***\n\n');
+        fprintf(fID_11,'\n***  possible inaccuracies in rngkta  ***\n\n');
     end
 
     if nrayl > 0
-        tempstr = sprintf('\n***  less than nray rays traced for %4d ray groups  ***\n',nrayl);
+        tempstr = sprintf('\n***  less than nray rays traced for %4d ray groups  ***\n\n',nrayl);
         fprintf(tempstr);
         fprintf(fID_11, tempstr);
     end
@@ -915,53 +944,55 @@ end
 function fun_writeNamelist(fid,name,namelist)
     eval(['global ',namelist]);
     clist = strsplit(namelist);
-    if clist{end}=='', clist(end)=[]; end
-    fprintf(fid, '&%s\n', name);
-    for parname = clist
-        fprintf(fid, '%s=', parname);
-        par = eval(parname);
-        ii = 1; count = 1;
-        par = [par, -123454321]
-        while ii < length(par)
-            if par(ii) ~= par(ii+1)
-                if count == 1
-                    fprintf(fid, '  %10f    ,', par(ii));
-                else
-                    fprintf(fid, ' %d*%10f      ,', count,par(ii));
-                end
-                count = 1;
-            else
-                count = count + 1;
-            end
-            ii = ii + 1;
-        end
-        fprintf(fid, '\n');
+    for h = 1:length(clist)
+        if isempty(strtrim(clist{h})), clist(h)=[]; end
     end
-    fprintf(fid, ' /\n');
+    fprintf(fid, '&%s\n', name);
+    for h = 1:length(clist)
+        parname = clist{h};
+        par = eval(parname);
+        tempLen = min(10,length(par));
+        isFloat = any(par(1:tempLen) > floor(par(1:tempLen)));
+        if isFloat, formatStr = ' %.2f';
+        else formatStr = ' %d'; end
+        fprintf(fid, '  %s =', parname);
+        tempSize = size(par);
+        for ii = 1:tempSize(1)
+            fprintf(fid, formatStr, par(ii,:));
+            if ii<tempSize(1), fprintf(fid, '\n'); end
+        end
+        if h<length(clist), fprintf(fid, ',\n'); end
+    end
+    fprintf(fid, '/\n');
 end
 
 % 9000
 function fun_goto900()
+    global file_rayinvr_par file_rayinvr_com file_main_par;
     global fID_11;
+    global file_iout;
+    run(file_rayinvr_par);
+    run(file_rayinvr_com);
+    run(file_main_par);
+
     ntblk = sum(nblk(1:nlayer)); % 920
     tempstr = sprintf(['\n|------------------------------------------',...
         '----------------------|\n|%64s|\n'], ''); % 935
-    if isum>0, disp(tempstr); end
+    if isum>0, fprintf(tempstr); end
     fprintf(fID_11, tempstr);
     if ntpts > 0
         tempstr = sprintf(['| total of %6d rays consisting of %8d points ',...
             'were traced |\n|%64s|\n'], ntray,ntpts,''); % 905
     else
-        tempstr = sprintf(['|                   ***  no rays traced  ***',...
-            '%21s|\n|%64s|\n'], '',''); % 915
+        tempstr = sprintf('|%20s***  no rays traced  ***%20s|\n|%64s|\n','','',''); % 915
     end
-    if isum>0, disp(tempstr); end
+    if isum>0, fprintf(tempstr); end
     fprintf(fID_11, tempstr);
 
     tempstr = sprintf(['|           model consists of %2d layers and %3d ',...
         'blocks           |\n|%64s|\n|----------------------------------',...
         '------------------------------|\n\n'], nlayer,ntblk,''); % 925
-    if isum>0, disp(tempstr); end
+    if isum>0, fprintf(tempstr); end
     fprintf(fID_11, tempstr);
 
     if invr == 1
