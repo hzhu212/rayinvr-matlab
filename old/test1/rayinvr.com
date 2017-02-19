@@ -1,8 +1,8 @@
-c      
+c
 c     version 1.3  Aug 1992
 c
 c     common blocks for RAYINVR
-c           
+c
 c     ----------------------------------------------------------------
 c
       integer refll(prefl+1),nblk(player),ivarz(player,ppcntr),
@@ -14,6 +14,8 @@ c
      +        icalc(prayi),npfref(pfrefl),colour(pcol),mcol(5),
      +        ivarf(pfrefl,ppfref),ircalc(prayi),
      +        nbnda(piray),sample(pzgrid,pxgrid)
+
+c     zh: real*4表示4字节的单精度实数类型，而real*8表示8字节的双精度实数类型
       real*4 c(player,ptrap,11),s(player,ptrap,2),b(player,ptrap,2),
      +       vm(player,ptrap,4),xbnd(player,ptrap,2),xshtar(pray),
      +       xm(pncntr,ppcntr),zm(pncntr,ppcntr),fidarr(pray),
@@ -29,8 +31,17 @@ c
      +       upf(prayi+pshot2+1),xcalc(prayi),xscalc(prayi),
      +       xfrefl(pfrefl,ppfref),zfrefl(pfrefl,ppfref),
      +       mtan(pitan2),btan(pitan2),mcotan(pitan2),bcotan(pitan2)
+c
+c     zh: 声明title为长度80的字符串
       character title*80
 c
+c     zh: common语句用于开辟公用区，是一种老式的用法，现在不太提倡使用。
+c         如common /blk1/ layer,iblk,id,fid,fid1表示在公用区blk1中有变量
+c         layer,iblk,id,fid,fid1，在调用子程序时,不必传送这些数据,只要在
+c         子程序中也写上同样的一条公用语句,变量的值就可以直接调用。
+C         公共区的含义有些类似于全局变量
+c         common是根据顺序来对应，而不是变量名字。所以现在不推荐使用common
+c         这种老语法了。
       common /blk1/ layer,iblk,id,fid,fid1
       common /blk2/ c,ivg
       common /blk3/ s,b,vm
@@ -69,4 +80,3 @@ c
       common /blk27/ nbnd,nbnda,npskip,npskp
       common /blktan/ mtan,btan,mcotan,bcotan,factan
       common /cplot/ iplot,isep,iseg,nseg,xwndow,ywndow,ibcol,ifcol,sf
-c

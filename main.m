@@ -12,6 +12,9 @@ function main(filePathIn, filePathOut)
         end
     end
 
+    addpath(genpath('functions'));
+    % addpath(genpath(fullfile(pwd(),'functions')));
+
     clear('global');
     global file_rayinvr_par file_rayinvr_com file_main_par;
     global fID_11 fID_12;

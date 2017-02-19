@@ -225,8 +225,11 @@ c
         go to 9999
       end if
 c
+C       write(*,'("iunit: ",i3,",player: ",i3)') iunit,player
+C       write(*,'("ppcntr: ",i3,",ppvel: ",i3)') ppcntr,ppvel
       nrzmax=ppcntr/10
       nrvmax=ppvel/10
+C       iunit=20, player=42, ppcntr=ppvel=300
       do 20 icont=1,player+1
          nrz=1
          j1=1
@@ -236,8 +239,10 @@ c
          read(iunit,15,end=999) icnt,(zm(icont,j),j=j1,j2)
          read(iunit,235,end=99) (ivarz(icont,j),j=j1,j2)
 15       format(i2,1x,10f7.2)
+C 15       format(i2,1x,10f8.3)
 c235      format(3x,10i7)
 235      format(3x,10(5x,i2))
+C 235      format(3x,10(6x,i2))
          nrz=nrz+1
          if(icnt.ne.1) go to 211
          j1=j1+10
@@ -271,6 +276,9 @@ c235      format(3x,10i7)
 20    continue
 c
 99    nlayer=ncont-1
+C       write(*,'("nlayer: ",i3)') nlayer
+C     nlayer=4
+C       write(*,'("xm(1): ",15f6.2)') (xm(1,i),i=1,15)
 c
 c     open I/O units
 c
@@ -414,24 +422,11 @@ c 575     format(3x,<npfref(nfrefl)>i7)
 550     continue
       end if
 c
+C       write(*,'("xm(1): ",11f6.2)') (xm(1,i),i=1,11)
 c     calculate velocity model parameters
-c
       call calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,
      +            xmin1d,xmax1d,insmth,xminns,xmaxns)
-C       write(*,*) ncont
-C       write(*,'("pois:  ",10f8.2)') (pois(i),i=1,10)
-C       write(*,'("poisb: ",10i8)') (poisb(i),i=1,10)
-C       write(*,'("poisl: ",10i8)') (poisl(i),i=1,10)
-C       write(*,'("poisbl: ",10f8.2)') (poisbl(i),i=1,10)
-C       write(*,*) invr
-C       write(*,*) iflagm
-C       write(*,*) ifrbnd
-C       write(*,*) xmin1d
-C       write(*,*) xmax1d
-C       write(*,'("insmth: ",10i8)') (insmth(i),i=1,10)
-C       write(*,*) xminns
-C       write(*,*) xmaxns
-c
+C c
       if(abs(modout).ne.0.or.ifd.gt.1) then
 c
         if(xmmin.lt.-999998) xmmin=xmin
@@ -453,7 +448,7 @@ c
         end if
 c
       end if
-c
+C c
       if(itx.ge.3.and.invr.eq.0) itx=2
       if(itxout.eq.3.and.invr.eq.0) itxout=2
       if(invr.eq.0.and.abs(idata).eq.2) idata=sign(1,idata)
@@ -550,12 +545,16 @@ c
 c
 c     plot velocity model
 c
-      if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.lt.2)
-     + call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
-     + idata,iroute,i33)
+C       if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.lt.2)
+C      + call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
+C      + idata,iroute,i33)
 c
 c     calculation of smooth layer boundaries
 c
+C       write(*,*) "hello==================="
+C       write(*,'(f8.3)') xsinc
+C       write(*,*) "hello==================="
+
       if(ibsmth.gt.0) then
         do 680 i=1,nlayer+1
            zsmth(1)=(cosmth(i,2)-cosmth(i,1))/xsinc
@@ -710,10 +709,10 @@ c
            end if
 c
            if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.gt.1) then
-             if(iflagp.eq.1) call aldone
+C              if(iflagp.eq.1) call aldone
              iflagp=1
-             call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
-     +                   idata,iroute,i33)
+C              call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
+C      +                   idata,iroute,i33)
            end if
 c
          end if
@@ -742,6 +741,7 @@ c
             ifam=ifam+1
             nrayr=nray(i)
             iflagl=0
+C             write(*,*) '---test---'
             ibrka(ifam)=ibreak(i)
             ivraya(ifam)=ivray(i)
             do 870 j=1,nlayer
@@ -834,6 +834,7 @@ c
                 go to 69
               end if
             end if
+C             write(*,*) iflag
 c
             call auto(xshotr,zshotr,i,ifam,idl,idt,aminr,amaxr,
      +         aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax(i),
@@ -847,6 +848,7 @@ c
               nrayr=0
               nrayl=nrayl+1
               iflagl=1
+C               write(*,*) '---test---'
               go to 69
             end if
             if(amaxr.eq.aminr.and.ihdwf.ne.1) then
@@ -1070,8 +1072,8 @@ c
                if(((iray.eq.1.or.(iray.eq.2.and.vr(npt,2).gt.0.)).
      +         and.mod(ir-1,nrskip).eq.0.and.irs.gt.0).or.
      +         (irays.eq.1.and.irs.eq.0)) then
-                 call pltray(npt,max(nskip,nhskip),idot,irayps,istep,
-     +                       angled)
+C                  call pltray(npt,max(nskip,nhskip),idot,irayps,istep,
+C      +                       angled)
                  if(i33.eq.1) then
                    if(iszero.eq.1) then
                      xwr=abs(xshtar(ntt-1)-xobs)
@@ -1127,10 +1129,11 @@ c
      +                    idr(is),ximax,iflagw,iszero,x2pt)
             if(iflagw.eq.1) iflagi=1
 c
-            if(iray.gt.0.or.irays.eq.1) call empty
+C             if(iray.gt.0.or.irays.eq.1) call empty
 c
             nrayr=nrg
 69          if(iflagl.eq.1) then
+C               write(*,*) '---test---'
               flag='*'
             else
               flag=' '
@@ -1143,19 +1146,19 @@ c
 c
 70       continue
 c
-         if(isep.eq.2.and.((itx.gt.0.and.ntt.gt.1).or.idata.ne.0.or.
-     +     itxout.gt.0)) call plttx(ifam,itt,iszero,idata,iaxlab,
-     +     xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,
-     +     float(idr(is)),itxbox,iroute,iline)
+C          if(isep.eq.2.and.((itx.gt.0.and.ntt.gt.1).or.idata.ne.0.or.
+C      +     itxout.gt.0)) call plttx(ifam,itt,iszero,idata,iaxlab,
+C      +     xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,
+C      +     float(idr(is)),itxbox,iroute,iline)
 c
 60    continue
 c
 1000  if((isep.lt.2.or.isep.eq.3).and.((itx.gt.0.and.ntt.gt.1).or.
      +  idata.ne.0.or.itxout.gt.0)) then
-        if(isep.gt.0.and.iplots.eq.1) call aldone
-        call plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,
-     +  itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,
-     +  iline)
+C         if(isep.gt.0.and.iplots.eq.1) call aldone
+C         call plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,
+C      +  itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,
+C      +  iline)
       end if
 c
       if(itxout.gt.0) write(17,930) 0.,0.,0.,-1
@@ -1352,7 +1355,7 @@ c                write(44,867) xsc,chi
         end if
       end if
 c
-      if(iplots.eq.1) call plotnd(1)
+C       if(iplots.eq.1) call plotnd(1)
 c
 9999  if(idump.eq.1) then
 c
@@ -1371,4 +1374,16 @@ c
 c
       go to 9999
 c
+
+
+
+
+      write(*,'(30i5)') nray
+      nray = 1
+      write(*,'(30i5)') nray
+      write(*,'(f8.4)') xsinc
+
+
       end
+
+c

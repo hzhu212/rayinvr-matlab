@@ -5,18 +5,6 @@ c     Calmod routine for RAYINVR
 c
 c     ----------------------------------------------------------------
 c
-C     ncont: 模型总层数（包括最后一层）
-C     pois: Poisson's ratio，数组，保存模型中每一层的泊松比
-C     poisl: Poisson layer, 数组，泊松比的层索引
-C     poisb: Poisson block, 数组，泊松比的块索引（模型中每层包含许多小块）
-C     poisbl: 数组，按照poisl和poisb两个索引来存储的泊松比，将会覆盖pois数组的内容
-C     iflagm: i-flag-model,代表模型是否有误，0-正常，1-模型错误
-C     invr: 计算所选定模型参数的偏微分，并把结果写入到i.out文件
-C     ifrbnd: 为1说明读取了f.in文件
-C     insmth: 非-smooth，数组，列出未使用光滑边界模拟的层面
-C     xminns,xmaxns: 限定最小模型距离和最大模型距离，当ibsmth=1或2时，insmth
-C       中所列出的层一旦超出该范围将不做光滑处理
-C     pncntr: player+1，player为模型分层数，pncntr则为模型层界面数
       subroutine calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,
      +                  ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns)
 c
@@ -24,64 +12,33 @@ c     calculate model parameters now for use later in program
 c
 c
       include 'rayinvr.par'
-C     除 xa 之外，其他变量都在 main 函数中声明过了，此处作为参数传入，
-C     保持其原有的值。但zsmth变量虽在main中声明，但并未传入，会初始化为
-C     一个全新的变量。几个向量的长度均为const常量，定义在rayinvr.par中
       real xa(2*(ppcntr+ppvel)),pois(player),poisbl(papois),
      +     zsmth(pnsmth)
       integer poisb(papois),poisl(papois),insmth(pncntr)
       include 'rayinvr.com'
-
       iflagm=0
       idvmax=0
       idsmax=0
 c
-C     xm: 保存形状模型中的x坐标
-C     zm: 保存形状模型中的z坐标
-C     nzed: 计数形状模型的每个layer中有多少个节点，少一个！
-
-C     1. 检查形状模型是否有误
-C       write(0,'("xm(1): ",11f6.2)') (xm(1,j),j=1,11)
-      nzed = 1
+C       write(*,*) xmin,xmax
       do 10 i=1,ncont
          do 20 j=1,ppcntr
-C           只取得模型x坐标小于xmax的部分，超出部分直接截去。到达xmax附近时
-C           跳出循环
             if(abs(xm(i,j)-xmax).lt..0001) go to 30
             nzed(i)=nzed(i)+1
-C             if(abs(xm(i,j)-xmax).lt..0001) then
-C               write(*,*) j,xm(i,j),xmax,nzed(i)
-C               go to 30
-C             end if
 20       continue
-C         write(0,'("nzed[]: ",4i3)') (nzed(j),j=1,4)
 30       if(nzed(i).gt.1) then
-C          模型每层节点的x坐标应为递增的，否则视为模型错误（类型1）
            do 40 j=1,nzed(i)-1
-C             write(0,*)很可能是屏幕输出，但不确定，与编译器有关
-C             10以下的文件通道号，不建议用户使用！
               if(xm(i,j).ge.xm(i,j+1)) write(0,*) 1,i,j
               if(xm(i,j).ge.xm(i,j+1)) go to 999
 40         continue
-C          如果模型每层的第一个节点和最后一个节点的x坐标与xmin和xmax不符，
-C          视为模型错误（类型2）
-C            if(abs(xm(i,1)-xmin).gt..001.or.
-C      +        abs(xm(i,nzed(i))-xmax).gt..001) write(0,*) 2,i
            if(abs(xm(i,1)-xmin).gt..001.or.
-     +        abs(xm(i,nzed(i))-xmax).gt..001) then
-             write(0,*) 2,i
-           end if
+     +        abs(xm(i,nzed(i))-xmax).gt..001) write(0,*) 2,i
            if(abs(xm(i,1)-xmin).gt..001.or.
      +        abs(xm(i,nzed(i))-xmax).gt..001) go to 999
          else
-C        如果模型该层没有（被上一步全部截去了），则留下一个默认值xmax
             xm(i,1)=xmax
          end if
 10    continue
-
-C     2. 检查速度模型（顶界面）是否有误
-C     nlayer: ncont-1,即模型的有效层数（最后一层无信息，去掉）
-      nvel = 1
       do 11 i=1,nlayer
          do 21 j=1,ppvel
             if(abs(xvel(i,j,1)-xmax).lt..0001) go to 31
@@ -109,8 +66,6 @@ C     nlayer: ncont-1,即模型的有效层数（最后一层无信息，去掉�
            end if
          end if
 11    continue
-
-C     3. 检查速度模型（底界面）是否有误
       do 12 i=1,nlayer
          do 22 j=1,ppvel
             if(abs(xvel(i,j,2)-xmax).lt..0001) go to 32
@@ -134,16 +89,6 @@ C     3. 检查速度模型（底界面）是否有误
          end if
 12    continue
 c
-C     4. 将模型的每一层都切分成小梯形（小梯形的左右两侧都是竖直的）
-C       切分规则：对每一层分别找出形状模型和速度模型上的所有节点（外加xmin和
-C       xmax两个节点），然后从每个节点出发向模型内做竖直线，这样每两条竖直
-C       线之间便得到了一个小梯形。同时需要注意去除重复的竖直线：每条竖直线
-C       与此前的竖直线（先形状节点后速度节点）之间拉开一定距离才被视为两条
-C       不同的线（>0.005），否则视为同一条线，只保留先做的。
-C       最终划分结果保存在xbnd数组中。
-C       nblk: 一维数组，保存模型的每一层被划分呈的小梯形的数目
-C       xbnd: 三维数组，保存各个小梯形的左竖直边与右竖直边的x坐标
-C        前2维是该小梯形在模型中的位置索引，后1维表示是左边（1）还是右边（2）
       do 50 i=1,nlayer
          xa(1)=xmin
          xa(2)=xmax
@@ -177,7 +122,6 @@ C        前2维是该小梯形在模型中的位置索引，后1维表示是左
              is=1
            end if
          end if
-
          do 71 j=1,nvel(il,is)
             do 81 k=1,ih
                if(abs(xvel(il,j,is)-xa(k)).lt..005) go to 71
@@ -185,7 +129,6 @@ C        前2维是该小梯形在模型中的位置索引，后1维表示是左
             ib=ib+1
             xa(ib)=xvel(il,j,is)
 71       continue
-
          if(nvel(i,2).gt.0) then
            ih=ib
            do 72 j=1,nvel(i,2)
@@ -214,7 +157,7 @@ c
 90       continue
 c
 50    continue
-C c
+c
       if(invr.eq.1) then
         do 310 i=1,nlayer
            ivlyr=0
@@ -366,9 +309,9 @@ c
         end if
 c
       end if
-C c
-C c     calculate slopes and intercepts of each block boundary
-C c
+c
+c     calculate slopes and intercepts of each block boundary
+c
       do 100 i=1,nlayer
          do 110 j=1,nblk(i)
             xbndc=xbnd(i,j,1)+.001
@@ -495,9 +438,11 @@ c
 c
 110      continue
 100   continue
-C c
-C c     assign velocities to each model block
-C c
+C       write(*,'(20f6.2)') (xbnd(1,i,1),i=1,20)
+C       write(*,'(20f6.2)') (xbnd(1,i,2),i=1,20)
+c
+c     assign velocities to each model block
+c
       do 160 i=1,nlayer
 c
          if(nvel(i,1).eq.0) then
