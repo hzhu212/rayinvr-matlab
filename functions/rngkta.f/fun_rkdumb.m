@@ -1,4 +1,7 @@
 % rngkta.f
+% [y,~,~,~]
+% called by: fun_trace;
+% call: none.
 
 function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
 % routine to solve a 2x2 system of first order o.d.e.'s

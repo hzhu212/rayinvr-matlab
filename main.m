@@ -1,3 +1,10 @@
+% \bvar\b(\(.*\))*\s*=[^=]
+% call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr;
+% fun_ttime; fun_cells; fun_fxtinv; fun_sort3; fun_calprt; fun_fd;
+% fun_load_vin; fun_trans_rin2m; fun_load_txin; fun_load_fin;
+
+% fun_aldone; fun_pltmod; fun_plttx; fun_pltray; fun_empty; fun_plotnd;
+
 function main(filePathIn, filePathOut)
     % main function for rayinvr, all variables are global
     %
@@ -17,7 +24,7 @@ function main(filePathIn, filePathOut)
 
     clear('global');
     global file_rayinvr_par file_rayinvr_com file_main_par;
-    global fID_11 fID_12;
+    global fID_11 fID_12 fID_31;
     global file_iout file_nout;
 
     file_rayinvr_par = 'rayinvr_par.m';
@@ -327,7 +334,8 @@ function main(filePathIn, filePathOut)
 
     % plot velocity model
     if (imod==1 | iray>0 | irays==1) & isep<2
-        fun_pltmod();
+        [ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33] ...
+        = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
     end
 
     % calculation of smooth layer boundaries
@@ -451,9 +459,12 @@ function main(filePathIn, filePathOut)
             if (imod==1 | iray>0 | irays==1) & isep>1
                 if iflagp == 1
                     % ?... call aldone
+                    fun_aldone();
                 end
                 iflagp = 1;
                 % ?... call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33)
+                [ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33] ...
+                = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
             end
         end
         irbnd = 0;
@@ -768,8 +779,12 @@ function main(filePathIn, filePathOut)
                 nhskip = 0;
 
                 % call trace()
+                [npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout] ...
+                = fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
 
                 % call ttime()
+                [ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf] ...
+                = fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
 
                 if irs == 0
                     ic2pt = ic2pt + 1;
@@ -782,6 +797,7 @@ function main(filePathIn, filePathOut)
 
                 if ((iray==1 | (iray==2 & vr(npt,2)>0.0)) & mod(ir-1,nrskip)==0 & irs>0) | (irays==1 & irs==0)
                     % call pltray()
+                    [npt,max(nskip,nhskip),idot,irayps,istep,angled] = fun_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
                     if i33 == 1
                         if iszero == 1, xwr=abs(xshtar(ntt-1)-xobs);
                         else xwr = xobs; end
@@ -791,10 +807,12 @@ function main(filePathIn, filePathOut)
 
                 if vr(npt,2)>0 & irs>0 & abs(modout)>=2
                     % call cells()
+                    [npt,xmmin,dxmod,dzmod] = fun_cells(npt,xmmin,dxmod,dzmod);
                 end
 
                 if invr==1 & irs>0
                     % call fxtinv(npt)
+                    npt = fun_fxtinv(npt);
                 end
 
                 if ihdwf == 0, break; end % go to 890
@@ -809,6 +827,7 @@ function main(filePathIn, filePathOut)
                 nc2pt = ic2pt;
                 if ni2pt > 1
                     % call sort3()
+                    [ta2pt,ipos,nc2pt] = fun_sort3(ta2pt,ipos,nc2pt);
                     ho2pt(1:nc2pt) = ra2pt(1:nc2pt); % 893
                     ra2pt(1:nc2pt) = ho2pt(ipos(1:nc2pt)); % 894
                     ho2pt(1:nc2pt) = tt2pt(1:nc2pt); % 897
@@ -822,10 +841,12 @@ function main(filePathIn, filePathOut)
 
             if ninv > 0
                 % call calprt()
+                [xshotr,i,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,i,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt);
             end
             if iflagw == 1, iflagi = 1; end
             if iray>0 | irays==1
                 % call empty
+                fun_empty();
             end
 
             nrayr = nrg;
@@ -844,6 +865,8 @@ function main(filePathIn, filePathOut)
         if isGoto1000, break; end
         if isep==2 & ((itx>0 & ntt>1) | idata~=0 | itxout>0)
             % ?... call plttx()
+            [ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,float(idr(is)),itxbox,iroute,iline] ...
+            = fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,float(idr(is)),itxbox,iroute,iline);
         end
     end % 60
     end % if ~isGoto1000
@@ -852,8 +875,11 @@ function main(filePathIn, filePathOut)
     if (isep<2 | isep==3) & ((itx>0 & ntt>1) | idata~=0 | itxout>0)
         if isep>0 & iplots==1
             % call aldone
+            fun_aldone();
         end
         % call plttx()
+        [ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,~,itxbox,iroute,iline] ...
+        = fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,iline);
     end
 
     if itxout > 0
@@ -880,47 +906,18 @@ function main(filePathIn, filePathOut)
 
     if abs(modout) ~= 0
         % call modwr()
+        [modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax);
     end
 
     if ifd > 0
         % call fd()
+        [dxzmod,xmmin,xmmax,ifd] = fun_fd(dxzmod,xmmin,xmmax,ifd);
     end
 
     fun_goto900();
 
     fclose('all');
 % main function end
-end
-
-
-%% fun_pltmod: plot model
-function [outputs] = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,...
-    ifrbnd,idata,iroute,i33)
-    outputs = 0;
-end
-
-function [xpt,zpt,layers,iblks,iflag] = fun_xzpt(xpt,zpt,layers,iblks,iflag)
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
-
-    iflag = 0;
-    for ii = 1:nlayer
-        for jj = 1:nblk(ii)
-            top = s(ii,jj,1) .* xpt + b(ii,jj,1);
-            bottom = s(ii,jj,2) .* xpt + b(ii,jj,2);
-            left = xbnd(ii,jj,1);
-            right = xbnd(ii,jj,2);
-            if zpt+0.001<top | zpt-0.001>bottom | xpt+0.001<left | xpt-0.001>right | abs(top-bottom)<0.001
-                continue; % go to 20
-            end
-            layers = ii;
-            iblks = jj;
-            return;
-        end % 20
-    end % 10
-    iflag = 1;
-    return;
 end
 
 function [col1,col2,col3,col4] = fun_load_txin(file_txin)
@@ -1097,6 +1094,7 @@ function fun_goto900()
     end
     if iplots == 1
         % ?... call plotnd(1)
+        fun_plotnd(1);
     end
     fun_goto9999(); return;
 end

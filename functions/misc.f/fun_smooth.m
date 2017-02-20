@@ -1,7 +1,12 @@
 % misc.f
+% [x,~]
+% called by: fun_calmod;
+% call: none.
 
-function [x] = fun_smooth(x,n)
+function [x,n] = fun_smooth(x,n)
 % three point triangular smoothing filter
+
+    % real x(n)
 
     m = n-1;
     a = 0.77*x(1) + 0.23*x(2);
@@ -16,4 +21,5 @@ function [x] = fun_smooth(x,n)
     end % 10
     x(1) = a;
     x(n) = b;
-end
+    return;
+end % fun_smooth end

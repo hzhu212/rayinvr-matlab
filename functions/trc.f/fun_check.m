@@ -1,4 +1,7 @@
 % trc.f
+% [~,x,z]
+% called by: fun_trace;
+% call: none.
 
 function [iflag,x,z] = fun_check(iflag,x,z)
 % check that the new ray point will still be inside the current

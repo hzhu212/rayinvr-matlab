@@ -1,4 +1,7 @@
 % rngkta.f
+% [~,~,f]
+% called by: fun_trace;
+% call: none.
 
 function [x,y,f] = fun_odezfi(x,y,f)
 % pair of first order o.d.e.'s solved by runge kutta method

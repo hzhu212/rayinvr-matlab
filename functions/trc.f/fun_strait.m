@@ -1,4 +1,7 @@
 % trc.f
+% [x,y,~,~]
+% called by: fun_trace;
+% call: none.
 
 function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
 % if the upper and lower velocities in a layer are nearly the same

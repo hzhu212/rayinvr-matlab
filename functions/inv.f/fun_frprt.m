@@ -1,4 +1,7 @@
 % inv.f
+% [~,~,~,~,~]
+% called by: fun_frefl;
+% call: none.
 
 function [vfr,afr,alpha,npt,ifrpt] = fun_frprt(vfr,afr,alpha,npt,ifrpt)
 % calculate partial derivatives for floating reflectors

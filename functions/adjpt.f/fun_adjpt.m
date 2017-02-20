@@ -1,11 +1,14 @@
 % adjpt.f
+% [n,top,bot,~,~,~,~,~,lstart,istart,~,iflag,~,~,~,~,~,~,~]
+% called by: fun_trace;
+% call: fun_adhoc; fun_corner; fun_block; fun_bndprt; fun_frefl; done.
 
-function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout] = ...
-	fun_adjpt(n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout)
+function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout] = fun_adjpt(n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout)
 % ray has intersected a model boundary so must determine correct
 % (x,z) coordinates and angle at boundary
 
 	global file_rayinvr_par file_rayinvr_com;
+	global fID_11 fID_32;
 	run(file_rayinvr_par);
 	% real lef
 	% integer icasec(5)
@@ -200,7 +203,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     % go to (1000,2000,3000,4000), icase
 
     % 1000 % -------------------- block 1000 begin
-    if icase == 1
+    if ~(icase == 3 | icase == 2 | icase == 4)
     	% ray intersects upper boundary
     	if ibsmth == 0
     	    alpha = atan(s(layer,iblk,1));
@@ -246,31 +249,522 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	    vi = vi .* vsvp(layer,iblk);
     	end
     	if layer > 1
-    	    % 1320
-    	    i1 = layer - 1;
-    	    [xn,i1,ib] = fun_block(xn,i1,ib);
+    	    cycle1320 = true;
+    	    isGoto1310 = false;
+    	    isGoto1330 = false;
+    	    while cycle1320 % -------------------- cycle1320 begin
+	    	    % 1320
+	    	    i1 = layer - 1;
+	    	    [xn,i1,ib] = fun_block(xn,i1,ib);
+
+	    	    if ivg(i1,ib) ~= -1
+	    	    	isGoto1310 = true;
+	    	    	break; % go to 1310
+	    	    end
+
+    	        layer = layer - 1;
+    	        if refll(ircbnd) == -layer
+    	            if ir ~= 0
+    	            	% 55
+    	                fprintf(fID_11, '***  ray stopped - reflected from pinchout  ***\n');
+    	            end
+	                vr(n,2) = 0.0;
+	                iflag = 1;
+	                return;
+    	        end
+
+    	        if layer>1, continue; end % go to 1320
+
+    	        if refll(ircbnd) ~= -1
+    	            vr(n,2) = 1.0;
+    	            iflag = 1;
+    	            return;
+    	        else
+    	        	vp2 = 0.001;
+    	        	vs2 = 0.001;
+    	        	vo = 0.001;
+    	        	isGoto1330 = true;
+    	        	break; % go to 1330
+    	        end
+
+	    	    break; % go to nothing
+	    	end % -------------------- cycle1320 end
+
+	    	% 1310 % -------------------- block 1310 begin
+	    	if ~isGoto1330
+	    	    vp2 = (c(i1,ib,1).*xn + c(i1,ib,2).*xn.^2 + c(i1,ib,3).*zn + c(i1,ib,4).*xn.*zn + c(i1,ib,5)) ./ (c(i1,ib,6).*xn + c(i1,ib,7));
+	    	    vs2 = vp2 .* vsvp(i1,ib);
+	    	    if iwave == 1
+	    	        vo = vp2;
+	    	    else
+	    	    	vo = vs2;
+	    	    end
+	    	end % -------------------- block 1310 end
     	end
 
+    	isGoto1110 = false;
+    	isGoto1100 = false;
+    	isGoto1200 = false;
+    	for cycle1330 = 1:1 % -------------------- one-time cycle1330 begin
+	    	% 1330
+	    	if refll(ircbnd) == -lstart
+	    	    layer = lstart;
+		        ircbnd = ircbnd + 1;
+		        if iconvt == 0
+		            a2 = a1;
+		            isGoto1110 = true;
+		            break; % go to 1110
+		        end
+		        at1 = (vi./vr(n,1)) .* sin(a1);
+		        if abs(at1) < 1.0
+		            isGoto1100 = true;
+		            break; % go to 1100
+		        end
+		        if ir ~= 0
+		        	% 35
+		            fprintf(fID_11, '***  ray stopped - converted ray cannot reflect/refract  ***\n');
+		        end
+	            vr(n,2) = 0.0;
+	            iflag = 1;
+	            return;
+	    	end
+	        at2 = (vo./vr(n,1)) .* sin(a1);
+	        if abs(at2) < 1.0
+	        	isGoto1200 = true;
+	            break; % go to 1200
+	        end
+
+	        % ray reflects off upper boundary
+
+	        if istop > 0 | ir == 0
+	            vr(n,2) = 0.0;
+	            iflag = 1;
+	            if ir ~= 0
+	            	% 15
+	                fprintf(fID_11, '***  ray stopped - illegal reflection  ***\n');
+	            end
+                return;
+	        end
+	        if iconvt == 0
+	            a2 = a1;
+	            isGoto1110 = true;
+	            break; % go to 1110
+	        end
+	        at1 = (vi./vr(n,1)) .* sin(a1);
+	        if abs(at1) >= 1.0
+	            if ir ~= 0
+	            	% 35
+	                fprintf(fID_11, '***  ray stopped - converted ray cannot reflect/refract  ***\n');
+	            end
+	            vr(n,2) = 0.0;
+	            iflag = 1;
+	            return;
+	        end
+    	end % -------------------- one-time cycle1330 end
+
+    	% 1100
+    	if ~(isGoto1200 | isGoto1110)
+    	    a2 = asin(at1);
+    	end
+    	% 1110
+    	if ~isGoto1200
+			ar(n,2) = fid .* a2 - alpha;
+			vr(n,2) = vi;
+			vp(n,2) = vp(n,1);
+			vs(n,2) = vs(n,1);
+			if fid.*ar(n,2) > 0.0
+			    id = -id;
+			    fid = id; % fid = float(id)
+			end
+			if vm(layer,iblk,1) == 0.0
+			    layer = lstart;
+			    iblk = istart;
+			end
+			if ir~=0 & invr==1
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,-2);
+			end
+			return;
+    	end
+
+    	% ray refracts through upper boundary
+
+    	% 1200
+		layer = layer - 1;
+		iblk = ib;
+		a2 = asin(at2);
+		ar(n,2) = fid .* (pi-a2) - alpha;
+		vr(n,2) = vo;
+		vp(n,2) = vp2;
+		vs(n,2) = vs2;
+		if iwave == -1 & vr(n,2) <= 0.001
+		    vr(n,2) = 0.0;
+		    iflag = 1;
+		    if ir ~= 0
+		    	% 45
+		        fprintf(fID_11, '***  ray stopped - s-wave cannot propagate  ***\n');
+		    end
+		    return;
+		end
+		if fid.*ar(n,2) > pi
+			ar(n,2) = fid .* pit2 + ar(n,2);
+			id = -id;
+			fid = id; % fid = float(id);
+		end
+		if ir~=0 & invr==1
+		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,-1);
+		end
         return;
     end % -------------------- block 1000 end
 
+    % ray intersects lower boundary
+
     % 3000 % -------------------- block 3000 begin
-    if icase == 3
+    if ~(icase == 2 | icase == 4)
+    	if layer == nlayer
+    	    vr(n,2) = 0.0;
+    	    iflag = 1;
+    	    return;
+    	end
+    	if ibsmth == 0
+    	    alpha = atan(s(layer,iblk,2));
+    	else
+			npl = ifix((xr(n)-xmin-0.001)./xsinc) + 1;
+			npr = npl + 1;
+			xpl = xmin + (npl-1) .* xsinc;
+			alpha = (cosmth(layer+1,npr)-cosmth(layer+1,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer+1,npl);
+    	end
+    	a1 = fid .* (ar(n,1)+alpha);
+    	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
+    	    % go to 999
+    	    fun_goto999(); return;
+    	end
+    	n3 = 0;
+    	dstepf = 1.0;
+    	nccbnd = nccbnd + 1;
+    	if icbnd(iccbnd) == nccbnd
+    	    iconvt = 1;
+	        iwave = -iwave;
+	        iccbnd = iccbnd + 1;
+    	end
+    	vi = vel(xr(n),zr(n));
+    	if iwave == -1
+    	    vi = vi .* vsvp(layer,iblk);
+    	end
+
+    	cycle3020 = true;
+    	while cycle3020 % -------------------- cycle3020 begin
+	    	% 3020
+	    	i1 = layer + 1;
+	    	[~,~,ib] = fun_block(xn,i1,ib);
+	    	if ivg(i1,ib) ~= -1
+	    	    break; % go to 3010
+	    	end
+	    	layer = layer + 1;
+	    	if refll(ircbnd) == layer
+	    	    if ir ~= 0
+	    	    	% 55
+	    	        fprintf(fID_11, '***  ray stopped - reflected from pinchout  ***\n');
+	    	        vr(n,2) = 0.0;
+	    	    end
+	    	    if idray(1) < layer, idray(1)=layer; end
+	    	    idray(2) = 2;
+	    	    iflag = 1;
+	    	    return;
+	    	end
+	    	if layer == nlayer
+	    	    vr(n,2) = 0.0;
+	    	    iflag = 1;
+	    	    return;
+	    	end
+	    	% go to 3020
+	    end % -------------------- cycle3020 end
+
+	    isGoto3110 = false;
+	    isGoto3100 = false;
+	    isGoto3200 = false;
+	    isGoto3300 = false;
+	    % 3010 % -------------------- one-time cycle3010 begin
+	    for cycle3010 = 1:1
+		    vp2 = (c(i1,ib,1).*xn + c(i1,ib,2).*xn.^2 + c(i1,ib,3).*zn + c(i1,ib,4).*xn.*zn + c(i1,ib,5)) ./ (c(i1,ib,6).*xn + c(i1,ib,7));
+		    vs2 = vp2 .* vsvp(i1,ib);
+		    if iwave == 1
+		        vo = vp2;
+		    else
+		    	vo = vs2;
+		    end
+		    if refll(ircbnd) == lstart
+		        layer = lstart;
+		        ircbnd = ircbnd + 1;
+		        if iconvt == 0
+		            a2 = a1;
+		            isGoto3110 = true;
+		            break; % go to 3110
+		        end
+		        at1 = (vi./vr(n,1)) .* sin(a1);
+		        if abs(at1) < 1.0
+		            isGoto3100 = true;
+		            break; % go to 3100
+		        end
+		        if ir ~= 0
+		        	% 35
+		            fprintf(fID_11, '***  ray stopped - converted ray cannot reflect/refract  ***\n');
+		        end
+		        vr(n,2) = 0.0;
+		        iflag = 1;
+		        return;
+		    end
+		    if iheadf(layer) == 1 & idifff == 1
+		        isGoto3300 = true;
+		        break; % go to 3300
+		    end
+		    if iheadf(layer) == 1 & vr(n,1) < vo
+		        crita = asin(vr(n,1)./vo);
+		        diff = abs(abs(a1)-crita);
+		        if fid ~= fid1
+		            fid = fid1;
+		            id = -id;
+		        end
+		        if diff <= crit
+		            isGoto3300 = true;
+		            break; % go to 3300
+		        end
+		    end
+	        at2 = (vo./vr(n,1)) .* sin(a1);
+	        if abs(at2) < 1.0
+	            isGoto3200 = true;
+	            break; % go to 3200
+	        end
+
+	        % ray reflects off lower boundary
+
+	        if istop > 0 | ir == 0
+	            vr(n,2) = 0.0;
+	            iflag = 1;
+	            if ir ~= 0
+	            	% 15
+	                fprintf(fID_11, '***  ray stopped - illegal reflection  ***\n');
+	            end
+	            idray(2) = 2;
+	            return;
+	        end
+	        if iconvt == 0
+	            a2 = a1;
+	            isGoto3110 = true;
+	            break; % go to 3110
+	        end
+	        at1 = (vi./vr(n,1)) .* sin(a1);
+	        if abs(at1) >= 1.0
+	            if ir ~= 0
+	            	% 35
+	                fprintf(fID_11, '***  ray stopped - converted ray cannot reflect/refract  ***\n');
+	            end
+	            vr(n,2) = 0.0;
+	            iflag = 1;
+	            return;
+	        end
+	    end % -------------------- one-time cycle3010 end
+
+        % 3100 % -------------------- block 3100 begin
+        if ~(isGoto3110 | isGoto3200 | isGoto3300)
+            a2 = asin(at1);
+        end % -------------------- block 3100 end
+
+        % 3110 % -------------------- block 3110 begin
+        if ~(isGoto3200 | isGoto3300)
+			ar(n,2) = fid .* (pi-a2) - alpha;
+			vr(n,2) = vi;
+			vp(n,2) = vp(n,1);
+			vs(n,2) = vs(n,1);
+			if fid.*ar(n,2) > pi
+			    ar(n,2) = fid .* pit2 + ar(n,2);
+		        id = -id;
+		        fid = id; % fid = float(id);
+			end
+			if ir ~= 0 | idr ~= 1
+			    idray(2) = 2;
+			end
+			if iturn == 1 & idr == 2
+			    iflag = 1;
+			end
+			if vm(layer,iblk,1) == 0.0
+			    layer = lstart;
+			    iblk = istart;
+			end
+			if ir ~= 0 & invr == 1
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,2);
+			end
+			if ir > 0 & modout == 1
+				% 155
+			    fprintf(fID_32, '%10.3f%10.3f%10d\n', xr(n),zr(n),0);
+			end
+			return;
+        end % -------------------- block 3110 end
+
+        % ray refracts through lower boundary
+
+        % 3200 % -------------------- block 3200 begin
+        if ~isGoto3300
+            if istop > 0 & idray(2) == 3
+                vr(n,2) = 0.0;
+                iflag = 1;
+                if ir ~= 0
+                	% 115
+                    fprintf(fID_11, '***  ray stopped - illegal headwave refraction  ***\n');
+                end
+                return;
+            end
+            if ir ~= 0 & istop == 2 & (layer+1) > idl
+                vr(n,2) = 0.0;
+                iflag = 1;
+                if ir ~= 0
+                    % 125
+                    fprintf(fID_11, '***  ray stopped - illegal refraction (istop=2)  ***\n');
+                end
+                return;
+            end
+            layer = layer + 1;
+			iblk = ib;
+			a2 = asin(at2);
+			ar(n,2) = fid .* a2 - alpha;
+			vr(n,2) = vo;
+			vp(n,2) = vp2;
+			vs(n,2) = vs2;
+			if iwave == -1 & vr(n,2) <= 0.001
+			    vr(n,2) = 0.0;
+			    iflag = 1;
+			    % 45
+		        fprintf(fID_11, '***  ray stopped - s-wave cannot propagate  ***\n');
+		        return;
+			end
+			if fid.*ar(n,2) < 0.0
+			    id = -id;
+			    fid = id; % fid = float(id);
+			end
+			if idray(1)<layer, idray(1)=layer; end
+			if ir ~= 0 & invr == 1
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,1);
+			end
+			return;
+        end % -------------------- block 3200 end
+
+        % head waves to be generated
+
+        % 3300
+        if idifff == 1
+            at1 = (vi./vr(n,1)) .* sin(a1);
+            if abs(at1) >= 1.0
+                if ir ~= 0
+                    % 35
+		            fprintf(fID_11, '***  ray stopped - converted ray cannot reflect/refract  ***\n');
+                end
+                vr(n,2) = 0.0;
+                iflag = 1;
+                return;
+            end
+            a2 = asin(at1);
+	        ar(n,2) = fid .* (pi-a2) - alpha;
+	    else
+	    	ar(n,2) = fid .* pi2 - alpha;
+	        a2 = pi2;
+        end
+		vr(n,2) = vo;
+		vp(n,2) = vp2;
+		vs(n,2) = vs2;
+		ihdw = 1;
+		idray(1) = layer;
+		if ir ~= 0 & invr == 1
+		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,1);
+		end
+		iflag = 2;
         return;
     end % -------------------- block 3000 end
 
-    % 2000
-    if icase == 2
-        ;
+    % ray intersects right boundary
+
+    % 2000 % -------------------- block 2000 begin
+    isGoto4010 = false;
+    if ~(icase == 4)
+        jt = nblk(layer);
+        ja = 1;
+        isGoto4010 = true; % go to 4010
+    end % -------------------- block 2000 end
+
+    % 4000 % -------------------- block 4000 begin
+    % if icase == 4
+    if ~isGoto4010
+        jt = 1;
+        ja = -1;
     end
 
-    % 4000
-    if icase == 4
-        ;
+    % 4010
+    if iblk == jt
+        vr(n,2) = 0.0;
+        iflag = 1;
+        return;
     end
+	iblk = iblk + ja;
+	vp(n,2) = vel(xn,zn);
+	vs(n,2) = vp(n,2) .* vsvp(layer,iblk);
+	if iwave == 1
+	    vr(n,2) = vp(n,2);
+	else
+		vr(n,2) = vs(n,2);
+	end
+	vo = vr(n,2);
+	vp2 = vp(n,2);
+	vs2 = vs(n,2);
+	a1 = pi2 - fid .* ar(n,1);
+	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
+		% go to 999
+	    fun_goto999(); return;
+	end
+	n3 = 0;
+	dstepf = 1.0;
+	if fid.*ar(n,1) > pi2, a1 = -a1; end
+	at = (vo./vr(n,1)) .* sin(a1);
+	if abs(at) >= 1.0
+	    % ray reflects off vertical boundary
+	    if istop > 0 | ir == 0
+	        vr(n,2) = 0.0;
+	        iflag = 1;
+	        if ir ~= 0
+	            % 15
+                fprintf(fID_11, '***  ray stopped - illegal reflection  ***\n');
+	        end
+	        return;
+	    end
+	    a2 = a1;
+        iblk = iblk - ja;
+        ar(n,2) = -ar(n,1);
+        vr(n,2) = vr(n,1);
+        vp(n,2) = vp(n,1);
+        vs(n,2) = vs(n,1);
+        id = -id;
+        fid = id; % fid = float(id);
+    else
+    	% ray refracts through vertical boundary
+    	a2 = asin(at);
+    	if fid.*ar(n,1) <= pi2
+    	    ar(n,2) = fid .* (pi2-a2);
+    	else
+    		ar(n,2) = fid .* (pi2+a2);
+    	end
+    	if iwave == -1 & vr(n,2) <= 0.001
+    	    vr(n,2) = 0.0;
+    	    iflag = 1;
+    	    % 45
+	        fprintf(fID_11, '***  ray stopped - s-wave cannot propagate  ***\n');
+    	    return;
+    	end
+	end
+	return;
+    % end % -------------------- block 4000 end
 
     % --------------------------------------------------
     function fun_goto999()
+    % ray has intersected a boundary with an angle of incidence
+	% beyond 90 degrees
+
     	n3 = n3 + 1;
     	n = n - 1;
     	nbnd = nbnd - 1;

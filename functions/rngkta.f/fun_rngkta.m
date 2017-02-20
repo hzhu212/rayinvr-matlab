@@ -1,4 +1,7 @@
 % rngkta.f
+% [x,~,y,~,h,~,~,~,g,s,t]
+% called by: fun_trace;
+% call: none.
 
 function [x,z,y,f,h,hmin,e,func,g,s,t] = fun_rngkta(x,z,y,f,h,hmin,e,func,g,s,t)
 % routine to solve a 2x2 system of first order o.d.e.'s

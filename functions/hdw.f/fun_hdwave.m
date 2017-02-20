@@ -1,4 +1,7 @@
 % hdw.f
+% [~,~,n,~,~,iflag,i1ray,~]
+% called by: fun_trace;
+% call: fun_block; fun_velprt; fun_bndprt; done.
 
 function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,xsmax,iflag,i1ray,modout)
 % ray now travels along a layer boundary as a head wave.

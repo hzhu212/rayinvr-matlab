@@ -1,4 +1,9 @@
 % trc.f
+% [npt,~,~,~,~,~,iflag,~,~,~,~,~,~]
+% called by: main; fun_autotr;
+% call: fun_strait; fun_check; fun_rngkta; fun_rkdumb; fun_odex; fun_odexfi;
+% fun_velprt; fun_odez; fun_odezfi; fun_frefpt; fun_frefl; fun_adjpt; fun_hdwave;
+% done.
 
 function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout)
 % trace a single ray through the model

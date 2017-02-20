@@ -1,9 +1,14 @@
 % inv.f
+% [~,~,~,~,~]
+% called by: fun_calmod;
+% call: none.
 
 function fun_cvcalc(ii,jj,ipos,itype,cf)
 % calculate coefficients of velocity partial derivatives
 
-    global cv;
+    global file_rayinvr_par file_rayinvr_com;
+    run(file_rayinvr_par);
+    run(file_rayinvr_com);
 
     if itype == 1
         ssign = 1.0;
@@ -32,4 +37,6 @@ function fun_cvcalc(ii,jj,ipos,itype,cf)
     cv(ii,jj,ipos,3) = cv(ii,jj,ipos,3) - cf*ssign*xb;
     cv(ii,jj,ipos,4) = cv(ii,jj,ipos,4) + cf*ssign;
     cv(ii,jj,ipos,5) = cv(ii,jj,ipos,5) + cf*ssign*bb*xb;
-end
+
+    return;
+end % fun_cvcalc end

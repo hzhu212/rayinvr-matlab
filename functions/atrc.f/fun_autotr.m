@@ -1,4 +1,7 @@
 % atrc.f
+% [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~]
+% called by: fun_auto;
+% call: fun_trace; done.
 
 function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,idr,irayps,istep)
 % trace a single ray through model to its turning point

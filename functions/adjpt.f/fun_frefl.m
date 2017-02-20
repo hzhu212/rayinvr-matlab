@@ -1,4 +1,7 @@
 % adjpt.f
+% [~,~,~,~,~,~,~]
+% called by: fun_adjpt; fun_trace;
+% call: fun_frprt; done.
 
 function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr)
 % calculate angles of incidence and reflection at floating reflector

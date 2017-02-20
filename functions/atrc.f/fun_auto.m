@@ -1,4 +1,7 @@
 % atrc.f
+% [~,~,~,~,~,~,amin,amax,~,~,~,~,~,~,~,~,~,iflag,~,~,~,ia0,~,~,~,~,~,~,~,~]
+% called by: main;
+% call: fun_autotr; fun_calvel; fun_block; done.
 
 function [xshot,zshot,if,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin] = fun_auto(xshot,zshot,if,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin)
 % determine min. and max. take-off angles for a specific ray code

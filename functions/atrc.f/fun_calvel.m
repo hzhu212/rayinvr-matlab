@@ -1,4 +1,7 @@
 % atrc.f
+% [~,~,~,~,~,vshot,~,~]
+% called by: fun_auto;
+% call: none;
 
 function [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom)
 

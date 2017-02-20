@@ -1,4 +1,7 @@
 % inv.f
+% [~,~,~,~,~,~,~,~,~]
+% called by: fun_hdwave; fun_adjpt;
+% call: none.
 
 function [lu,iu,v1,v2,a1,a2,alpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2,alpha,npt,itype)
 % calculate boundary partial derivatives

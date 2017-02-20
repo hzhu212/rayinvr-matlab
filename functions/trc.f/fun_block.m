@@ -1,4 +1,7 @@
 % trc.f
+% [~,~,iblk1]
+% called by: fun_adjpt; fun_auto; fun_hdwave;
+% call: none;
 
 function [x,layer1,iblk1] = fun_block(x,layer1,iblk1)
 % determine block of point x in layer

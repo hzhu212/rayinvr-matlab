@@ -1,4 +1,7 @@
 % inv.f
+% [~,~,~]
+% called by: fun_trace; fun_hdwave;
+% call: none.
 
 function [lu,iu,npt] = fun_velprt(lu,iu,npt)
 % calculate velocity partial derivatives

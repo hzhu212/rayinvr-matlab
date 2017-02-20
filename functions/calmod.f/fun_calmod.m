@@ -1,20 +1,22 @@
 % calmod.f
+% [~,~,poisb,poisl,~,invr,iflagm,~,xmin1d,xmax1d,~,~,~]
+% called by: main;
+% call: fun_cvcalc; fun_smooth; fun_smooth2; done.
 
-function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
- = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
- % calculate model
- % ncont: 模型总层数（包括最后一层）
- % pois: Poisson's ratio，数组，保存模型中每一层的泊松比
- % poisl: Poisson layer, 数组，泊松比的层索引
- % poisb: Poisson block, 数组，泊松比的块索引（模型中每层包含许多小块）
- % poisbl: 数组，按照poisl和poisb两个索引来存储的泊松比，将会覆盖pois数组的内容
- % iflagm: i-flag-model,代表模型是否有误，0-正常，1-模型错误
- % invr: 计算所选定模型参数的偏微分，并把结果写入到i.out文件
- % ifrbnd: 为1说明读取了f.in文件
- % insmth: 非-smooth，数组，列出未使用光滑边界模拟的层面
- % xminns,xmaxns: 限定最小模型距离和最大模型距离，当ibsmth=1或2时，insmth
- %   中所列出的层一旦超出该范围将不做光滑处理
- % pncntr: player+1，player为模型分层数，pncntr则为模型层界面数
+function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
+% calculate model
+% ncont: 模型总层数（包括最后一层）
+% pois: Poisson's ratio，数组，保存模型中每一层的泊松比
+% poisl: Poisson layer, 数组，泊松比的层索引
+% poisb: Poisson block, 数组，泊松比的块索引（模型中每层包含许多小块）
+% poisbl: 数组，按照poisl和poisb两个索引来存储的泊松比，将会覆盖pois数组的内容
+% iflagm: i-flag-model,代表模型是否有误，0-正常，1-模型错误
+% invr: 计算所选定模型参数的偏微分，并把结果写入到i.out文件
+% ifrbnd: 为1说明读取了f.in文件
+% insmth: 非-smooth，数组，列出未使用光滑边界模拟的层面
+% xminns,xmaxns: 限定最小模型距离和最大模型距离，当ibsmth=1或2时，insmth
+%   中所列出的层一旦超出该范围将不做光滑处理
+% pncntr: player+1，player为模型分层数，pncntr则为模型层界面数
 
     global file_rayinvr_par file_rayinvr_com;
     global fID_12;
@@ -1114,9 +1116,9 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 zsmth(1:npbnd) = cosmth(ii,1:npbnd);
                 for jj = 1:nbsmth
                     if iflag12==1 & iflagns==1
-                        zsmth = fun_smooth2(zsmth,npbnd,n1ns,n2ns);
+                        [zsmth,~,~,~] = fun_smooth2(zsmth,npbnd,n1ns,n2ns);
                     else
-                        zsmth = fun_smooth(zsmth,npbnd);
+                        [zsmth,~] = fun_smooth(zsmth,npbnd);
                     end
                 end % 650
                 % 660
@@ -1336,10 +1338,12 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
     end % 930
 
     return;
-end
 
+    % --------------------------------------------------
+    function fun_goto999()
+    % calculate end for model error
 
-%% fun_goto999: calculate end for model error
-function fun_goto999()
-    error('e:test','\n***  error in velocity model 2 ***\n');
-end
+        error('e:test','\n***  error in velocity model 2 ***\n');
+    end % fun_goto999 end
+
+end % fun_calmod end

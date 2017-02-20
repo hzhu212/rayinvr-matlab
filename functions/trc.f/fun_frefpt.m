@@ -1,4 +1,7 @@
 % trc.f
+% [~,~,xfr,zfr,ifrpt,iflagf]
+% called by: fun_trace;
+% call: none.
 
 function [ir,npt,xfr,zfr,ifrpt,iflagf] = fun_frefpt(ir,npt,xfr,zfr,ifrpt,iflagf)
 % determine intersection point of ray with a floating reflector
