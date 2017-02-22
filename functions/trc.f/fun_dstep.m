@@ -1,7 +1,7 @@
 % trc.f
 % [dstep]
-% called by:
-% call: none.
+% called by: fun_trace;
+% call: fun_vel; done.
 
 % fortran function
 
@@ -19,7 +19,7 @@ function [dstep] = fun_dstep(x,z)
 		c(layer,iblk,11)) ./ (c(layer,iblk,6).*x + c(layer,iblk,7)).^2;
 	vz = (c(layer,iblk,3) + c(layer,iblk,4).*x) ./ (c(layer,iblk,6).*x + ...
 		c(layer,iblk,7));
-	dstep = step .* vel(x,z) ./ (abs(vx)+abs(vz));
+	dstep = stepstep .* fun_vel(x,z) ./ (abs(vx)+abs(vz));
 
 	if dstep < smin
 	    dstep = smin;

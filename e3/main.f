@@ -74,7 +74,9 @@ c
      +        insmth(pncntr)
       character flag*1
 c     character title*80
-c
+
+      logical onDev
+C
       include 'rayinvr.com'
 c
       namelist /pltpar/ iplot,imod,ibnd,idash,ivel,iray,irays,
@@ -114,6 +116,9 @@ c
      +     cbnd/pconvt*-99/,ibreak/prayf*1/,ihead/player*0/,
      +     insmth/pncntr*0/
 c
+      onDev = .true.
+      if(onDev) write(*,*) '=============== tick 0 ==============='
+
       iline=0
       ititle=0
       xtitle=-9999999.
@@ -203,6 +208,8 @@ c
       read(10,trapar)
       read(10,invpar)
 c
+      if(onDev) write(*,*) '=============== tick 1 ==============='
+
       if(xmax.lt.-99998) then
         write(6,25)
 25      format(/'***  xmax not specified  ***'/)
@@ -272,6 +279,8 @@ c235      format(3x,10i7)
 c
 99    nlayer=ncont-1
 c
+      if(onDev) write(*,*) '=============== tick 2 ==============='
+
 c     open I/O units
 c
       if(iplot.eq.0) iplot=-1
@@ -313,6 +322,8 @@ c
         if(ipf(isf-1).ne.-1) go to 910
       end if
 c
+      if(onDev) write(*,*) '=============== tick 3 ==============='
+
 c     determine if plot parameters for distance axis of travel
 c     time plot are same as model distance parameters
 c
@@ -414,6 +425,8 @@ c 575     format(3x,<npfref(nfrefl)>i7)
 550     continue
       end if
 c
+      if(onDev) write(*,*) '=============== tick 4 ==============='
+
 c     calculate velocity model parameters
 c
       call calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,
@@ -476,6 +489,8 @@ c
         write(11,895)
       end if
 c
+      if(onDev) write(*,*) '=============== tick 5 ==============='
+
 c     assign values to the arrays xshota, zshota and idr
 c     and determine nshot
 c
@@ -548,6 +563,8 @@ c
          end if
 470   continue
 c
+      if(onDev) write(*,*) '=============== tick 6 ==============='
+
 c     plot velocity model
 c
       if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.lt.2)
@@ -621,6 +638,8 @@ c
         end if
       end if
 c
+      if(onDev) write(*,*) '=============== tick 7 ==============='
+
 c     assign default values to smin and smax if not specified
 c
       if(smin.lt.0.) smin=(xmax-xmin)/4500.
@@ -656,6 +675,8 @@ c
 c
       if(nshot.eq.0) go to 1000
 c
+      if(onDev) write(*,*) '======== tick 8: entering cycle 60 ========'
+
       do 60 is=1,nshot
          ist=ist+1
          id=idr(is)
@@ -699,6 +720,8 @@ c
 820          continue
            end if
          end if
+
+
          if(ics.eq.1) then
 c
            call xzpt(xshotr,zshotr,layer1,iblk1,iflags)
@@ -720,6 +743,8 @@ c
          irbnd=0
          ictbnd=0
 c
+      if(onDev) write(*,*) '======== tick 9: entering cycle 70 ========'
+
          do 70 i=1,ngroup
             if(iraysl.eq.1) then
               irpos=(ishotr(is)-1)*ngroup+i
@@ -805,6 +830,7 @@ c
               iflag2=0
               nsfc=1
               isf=ilshot(nsfc)
+
 1110          xf=xpf(isf)
               tf=tpf(isf)
               uf=upf(isf)
@@ -835,11 +861,15 @@ c
               end if
             end if
 c
+      if(onDev) write(*,*) '========== tick 10: before auto =========='
+
             call auto(xshotr,zshotr,i,ifam,idl,idt,aminr,amaxr,
      +         aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax(i),
      +         iflag,iturn(i),amin(ia0),amax(ia0),ia0,stol,
      +         irays,nskip,idot,irayps,xsmax,istep,nsmin(i))
 c
+      if(onDev) write(*,*) '========== tick 11: after auto =========='
+
             if(iflag.ne.0) then
               write(11,65) ishotw(is),ray(i)
 65            format('***  shot#',i4,' ray code',f5.1,
@@ -927,12 +957,17 @@ c
               ii2pt=0
             end if
 c
+      if(onDev) write(*,*) '======= tick 12: entering cycle 91 ======='
+
 91          ir=0
             nrg=0
             ihdwf=ihdwm
             tdhw=0.
             dhw=0.
             i1ray=1
+
+      if(onDev) write(*,*) '======= tick 13: entering cycle 90 ======='
+
 90          ir=ir+1
             if(ir.gt.nrayr.and.ni2pt.le.1) go to 890
                if(i2pt.eq.0.and.iend.eq.1) go to 890
@@ -1048,11 +1083,18 @@ c
                nrg=nrg+1
                nhskip=0
 c
+      if(onDev) write(*,*) '======= tick before trace ======='
+
                call trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,
      +                    iray,ii2pt,i1ray,modout)
+
+      if(onDev) write(*,*) '======= tick after trace ======='
+      if(onDev) write(*,*) '======= tick before ttime ======='
 c
                call ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,
      +                    iszero,iflag,uf,irayf)
+
+      if(onDev) write(*,*) '======= tick after ttime ======='
 c
 c              if(irs.eq.0.and.vr(npt,2).gt.0.) then
                if(irs.eq.0) then
@@ -1130,6 +1172,9 @@ c
             if(iray.gt.0.or.irays.eq.1) call empty
 c
             nrayr=nrg
+
+      if(onDev) write(*,*) '============= tick: out of 69 ============='
+
 69          if(iflagl.eq.1) then
               flag='*'
             else
@@ -1150,6 +1195,8 @@ c
 c
 60    continue
 c
+      if(onDev) write(*,*) '=============== tick 1000 ==============='
+
 1000  if((isep.lt.2.or.isep.eq.3).and.((itx.gt.0.and.ntt.gt.1).or.
      +  idata.ne.0.or.itxout.gt.0)) then
         if(isep.gt.0.and.iplots.eq.1) call aldone

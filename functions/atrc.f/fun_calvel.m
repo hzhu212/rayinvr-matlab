@@ -1,9 +1,9 @@
 % atrc.f
-% [~,~,~,~,~,vshot,~,~]
+% [~,~,~,~,~,vshot,vtop,vbotom]
 % called by: fun_auto;
-% call: none;
+% call: fun_vel; done.
 
-function [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom)
+function [xshot,zshot,ls,ibs,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,ls,ibs,l,vshot,vtop,vbotom)
 
     global file_rayinvr_par file_rayinvr_com;
     run(file_rayinvr_par);
@@ -13,7 +13,7 @@ function [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot
     iblk = ibs;
     iwave = 1;
     iccbnd = 1;
-    vshot = vel(xshot,zshot);
+    vshot = fun_vel(xshot,zshot);
     if icbnd(1) == 0
         vshot = vshot .* vsvp(layer,iblk);
         iwave = -iwave ;
@@ -42,7 +42,7 @@ function [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot
                 end
                 if iwave == -1
                     vti = vti .* vsvp(ii,jj);
-                    vbi = vbi .8 vsvp(ii,jj);
+                    vbi = vbi .* vsvp(ii,jj);
                 end
                 if ii < l
                     if vti>vlmax, vlmax=vti; end

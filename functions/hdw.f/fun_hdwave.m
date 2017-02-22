@@ -110,7 +110,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
         else
         	a2 = asin(vratio);
         end
-        ar(n,2) = fid .* (pi-a2) - alpha;
+        arar(n,2) = fid .* (pi-a2) - alpha;
         if invr==1 & ir>0
             [lstart,istart,vr(n,1),vr(n,2),pi2,a2,alpha,n,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),pi2,a2,alpha,n,-1);
         end
@@ -120,7 +120,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
     	if idump == 1
     		% 5
     	    fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-    	    	ifam,ir,n,xr(n),zr(n),ar(n,1).*pi18,ar(n,2).*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
+    	    	ifam,ir,n,xr(n),zr(n),arar(n,1).*pi18,arar(n,2).*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
     	end
 	end
 
@@ -153,7 +153,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        else
 	        	vr(n,1) = vs(n,1);
 	        end
-	        ar(n,1) = ar(n-1,2);
+	        arar(n,1) = arar(n-1,2);
 	        iblk = iblk + id;
 	        if iblk<1 | iblk>nblk(layer)
 	            fun_goto999(); return;
@@ -179,14 +179,14 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        	vr(n,2) = vs(n,2);
 	        end
 	        alpha = atan(s(layer,iblk,1));
-	        ar(n,2) = fid .* pi2 - alpha;
+	        arar(n,2) = fid .* pi2 - alpha;
 	        if invr == 1 & ir > 0
 	            [layer,iblk,n] = fun_velprt(layer,iblk,n);
 	        end
 
 	        if idump == 1
 	            fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-	            	ifam,ir,n,xr(n),zr(n),ar(n,1)*pi18,ar(n,2)*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
+	            	ifam,ir,n,xr(n),zr(n),arar(n,1)*pi18,arar(n,2)*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
 	        end
 
 	        continue; % go to 500
@@ -214,11 +214,11 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        else
 	        	vr(n,1) = vs(n,1);
 	        end
-	        ar(n,1) = ar(n-1,2);
+	        arar(n,1) = arar(n-1,2);
 	        vp(n,2) = vp(n,1);
 	        vs(n,2) = vs(n,1);
 	        vr(n,2) = vr(n,1);
-	        ar(n,2) = ar(n,1);
+	        arar(n,2) = arar(n,1);
 	        if invr == 1 & ir > 0
 	            [layer,iblk,n] = fun_velprt(layer,iblk,n);
 	        end

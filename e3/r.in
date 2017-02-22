@@ -3,18 +3,18 @@
            xwndow=292., ywndow=175.,
            ircol=1, itcol=1,
   &end
-  &axepar  xmax=10., xmm=265., 
-           zmax=3.,  zmm=70., 
+  &axepar  xmax=10., xmm=265.,
+           zmax=3.,  zmm=70.,
            tmin=0.7, tmax=2.2, tmm=60.,
            itrev=1, albht=4., orig=20., sep=10.,
-  &end   
-  &trapar  imodf=1, i2pt=1, 
+  &end
+  &trapar  imodf=1, i2pt=1,
            ishot=1,2,2,2,2,2,2,2,2,2,-1,
            xshot=0.01,1.01,2.01,3.01,4.01,5.01,
                  6.01,7.01,8.01,9.01,9.99,
            ray=2.2,3.2,
-           nsmax=25, 
-           nray=100,  
+           nsmax=25,
+           nray=100,
            ibsmth=1, npbnd=250, nbsmth=100,
            aamax=120.0,
   &end

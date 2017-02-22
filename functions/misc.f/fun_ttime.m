@@ -17,10 +17,13 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 	% integer itt(1)
 	run(file_rayinvr_com);
 
+	onDev = true;
+	if onDev, disp('========================= tick fun_ttime ========================='); end
+
 	if idump == 1
 		% 15
 	    fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-	    	ifam,nr,npt,xr(npt),zr(npt),ar(npt,1).*pi18,ar(npt,2).*pi18,vr(npt,1),vr(npt,2),layer,iblk,id,iwave);
+	    	ifam,nr,npt,xr(npt),zr(npt),arar(npt,1).*pi18,arar(npt,2).*pi18,vr(npt,1),vr(npt,2),layer,iblk,id,iwave);
 	end
 
 	time = 0.0;
@@ -40,7 +43,7 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 		time = time + tr(ii) ./ vave(ii);
 	end % 10
 
-	a2 = fid1 .* (90.0-fid.*ar(npt,1).*pi18) ./ fid;
+	a2 = fid1 .* (90.0-fid.*arar(npt,1).*pi18) ./ fid;
 	nptr = npt;
 	if vred == 0.0
 	    timer = time;

@@ -20,16 +20,16 @@ function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
 
     if iflag == 0
         x = xr(npt) + fid.*smax./dstepf;
-        y(1) = zr(npt) + (x - xr(npt)) ./ tan(ar(npt,2));
-        y(2) = ar(npt,2);
+        y(1) = zr(npt) + (x - xr(npt)) ./ tan(arar(npt,2));
+        y(2) = arar(npt,2);
     else
-        if (fid .* ar(npt,2)) <= pi2
+        if (fid .* arar(npt,2)) <= pi2
             x = x + smax ./ dstepf;
         else
             x = x - smax ./ dstepf;
         end
-        y(1) = xr(npt) + tan(ar(npt,2)) .* (x - zr(npt));
-        y(2) = ar(npt,2);
+        y(1) = xr(npt) + tan(arar(npt,2)) .* (x - zr(npt));
+        y(2) = arar(npt,2);
     end
     return;
 end % function end

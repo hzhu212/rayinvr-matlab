@@ -23,11 +23,11 @@ function [iflag,x,z] = fun_check(iflag,x,z)
         z4 = s(layer,iblk,2).*xbnd(layer,iblk,2) + b(layer,iblk,2);
         zb = s(layer,iblk,2).*x + b(layer,iblk,2);
         if id < 0
-            zt = amin1(z1,zt);
-            zb = amax1(z3,zb);
+            zt = min(z1,zt); % amin1 -> min
+            zb = max(z3,zb); % amax1 -> max
         else
-            zt = amin1(z2,zt);
-            zb = amax1(z4,zb);
+            zt = min(z2,zt); % amin1 -> min
+            zb = max(z4,zb); % amax1 -> max
         end
         if z < zt, z = zt - 0.001; end
         if z > zb, z = zb + 0.001; end

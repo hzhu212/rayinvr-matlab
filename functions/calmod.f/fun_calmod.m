@@ -1339,11 +1339,11 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
 
     return;
 
-    % --------------------------------------------------
-    function fun_goto999()
-    % calculate end for model error
-
-        error('e:test','\n***  error in velocity model 2 ***\n');
-    end % fun_goto999 end
-
 end % fun_calmod end
+
+% --------------------------------------------------
+function fun_goto999()
+% calculate end for model error
+
+    error('e:stop','\n***  error in velocity model 2 ***\n\n');
+end % fun_goto999 end

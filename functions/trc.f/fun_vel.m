@@ -1,6 +1,7 @@
 % trc.f
 % [vel]
-% called by: fun_modwr; fun_fd;
+% called by: fun_modwr; fun_fd; fun_calvel; fun_autotr; fun_dstep; fun_trace;
+% fun_adjpt;
 % call: none.
 
 % fortran function
