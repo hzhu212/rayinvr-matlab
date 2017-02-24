@@ -8,9 +8,10 @@ function [iflag,x,z] = fun_check(iflag,x,z)
 % trapezoid; if not, adjust the step length so it falls 1 meter
 % outside the trapezoid
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+    global xbnd layer iblk s b id;
 
     if iflag == 0
         if x < xbnd(layer,iblk,1), x = xbnd(layer,iblk,1) - 0.001; end

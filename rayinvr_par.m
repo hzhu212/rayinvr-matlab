@@ -14,12 +14,8 @@ global player ppcntr ptrap pshot prayf ptrayf ppray pnrayf ...
        pitan2 piray;
 global pi4 pi2 pi34 pi18 pit2;
 
-global onDev
-
 if isempty(has_rayinvr_par_init)
     %% these parameters are all constant.
-
-    onDev = true;
 
     % pi = 3.141592654;
     % pi4 = 0.785398163;

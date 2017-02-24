@@ -13,10 +13,10 @@ function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
 %              iflag=0 --  x is present x coordinate
 %              iflag=1 --  x is present z coordinate
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    % y = zeros(1,2);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+    global xr fid smax dstepf zr arar pi2;
 
     if iflag == 0
         x = xr(npt) + fid.*smax./dstepf;

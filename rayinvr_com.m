@@ -3,7 +3,8 @@
 global has_rayinvr_com_init;
 
 % changed 'ar' to 'arar' to avoid name conflict.
-% changed 'step' to 'stepstep' to avoid name conflict.
+% changed 'step' to 'stepstep'.
+% changed 'rangerange' to 'rangerange'.
 
 % common
 global layer iblk id fid fid1;  %  blk1
@@ -14,13 +15,13 @@ global xm zm vf nzed nvel xvel;  %  blk5
 global xr zr arar vr tr vp vs;  %  blk6
 global refll ircbnd;  %  blk7
 global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
-global itx vred time timer;  %  blk9
+global itx vred time timertimer;  %  blk9
 global stepstep smin smax;  %  blk10
-global range tt rayid xshtar fidarr idray ntt ray;  %  blk11
+global rangerange tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
        xtmaxt xmmt ndecxt xscalt ntckxt zmin zmax ztmin ztmax zmm ndeciz ...
        zscale ntickz tmin tmax ttmin ttmax tmm ndecit tscale ntickt symht ...
-       albht iplots orig sep title ititle xtitle ytitle ircol mcol irrcol ...
+       albht iplots orig sep titletitle ititle xtitle ytitle ircol mcol irrcol ...
        itcol ncol colour;  %  blk12
 global icasel dstepf n2 n3 istop nstepr;  %  blk13
 global iwave nccbnd iccbnd icbnd vsvp;  %  blk14
@@ -40,6 +41,9 @@ global sample;  %  blk26
 global nbnd nbnda npskip npskp;  %  blk27
 global mtan btan mcotan bcotan factan;  %  blktan
 global iplot isep iseg nseg xwndow ywndow ibcol ifcol sf;  %  cplot
+
+% common /rkcs/ in rngkta, odex and odez
+global ok;
 
 % these varables come from blkdat.f
 % fortran 中全局变量(common变量)不能直接使用 data 语句赋值，只能通过 block data 模块赋初值
@@ -129,7 +133,7 @@ if isempty(has_rayinvr_com_init)
     cz = zeros(player,ptrap,4,2);
     tang = zeros(player,4);
     cosmth = zeros(pncntr,pnsmth);
-    range = zeros(1,pray);
+    rangerange = zeros(1,pray);
     apart = zeros(prayi,pnvar);
     fpart = zeros(pnrayf,pnvar);
     tobs = zeros(1,prayi);
@@ -149,7 +153,7 @@ if isempty(has_rayinvr_com_init)
     bcotan = zeros(1,pitan2);
 
     % character
-    title = '';
+    titletitle = '';
 end
 
 if isempty(has_rayinvr_com_init)

@@ -1,7 +1,7 @@
 % calmod.f
 % [~,~,poisb,poisl,~,invr,iflagm,~,xmin1d,xmax1d,~,~,~]
 % called by: main;
-% call: fun_cvcalc; fun_smooth; fun_smooth2; done.
+% call: fun_cvcalc; fun_smooth; fun_smooth2; fun_vel; done.
 
 function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
 % calculate model
@@ -1075,26 +1075,30 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
     % 400
     if ibsmth > 0
         xsinc = (xmax-xmin) / (npbnd-1);
-        for ii = 1: nlayer+1
+        for ii = 1: nlayer+1 % 600
             if ii < nlayer+1
                 il = ii; ib = 1;
             else
                 il = ii-1; ib = 2;
             end
             iblk = 1;
-            for jj = 1:npbnd
+            for jj = 1:npbnd % 610
                 x = xmin + (jj-1)*xsinc;
                 if x<xmin, x=xmin+0.001; end
                 if x>xmax, x=xmax-0.001; end
-                while true
-                    % 620
+
+                % 620 % -------------------- cycle620 begin
+                cycle620 = true;
+                while cycle620
                     if x>=xbnd(il,iblk,1) & x<=xbnd(il,iblk,2)
-                        cosmth(ii,jj) = s(il,iblk,ib)*x + b(il,iblk,ib);
+                        cosmth(ii,jj) = s(il,iblk,ib).*x + b(il,iblk,ib);
                         break; % go to 610
                     else
                         iblk = iblk + 1;
+                        continue; % go to 620
                     end
-                end
+                    break; % go to nothing
+                end % -------------------- cycle620 begin
             end % 610
         end % 600
         n1ns = round(xminns/xsinc) + 1;
@@ -1104,7 +1108,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             iflag12 = 1;
         end
         if nbsmth > 0
-            for ii = 1: nlayer+1
+            for ii = 1: nlayer+1 % 630
                 if xminns<xmin & xmaxns<xmin
                     % 6630
                     if any(insmth(1:pncntr)==ii), continue; end % go to 630
@@ -1229,10 +1233,10 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 z2sum = z2sum + xblk*(z21+z22)/2.0;
                 if vm(ii,jj,1) > 0.001
                     layer = ii; iblk = jj;
-                    v11 = vel(xb1,z11);
-                    v12 = vel(xb2,z12);
-                    v21 = vel(xb1,z21);
-                    v22 = vel(xb2,z22);
+                    v11 = fun_vel(xb1,z11);
+                    v12 = fun_vel(xb2,z12);
+                    v21 = fun_vel(xb1,z21);
+                    v22 = fun_vel(xb2,z22);
                     vp1sum = vp1sum + xblk*(v11+v12)/2.0;
                     vs1sum = vs1sum + xblk*(v11+v12)*vsvp(ii,jj)/2.0;
                     vp2sum = vp2sum + xblk*(v21+v22)/2.0;

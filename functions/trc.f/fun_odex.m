@@ -1,19 +1,22 @@
 % trc.f
 % [~,~,f]
 % called by: fun_trace;
-% call: none.
+% call: fun_vel; done.
 
 function [x,y,f] = fun_odex(x,y,f)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with x as independent variable
 
-    global file_rayinvr_par file_rayinvr_com;
-    global fID_12;
-    run(file_rayinvr_par);
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_12;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
     % real y(2),f(2)
     % logical ok
-    run(file_rayinvr_com);
     % common /rkcs/ ok
+    global c layer iblk isrkc idump irkc;
+    global fID_12;
+    global ok;
 
     f(1) = 1.0 ./ tan(y(2));
     term1 = c(layer,iblk,3) + c(layer,iblk,4) .* x;
@@ -25,7 +28,7 @@ function [x,y,f] = fun_odex(x,y,f)
     if ~ok
         if isrkc==1 & idump==1
             % 5
-            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. x  ***\n|del(v)| = %12.5f\n',vel(x,y(1)).*(vxv.^2+vzv.^2).^0.5);
+            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. x  ***\n|del(v)| = %12.5f\n',fun_vel(x,y(1)).*(vxv.^2+vzv.^2).^0.5);
         end
         irkc = 1;
         isrkc = 0;

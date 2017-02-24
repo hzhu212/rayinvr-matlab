@@ -7,10 +7,11 @@ function [x,y,f] = fun_odexfi(x,y,f)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with x as independent variable
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
     % real y(2),f(2)
-    run(file_rayinvr_com);
+    % run(file_rayinvr_com);
+    global factan mcotan bcotan c layer iblk;
 
     sa = 1.0 .* sign(y(2));
     n1 = fix(sa.*y(2).*factan) + 1;

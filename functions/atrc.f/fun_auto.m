@@ -36,12 +36,10 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
 
     if idr == 1
         % search for refracted rays
-        % [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = ...
-        [~,~,~,~,~,vshot,vtop,vbotom] = ...
-        fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
+        [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
 
         if l>layer1 & abs(vtop-vbotom)<=0.000001
-            [~,l,ib] = fun_block(xshot+fid.*0.0005,l,ib);
+            [~,~,ib] = fun_block(xshot+fid.*0.0005,l,ib);
             if id == 1
                 i1 = ib; i2 = nblk(l);
             else
@@ -68,29 +66,29 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             a1 = 0.0;
             amin = -999999.0;
             amax = -999999.0;
-            if isrch==0 & tang(l,1)<100.0
+            if isrch == 0 & tang(l,1) < 100.0
                 amin = tang(l,1);
             else
                 for n = 1:nsmax % 101
-                    [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                    fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                    [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                    = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                     if idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0
                         amin = ang;
                         tang(l,1) = amin;
                         if n >= nsmin, break; end % go to 104
                         if stol > 0.0 & n > 1
-                            dp = sqrt((xr(npt)-xmmm).^2+(zr(npt)-zmmm).^2);
-                            if dp < stol, break; end
+                            dp = sqrt((xr(npt)-xmmm).^2 + (zr(npt)-zmmm).^2);
+                            if dp < stol, break; end % go to 104
                         end
                         if amax < -999998.0, amax = amin;
                         else
                             if ang > amax, amax = ang; end
                         end
-                        if a1 == 0, ang = ang - ainc;
+                        if a1 == 0.0, ang = ang - ainc;
                         else ang = (a1+ang) ./ 2.0; end
                     else
                         if idray(1) >= 1
-                            if a1 == 0
+                            if a1 == 0.0
                                 if amin < -999998.0, ang = ang - ainc;
                                 else ang = amin - ainc; end
                             else
@@ -118,18 +116,17 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                     a2 = 0.0;
                     ang = amax + ainc;
                     for n = 1:nsmax % 102
-                        % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                        fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                        = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                         if idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0
                             amin = ang;
                             tang(l,2) = amax;
                             if n >= nsmin, return; end
                             if stol > 0.0 & n > 1
-                                dp = sqrt((xr(npt)-xmmm).^2+(zr(npt)-zmmm).^2);
+                                dp = sqrt((xr(npt)-xmmm).^2 + (zr(npt)-zmmm).^2);
                                 if dp < stol, return; end
                             end
-                            if a2 == 0, ang = ang + ainc.*n;
+                            if a2 == 0.0, ang = ang + ainc.*n; % float
                             else ang = (a2+ang) ./ 2.0; end
                         else
                             a2 = ang;
@@ -145,12 +142,12 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             if vratio > 0.99999, amin = aamin;
             else amin = 90.0 - asin(vratio).*pi18; end
             vratio = vshot ./ vbotom;
-            if vratio > -0.99999, amax = aamin;
+            if vratio > 0.99999, amax = aamin;
             else amax = 90.0 - asin(vshot./vbotom).*pi18; end
             ainc = (amax-amin) .* aainc;
             if ainc < aaimin, ainc = aaimin; end
             if l ~= layer1
-                if isrch==0 & tang(l,1) < 100.0
+                if isrch == 0 & tang(l,1) < 100.0
                     amin=tang(l,1);
                 else
                     ang = amin;
@@ -159,8 +156,8 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                     isGoto111 = false;
                     for n = 1:nsmax % 110
                         % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                        fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                        = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                         if idray(1) >= l
                             a2 = ang;
                             if idray(1) == l & idray(2) == 1 & vr(npt,2) ~= 0.0
@@ -168,8 +165,8 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                                 tang(l,1) = amin;
                                 if n >= nsmin, isGoto111=true; break; end % go to 111
                                 if stol > 0.0 & n > 1
-                                    dp = sqrt((xr(npt)-xmmm).^2+(zr(npt)-zmmm).^2);
-                                    if dp < stol, isGoto111=true; break; end
+                                    dp = sqrt((xr(npt)-xmmm).^2 + (zr(npt)-zmmm).^2);
+                                    if dp < stol, isGoto111=true; break; end % go to 111
                                 end
                             end
                             if a1 == 0.0, ang = ang - ainc;
@@ -182,7 +179,9 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                         xmmm = xr(npt);
                         zmmm = zr(npt);
                     end % 110
-                    if ~isGoto111 && amin < -999998.0, iflag = 1; end
+                    if ~isGoto111
+                        if amin < -999998.0, iflag = 1; end
+                    end
                 end
             end
             % 111
@@ -193,9 +192,8 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                 a1 = 0.0; a2 = 0.0;
                 amax = -999999.0;
                 for n = 1:nsmax % 130
-                    % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                    [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                    fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                    [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                    = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                     if idray(1)<l | (idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0)
                         a1 = ang;
                         if idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0
@@ -203,8 +201,8 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                             tang(l,2) = amax;
                             if n >= nsmin, break; end % go to 131
                             if stol > 0.0 & n > 1
-                                dp = sqrt((xr(npt)-xmmm).^2+(zr(npt)-zmmm).^2);
-                                if dp < stol, break; end
+                                dp = sqrt((xr(npt)-xmmm).^2 + (zr(npt)-zmmm).^2);
+                                if dp < stol, break; end % go to 131
                             end
                         end
                         if a2 == 0.0, ang = ang + ainc;
@@ -246,22 +244,18 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             amin = tang(l,3);
             amax = aamax;
         else
-            % [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = ...
-            [~,~,~,~,~,vshot,vtop,vbotom] = ...
-            fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
+            [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
             vratio = vshot ./ vbotom;
             if vratio > 0.99999, amin=aamin;
-            else amin=90.0-asin(vratio).*pi18; end
+            else amin = 90.0-asin(vratio).*pi18; end
             amax = aamax;
             a1 = 0.0; a2 = 0.0;
             ainc = (amax-amin) .* aainc;
-            if ainc<aaimin, ainc=aaimin; end
+            if ainc < aaimin, ainc = aaimin; end
             ang = amin;
             amin = -999999.0;
             for n = 1:nsmax % 210
-                % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if (idray(1)<l) | (idray(1)==l & idray(2)==1) | (idray(1)==l & idray(2)==2 & vr(npt,2)==0.0) | ...
                     (xsmax>0.0 & it==1 & idray(1)==l & idray(2)==2 & 2.0*abs(xshot-xr(npt))>xsmax) | ...
                     (xsmax>0.0 & it==0 & idray(1)==l & idray(2)==2 & abs(xshot-xr(npt))>xsmax)
@@ -274,12 +268,12 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                         amin = ang;
                         tang(l,3) = amin;
                         if n >= nsmin, return; end
-                        if stol > 0 & n > 1
+                        if stol > 0.0 & n > 1
                             dp = sqrt((xr(npt)-xmmm).^2 + (zr(npt)-zmmm).^2);
                             if dp < stol, return; end
                         end
                     end
-                    if a1 == 0, ang = ang - ainc;
+                    if a1 == 0.0, ang = ang - ainc;
                     else ang = (a1 + a2) ./ 2.0; end
                 end
                 xmmm = xr(npt);
@@ -295,16 +289,12 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             amin = tang(l,4);
             amax = tang(l,4);
         else
-            % [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = ...
-            [~,~,~,~,~,vshot,vtop,vbotom] = ...
-            fun_calvel(xshot,zshot,layer1,iblk1,l+1,vshot,vtop,vbotom);
+            [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l+1,vshot,vtop,vbotom);
             vratio = vshot ./ vtop;
             if vratio > 0.99999, ang = aamin;
             else ang = 90.0 - asin(vratio).*pi18; end
             a1 = 0.0; a2 = 0.0;
-            % [xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom] = ...
-            [~,~,~,~,~,vshot,vtop,vbotom] = ...
-            fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
+            [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
             if vtop < vbotom
                 if vtop <= vshot
                     ainc = (90.0 - asin(vratio).*pi18 - aamin) .* aainc;
@@ -317,9 +307,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             if ainc < aaimin, ainc = aaimin; end
             angm = ang;
             for n = 1:nsmax % 1100
-                % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if idray(1) == l & iflag2 == 2
                     amax = ang;
                     amin = ang;
@@ -339,9 +327,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             ang = angm;
             a1 = 0.0; a2 = 0.0;
             for n = 1:nsmax % 1200
-                % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = ...
-                fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if idray(1) == l & iflag2 == 2
                     amax = ang;
                     amin = ang;

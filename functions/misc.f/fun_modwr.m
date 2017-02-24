@@ -175,7 +175,7 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 					iblk = iblk + 1;
 				end
 				vzgrid(jj) = s(il,iblk,ib) .* x + b(il,iblk,ib);
-				% go to 70
+				continue; % go to 70
 			end % 70
 
 			% 25

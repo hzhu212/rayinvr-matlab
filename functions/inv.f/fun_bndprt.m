@@ -3,14 +3,14 @@
 % called by: fun_hdwave; fun_adjpt;
 % call: none.
 
-function [lu,iu,v1,v2,a1,a2,alpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2,alpha,npt,itype)
+function [lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype)
 % calculate boundary partial derivatives
 
 	global file_rayinvr_par file_rayinvr_com;
 	run(file_rayinvr_par);
 	run(file_rayinvr_com);
 
-	if iabs(itype)==2, a2=pi-2; end
+	if abs(itype)==2, a2=pi-2; end % iabs -> abs
 	if itype > 0
 	    iz1 = 3;
 	    iz2 = 4;
@@ -23,7 +23,7 @@ function [lu,iu,v1,v2,a1,a2,alpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2,alph
 	    if izv(lu,iu,ii) ~= 0
 	        jv = izv(lu,iu,ii);
 	        if cz(lu,iu,ii,2) ~= 0.0
-	            slptrm = cos(alpha) .* abs(cz(lu,iu,ii,1)-xr(npt)) ./ cz(lu,iu,ii,2);
+	            slptrm = cos(alphaalpha) .* abs(cz(lu,iu,ii,1)-xr(npt)) ./ cz(lu,iu,ii,2);
 	        else
 	        	slptrm = 1.0;
 	        end

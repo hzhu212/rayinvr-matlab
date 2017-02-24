@@ -65,8 +65,6 @@ c
           if(ifast.eq.0) then
             call rngkta(x,z,y,f,hn,hminn,tol,odex,w1,w2,w3)
           else
-C             debug
-C             write(*,*) '---test---',x,z
             call rkdumb(y,x,z,odexfi)
             x=z
           end if

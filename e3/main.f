@@ -116,7 +116,7 @@ c
      +     cbnd/pconvt*-99/,ibreak/prayf*1/,ihead/player*0/,
      +     insmth/pncntr*0/
 c
-      onDev = .true.
+      onDev = .false.
       if(onDev) write(*,*) '=============== tick 0 ==============='
 
       iline=0
@@ -567,9 +567,9 @@ c
 
 c     plot velocity model
 c
-      if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.lt.2)
-     + call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
-     + idata,iroute,i33)
+C       if((imod.eq.1.or.iray.gt.0.or.irays.eq.1).and.isep.lt.2)
+C      + call pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,
+C      + idata,iroute,i33)
 c
 c     calculation of smooth layer boundaries
 c

@@ -18,8 +18,8 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 	nsfc = 1;
 	isf = ilshot(nsfc);
 
-	cycle100 = true;
 	% 100 % -------------------- cycle100 begin
+	cycle100 = true;
 	while cycle100
 		xf = xpf(isf);
 		tf = tpf(isf);
@@ -29,7 +29,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 		if irayf < 0, return; end % go to 999
 		if irayf == 0
 			xshotf = xf;
-			idf = sign(1.0,tf);
+			idf = 1.0 .* sign(tf);
 			if abs(xshotr-xshotf) < 0.001 & idr == idf
 				iflag = 1;
 				npick = isf - nsfc;
@@ -104,7 +104,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 				if tvmin > 9999.0
 					% go to 110
 					isf = isf + 1;
-					continue;
+					continue; % go to 100
 				end
 				iapos = 0;
 				if narinv > 0
@@ -123,7 +123,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 					if tcalc(iapos) <= tvmin
 						% go to 110
 						isf = isf + 1;
-						continue;
+						continue; % go to 100
 					end
 				end
 				ipinv(iapos) = npick;
@@ -153,8 +153,11 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 			% 110
 			isf = isf + 1;
 		end
+		continue; % go to 100
+		break; % go to nothing
 	end % -------------------- cycle100 end
 
+	% 999
 	return;
 
 end % fun_calprt end

@@ -14,8 +14,9 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	% integer icasec(5)
 	run(file_rayinvr_com);
 
-	[xn,zn,an] = deal([]); % for fun_adhoc
+	[xn,zn,an,xb,zb,ab,xt,zt,at,xl,zl,al,xri,zri,ari] = deal([]); % for fun_adhoc
 	ib = []; % for fun_block
+	icase = []; % for fun_corner
 
 	icasec = [3,4,1,2,5];
 
@@ -26,31 +27,35 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	% make appropriate adjustment if point outside current model
 	% block is above top boundary and below bottom boundary
 
-	% 100
-	while zr(n)<=top & zr(n)>bot % -------------------- cycle100 begin
+	% 100 % -------------------- cycle100 begin
+	while (zr(n) <= top && zr(n) > bot)
+
+		isGoto100 = false;
+
 	    xmmm = (xr(n)+xr(n-1)) ./ 2.0;
 	    zmmm = (zr(n)+zr(n-1)) ./ 2.0;
 	    am = (arar(n,1)+arar(n-1,2)) ./ 2.0;
 
+	    % 500 % -------------------- cycle500 begin
 	    cycle500 = true;
-	    while cycle500 % -------------------- cycle500 begin
-		    % 500
+	    while cycle500
 		    top = s(layer,iblk,1).*xmmm + b(layer,iblk,1);
 		    bot = s(layer,iblk,2).*xmmm + b(layer,iblk,2);
 		    if zmmm<=top | zmmm>bot | xmmm<=lef | xmmm>rig
 				xr(n) = xmmm;
 				zr(n) = zmmm;
 				arar(n,1) = am;
-				% go to 100
-				break;
+				isGoto100 = true; break; % go to 100 step1
 			else
 				xmmm = (xr(n)+xmmm) ./ 2.0;
 				zmmm = (zr(n)+zmmm) ./ 2.0;
 				am = (arar(n,1)+am) ./ 2.0;
-				% go to 500
-				continue;
+				continue; % go to 500
 		    end
+		    break; % go to nothing
 		end % -------------------- cycle500 end
+		if isGoto100, continue; end % go to 100 step2
+		break; % go to nothing
 	end % -------------------- cycle100 end
 
 	% 为方便快速跳转到1001处，构造一个只执行一次的循环，通过break语句实现与goto类似的效果
@@ -205,21 +210,23 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 
     % go to (1000,2000,3000,4000), icase
 
+    % ray intersects upper boundary
+
     % 1000 % -------------------- block 1000 begin
     if ~(icase == 3 | icase == 2 | icase == 4)
     	% ray intersects upper boundary
     	if ibsmth == 0
-    	    alpha = atan(s(layer,iblk,1));
+    	    alphaalpha = atan(s(layer,iblk,1));
     	else
-			npl = ifix((xr(n)-xmin-0.001)./xsinc) + 1;
+			npl = fix((xr(n)-xmin-0.001)./xsinc) + 1; % ifix -> fix
 			npr = npl + 1;
 			xpl = xmin + (npl-1) .* xsinc;
-			alpha = (cosmth(layer,npr)-cosmth(layer,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer,npl);
+			alphaalpha = (cosmth(layer,npr)-cosmth(layer,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer,npl);
     	end
-    	a1 = pi - fid .* (arar(n,1)+alpha);
+    	a1 = pi - fid .* (arar(n,1)+alphaalpha);
     	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
     	    % go to 999
-    	    [n3,n,nbnd,nptbnd,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,dstepf);
+    	    [n3,n,nbnd,nptbnd,~,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,npbndm,dstepf);
     	    return;
     	end
     	n3 = 0;
@@ -253,18 +260,16 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	    vi = vi .* vsvp(layer,iblk);
     	end
     	if layer > 1
+    		isGoto1330 = false;
+    		% 1320 % -------------------- cycle1320 begin
     	    cycle1320 = true;
-    	    isGoto1310 = false;
-    	    isGoto1330 = false;
-    	    while cycle1320 % -------------------- cycle1320 begin
-	    	    % 1320
-	    	    i1 = layer - 1;
-	    	    [xn,i1,ib] = fun_block(xn,i1,ib);
+    	    while cycle1320
+	    	    isGoto1330 = false;
 
-	    	    if ivg(i1,ib) ~= -1
-	    	    	isGoto1310 = true;
-	    	    	break; % go to 1310
-	    	    end
+	    	    i1 = layer - 1;
+	    	    [~,~,ib] = fun_block(xn,i1,ib);
+
+	    	    if ivg(i1,ib) ~= -1, break; end % go to 1310
 
     	        layer = layer - 1;
     	        if refll(ircbnd) == -layer
@@ -277,7 +282,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	                return;
     	        end
 
-    	        if layer>1, continue; end % go to 1320
+    	        if layer > 1, continue; end % go to 1320
 
     	        if refll(ircbnd) ~= -1
     	            vr(n,2) = 1.0;
@@ -309,8 +314,8 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	isGoto1110 = false;
     	isGoto1100 = false;
     	isGoto1200 = false;
-    	for cycle1330 = 1:1 % -------------------- one-time cycle1330 begin
-	    	% 1330
+    	% 1330 % -------------------- one-time cycle1330 begin
+    	for cycle1330 = 1:1
 	    	if refll(ircbnd) == -lstart
 	    	    layer = lstart;
 		        ircbnd = ircbnd + 1;
@@ -372,7 +377,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	end
     	% 1110
     	if ~isGoto1200
-			arar(n,2) = fid .* a2 - alpha;
+			arar(n,2) = fid .* a2 - alphaalpha;
 			vr(n,2) = vi;
 			vp(n,2) = vp(n,1);
 			vs(n,2) = vs(n,1);
@@ -385,7 +390,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 			    iblk = istart;
 			end
 			if ir~=0 & invr==1
-			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,-2);
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alphaalpha,n,-2);
 			end
 			return;
     	end
@@ -396,7 +401,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 		layer = layer - 1;
 		iblk = ib;
 		a2 = asin(at2);
-		arar(n,2) = fid .* (pi-a2) - alpha;
+		arar(n,2) = fid .* (pi-a2) - alphaalpha;
 		vr(n,2) = vo;
 		vp(n,2) = vp2;
 		vs(n,2) = vs2;
@@ -415,7 +420,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 			fid = id; % fid = float(id);
 		end
 		if ir~=0 & invr==1
-		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,-1);
+		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alphaalpha,n,-1);
 		end
         return;
     end % -------------------- block 1000 end
@@ -430,18 +435,17 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	    return;
     	end
     	if ibsmth == 0
-    	    alpha = atan(s(layer,iblk,2));
+    	    alphaalpha = atan(s(layer,iblk,2));
     	else
 			npl = fix((xr(n)-xmin-0.001)./xsinc) + 1; % ifix -> fix
 			npr = npl + 1;
 			xpl = xmin + (npl-1) .* xsinc;
-			alpha = (cosmth(layer+1,npr)-cosmth(layer+1,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer+1,npl);
+			alphaalpha = (cosmth(layer+1,npr)-cosmth(layer+1,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer+1,npl);
     	end
-    	a1 = fid .* (arar(n,1)+alpha);
-    	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
-    	    % go to 999
-    	    [n3,n,nbnd,nptbnd,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,dstepf);
-    	    return;
+    	a1 = fid .* (arar(n,1)+alphaalpha);
+    	if abs(a1)>=pi2 & n3<=nstepr & dstepf< 1.0e6
+    	    [n3,n,nbnd,nptbnd,~,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,npbndm,dstepf);
+    	    return; % go to 999
     	end
     	n3 = 0;
     	dstepf = 1.0;
@@ -456,9 +460,9 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	    vi = vi .* vsvp(layer,iblk);
     	end
 
+    	% 3020 % -------------------- cycle3020 begin
     	cycle3020 = true;
-    	while cycle3020 % -------------------- cycle3020 begin
-	    	% 3020
+    	while cycle3020
 	    	i1 = layer + 1;
 	    	[~,~,ib] = fun_block(xn,i1,ib);
 	    	if ivg(i1,ib) ~= -1
@@ -481,7 +485,8 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	    	    iflag = 1;
 	    	    return;
 	    	end
-	    	% go to 3020
+	    	continue; % go to 3020
+	    	break; % go to nothing
 	    end % -------------------- cycle3020 end
 
 	    isGoto3110 = false;
@@ -576,7 +581,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 
         % 3110 % -------------------- block 3110 begin
         if ~(isGoto3200 | isGoto3300)
-			arar(n,2) = fid .* (pi-a2) - alpha;
+			arar(n,2) = fid .* (pi-a2) - alphaalpha;
 			vr(n,2) = vi;
 			vp(n,2) = vp(n,1);
 			vs(n,2) = vs(n,1);
@@ -596,7 +601,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 			    iblk = istart;
 			end
 			if ir ~= 0 & invr == 1
-			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,2);
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alphaalpha,n,2);
 			end
 			if ir > 0 & modout == 1
 				% 155
@@ -630,7 +635,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
             layer = layer + 1;
 			iblk = ib;
 			a2 = asin(at2);
-			arar(n,2) = fid .* a2 - alpha;
+			arar(n,2) = fid .* a2 - alphaalpha;
 			vr(n,2) = vo;
 			vp(n,2) = vp2;
 			vs(n,2) = vs2;
@@ -647,7 +652,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 			end
 			if idray(1)<layer, idray(1)=layer; end
 			if ir ~= 0 & invr == 1
-			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,1);
+			    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alphaalpha,n,1);
 			end
 			return;
         end % -------------------- block 3200 end
@@ -667,9 +672,9 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
                 return;
             end
             a2 = asin(at1);
-	        arar(n,2) = fid .* (pi-a2) - alpha;
+	        arar(n,2) = fid .* (pi-a2) - alphaalpha;
 	    else
-	    	arar(n,2) = fid .* pi2 - alpha;
+	    	arar(n,2) = fid .* pi2 - alphaalpha;
 	        a2 = pi2;
         end
 		vr(n,2) = vo;
@@ -678,7 +683,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 		ihdw = 1;
 		idray(1) = layer;
 		if ir ~= 0 & invr == 1
-		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alpha,n,1);
+		    [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),a1,a2,alphaalpha,n,1);
 		end
 		iflag = 2;
         return;
@@ -721,7 +726,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	a1 = pi2 - fid .* arar(n,1);
 	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
 		% go to 999
-	    [n3,n,nbnd,nptbnd,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,dstepf);
+	    [n3,n,nbnd,nptbnd,~,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,npbndm,dstepf);
 	    return;
 	end
 	n3 = 0;
@@ -770,7 +775,8 @@ end % fun_adjpt end
 
 % ----------------------------------------------------------------------
 
-function [n3,n,nbnd,nptbnd,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,dstepf)
+% [n3,n,nbnd,nptbnd,~,dstepf]
+function [n3,n,nbnd,nptbnd,npbndm,dstepf] = fun_goto999(n3,n,nbnd,nptbnd,npbndm,dstepf)
 % ray has intersected a boundary with an angle of incidence
 % beyond 90 degrees
 

@@ -1,5 +1,5 @@
 % \bvar\b(\(.*\))*\s*=[^=]
-% call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr;
+% call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
 % fun_ttime; fun_cells; fun_fxtinv; fun_sort3; fun_calprt; fun_fd;
 % fun_load_vin; fun_trans_rin2m; fun_load_txin; fun_load_fin;
 
@@ -21,6 +21,9 @@ function main(filePathIn, filePathOut)
 
 	addpath(genpath('functions'));
 	% addpath(genpath(fullfile(pwd(),'functions')));
+
+	% global onDev;
+	onDev = false;
 
 	clear('global');
 	global file_rayinvr_par file_rayinvr_com file_main_par;
@@ -79,8 +82,8 @@ function main(filePathIn, filePathOut)
 		% ?... iunit=10 read(10,1)
 		error('e:stop','\n***  by HeZhu: model must be load from file v.in, not r.in  ***\n\n');
 	end
-	if mod(ppcntr,10) ~= 0 | mod(ppvel,10) ~= 0
-		disp(sprintf('\n***  array size error for number of model points  ***\n\n'));
+	if mod(ppcntr,10) ~= 0 || mod(ppvel,10) ~= 0
+		fprintf('\n***  array size error for number of model points  ***\n\n');
 		fun_goto9999(); return; % go to 9999
 	end
 
@@ -97,27 +100,39 @@ function main(filePathIn, filePathOut)
 	% xvel = arrayfun(@(x) [x.tv(1,:);x.bv(1,:)],model(1:end-1),'UniformOutput',false);
 	% vf = arrayfun(@(x) [x.tv(2,:);x.bv(2,:)],model(1:end-1),'UniformOutput',false);
 	% ivarv = arrayfun(@(x) [x.tv(3,:);x.bv(3,:)],model(1:end-1),'UniformOutput',false);
-	for ii = 1:length(model)-1
-		thisLayer = model(ii);
-		xlen = length(thisLayer.bd(1,:));
-		tvlen = length(thisLayer.tv(1,:));
-		bvlen = length(thisLayer.bv(1,:));
+	for ii = 1:length(model)
+		t_thisLayer = model(ii);
+		[~,t_xlen] = size(t_thisLayer.bd);
+		[~,t_tvlen] = size(t_thisLayer.tv);
+		[~,t_bvlen] = size(t_thisLayer.bv);
 
-		xm(ii,1:xlen) = thisLayer.bd(1,:);
-		zm(ii,1:xlen) = thisLayer.bd(2,:);
-		ivarz(ii,1:xlen) = thisLayer.bd(3,:);
+		% 调整数组形式，与fortran代码中对应的数组一致
+		if t_xlen == 2
+		    t_thisLayer.bd = t_thisLayer.bd(:,2);
+		    t_xlen = 1;
+		end
+		if t_tvlen == 2
+		    t_thisLayer.tv = t_thisLayer.tv(:,2);
+		    t_tvlen = 1;
+		end
+		if t_bvlen == 2
+		    t_thisLayer.bv = t_thisLayer.bv(:,2);
+		    t_bvlen = 1;
+		end
 
-		xvel(ii,1:tvlen,1) = thisLayer.tv(1,:);
-		xvel(ii,1:bvlen,2) = thisLayer.bv(1,:);
-		vf(ii,1:tvlen,1) = thisLayer.tv(2,:);
-		vf(ii,1:bvlen,2) = thisLayer.bv(2,:);
-		ivarv(ii,1:tvlen,1) = thisLayer.tv(3,:);
-		ivarv(ii,1:bvlen,2) = thisLayer.bv(3,:);
+		xm(ii,1:t_xlen) = t_thisLayer.bd(1,:);
+		zm(ii,1:t_xlen) = t_thisLayer.bd(2,:);
+		% the last layer has no bd(3), tv and bv, so jump out
+		if ii==length(model), break; end
+		ivarz(ii,1:t_xlen) = t_thisLayer.bd(3,:);
+
+		xvel(ii,1:t_tvlen,1) = t_thisLayer.tv(1,:);
+		xvel(ii,1:t_bvlen,2) = t_thisLayer.bv(1,:);
+		vf(ii,1:t_tvlen,1) = t_thisLayer.tv(2,:);
+		vf(ii,1:t_bvlen,2) = t_thisLayer.bv(2,:);
+		ivarv(ii,1:t_tvlen,1) = t_thisLayer.tv(3,:);
+		ivarv(ii,1:t_bvlen,2) = t_thisLayer.bv(3,:);
 	end
-	indexLast = length(model);
-	xlen = length(model(end).bd(1,:));
-	xm(indexLast,1:xlen) = model(end).bd(1,:);
-	zm(indexLast,1:xlen) = model(end).bd(2,:);
 
 	ncont = LN;
 	nlayer = ncont - 1; % 20
@@ -135,7 +150,7 @@ function main(filePathIn, filePathOut)
 	if itxout > 0, fID_17 = fopen(file_txout,'w'); end
 	if iplot <= 0, fID_19 = fopen(file_pout,'w'); end
 	if abs(modout) ~= 0, fID_31= fopen(file_vout,'w'); end
-	if i2pt>0 & iray==2 & irays==0 & irayps==0 & iplot<=0
+	if i2pt>0 && iray==2 && irays==0 && irayps==0 && iplot<=0
 		fID_33 = fopen(file_ra1out,'w');
 		fID_34 = fopen(file_ra2out,'w');
 		i33 = 1;
@@ -167,9 +182,8 @@ function main(filePathIn, filePathOut)
 	    if ipf(isf-1)~=-1, continue; end % go to 910
 	    break; % go to nothing
 	end % -------------------- cycle910 end
-	txLen = isf - 2;
-	[xpf,tpf,upf,ipf] = deal(xpf(1:txLen),tpf(1:txLen),upf(1:txLen),ipf(1:txLen));
-
+	% t_txLength = isf - 2;
+	% [xpf,tpf,upf,ipf] = deal(xpf(1:t_txLength),tpf(1:t_txLength),upf(1:t_txLength),ipf(1:t_txLength));
 
 	if onDev, disp('========================= tick 3 ========================='); end
 
@@ -195,7 +209,7 @@ function main(filePathIn, filePathOut)
 
 	if itrev==1, tscale = -tscale; end
 	if iroute~=1, ibcol = 0; end
-	if isep==2 & imod==0 & iray==0 & irays==0, isep = 3; end
+	if isep==2 && imod==0 && iray==0 && irays==0, isep = 3; end
 	if n2pt>pn2pt, n2pt = pn2pt; end
 	if i2pt==0, x2pt = 0; end
 	if x2pt< 0.0, x2pt = (xmax-xmin) ./ 2000.0; end
@@ -227,7 +241,7 @@ function main(filePathIn, filePathOut)
 
 	ifrbnd = 0;
 	for ii = 1:ngroup % 540
-		if frbnd(ii) < 0 | frbnd(ii) > pfrefl
+		if frbnd(ii) < 0 || frbnd(ii) > pfrefl
 			% 565
 			error('e:stop','\n***  error in array frbnd  ***\n\n');
 		end
@@ -250,24 +264,10 @@ function main(filePathIn, filePathOut)
 	%% calculate velocity model parameters
 
 	iflagm = [];
-	% [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
 	[~,~,poisb,poisl,~,invr,iflagm,~,xmin1d,xmax1d,~,~,~] ...
 	= fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
-	% disp(ncont);
-	% disp(pois(1:10));
-	% disp(poisb(1:10));
-	% disp(poisl(1:10));
-	% disp(poisbl(1:10));
-	% disp(invr);
-	% disp(iflagm);
-	% disp(ifrbnd);
-	% disp(xmin1d);
-	% disp(xmax1d);
-	% disp(insmth(1:10));
-	% disp(xminns);
-	% disp(xmaxns);
 
-	if abs(modout) ~= 0 | ifd > 1
+	if abs(modout) ~= 0 || ifd > 1
 		if xmmin < -999998, xmmin = xmin; end
 		if xmmax < -999998, xmmax = xmax; end
 
@@ -284,14 +284,14 @@ function main(filePathIn, filePathOut)
 		end
 	end
 
-	if itx>=3 & invr==0, itx = 2; end
-	if itxout==3 & invr==0, itxout = 2; end
-	if invr==0 & abs(idata)==2, idata = 1 * sign(idata); end
+	if itx>=3 && invr==0, itx = 2; end
+	if itxout==3 && invr==0, itxout = 2; end
+	if invr==0 && abs(idata)==2, idata = 1 * sign(idata); end
 	if iflagm == 1
 		fun_goto9999(); return; % go to 9999
 	end
 
-	if idvmax > 0 | idsmax > 0
+	if idvmax > 0 || idsmax > 0
 		% 895 write(' ')
 		fprintf(' \n');
 		fprintf(fID_11,' \n');
@@ -327,7 +327,7 @@ function main(filePathIn, filePathOut)
 	% and determine nshot
 
 	for ii = 1:pshot % 290
-		if ishot(ii)==-1 | ishot(ii)==2
+		if ishot(ii)==-1 || ishot(ii)==2
 			nshot = nshot + 1;
 			xshota(nshot) = xshot(ii);
 			zshota(nshot) = zshot(ii);
@@ -335,7 +335,7 @@ function main(filePathIn, filePathOut)
 			ishotw(nshot) = -ii;
 			ishotr(nshot) = 2 .* ii - 1;
 		end
-		if ishot(ii)==1 | ishot(ii)==2
+		if ishot(ii)==1 || ishot(ii)==2
 			nshot = nshot + 1;
 			xshota(nshot) = xshot(ii);
 			zshota(nshot) = zshot(ii);
@@ -352,18 +352,16 @@ function main(filePathIn, filePathOut)
 	zshift = abs(zmax-zmin) ./ 10000.0;
 	for ii = 1:nshot % 300
 		if zshota(ii) < -1000.0
-			if xshota(ii)<xbnd(1,1,1) | xshota(ii)>xbnd(1,nblk(1),2)
+			if xshota(ii)<xbnd(1,1,1) || xshota(ii)>xbnd(1,nblk(1),2)
 				continue; % go to 300
 			end
 			for jj = 1:nblk(1) % 310
-				if xshota(ii)>=xbnd(1,jj,1) & xshota(ii)<=xbnd(1,jj,2)
+				if xshota(ii)>=xbnd(1,jj,1) && xshota(ii)<=xbnd(1,jj,2)
 					zshota(ii) = s(1,jj,1) .* xshota(ii) + b(1,jj,1) + zshift;
 				end
 			end % 310
 		end
 	end % 300
-
-	if onDev, disp('========================= tick 3 ========================='); end
 
 	% assign default value to nray if not specified or nray(1) if only
 	% it is specified and also ensure that nray<=pnrayf
@@ -401,14 +399,13 @@ function main(filePathIn, filePathOut)
 
 	% plot velocity model
 
-	if (imod==1 | iray>0 | irays==1) & isep<2
+	if (imod==1 || iray>0 || irays==1) && isep<2
 		% [ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33] ...
 		% = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 	end
 
 	% calculation of smooth layer boundaries
 
-	% size(cosmth),size(xsinc),size(zsmth)
 	if ibsmth > 0
 		for ii = 1:nlayer+1 % 680
 			zsmth(1) = (cosmth(ii,2)-cosmth(ii,1)) ./ xsinc;
@@ -419,7 +416,7 @@ function main(filePathIn, filePathOut)
 			cosmth(ii,1:npbnd) = atan(zsmth(1:npbnd));
 		end % 680
 	end
-	if(isep>1 & ibsmth==2), ibsmth=1; end
+	if(isep>1 && ibsmth==2), ibsmth=1; end
 
 	% 35
 	fprintf(fID_11,'shot  ray i.angle  f.angle   dist     depth red.time  npts code\n');
@@ -450,7 +447,7 @@ function main(filePathIn, filePathOut)
 		% 350 cycle
 		nsmax(1:ngroup) = 10;
 	else
-		if nsmax(2) < 0 & ngroup > 1
+		if nsmax(2) < 0 && ngroup > 1
 			% 360 cycle
 			nsmax(2:ngroup) = nsmax(1);
 		end
@@ -460,7 +457,7 @@ function main(filePathIn, filePathOut)
 		% 351 cycle
 		nsmin(1:ngroup) = 1000000.0;
 	else
-		if nsmin(2) < 0 & ngroup > 1
+		if nsmin(2) < 0 && ngroup > 1
 			% 361 cycle
 			nsmin(ii) = nsmin(1);
 		end
@@ -521,7 +518,7 @@ function main(filePathIn, filePathOut)
 				% 810 cycle
 				tang(1:nlayer,1:4) = 999.0;
 			else
-				if abs(xshotr-xsec) < 0.001 & abs(zshotr-zsec) < 0.001
+				if abs(xshotr-xsec) < 0.001 && abs(zshotr-zsec) < 0.001
 					if iflags == 1, continue; end % go to 60
 					ics = 0;
 					if id ~= idsec
@@ -547,7 +544,7 @@ function main(filePathIn, filePathOut)
 					continue; % go to 60
 				end
 
-				if (imod==1 | iray > 0 | irays==1) & isep > 1
+				if (imod==1 || iray > 0 || irays==1) && isep > 1
 					if iflagp == 1
 						% fun_aldone();
 					end
@@ -657,7 +654,7 @@ function main(filePathIn, filePathOut)
 							if irayf == 0
 								xshotf = xf;
 								idf = sign(tf);
-								if abs(xshotr-xshotf) < 0.001 & idr(is) == idf
+								if abs(xshotr-xshotf) < 0.001 && idr(is) == idf
 									i2flag = 1;
 									isf = isf + 1;
 								else
@@ -666,7 +663,7 @@ function main(filePathIn, filePathOut)
 									isf = ilshot(nsfc);
 								end
 							else
-								if i2flag==1 & ivray(ii)==irayf
+								if i2flag==1 && ivray(ii)==irayf
 									iflag2 = 1;
 									break; % go to 1200
 								end
@@ -703,7 +700,7 @@ function main(filePathIn, filePathOut)
 						iflagl = 1;
 						break; % go to 69
 					end
-					if amaxr == aminr & ihdwf ~= 1
+					if amaxr == aminr && ihdwf ~= 1
 						if nrayr > 1
 							% 665
 							fprintf(fID_11,'***  shot#%4d ray code%5.1f 1 ray traced  ***\n',ishotw(is),ray(ii));
@@ -731,13 +728,13 @@ function main(filePathIn, filePathOut)
 					ifcbnd = frbnd(ii);
 					nc2pt = 0;
 
-					if i2pt > 0 & nrayr > 1
+					if i2pt > 0 && nrayr > 1
 						ii2pt = i2pt;
 						ni2pt = 1; no2pt = 0; nco2pt = 0; ic2pt = 0;
 						nsfc = 1;
 						isf = ilshot(nsfc);
 						% 1100 % -------------------- cycle1100 begin
-						cycle1100 = true
+						cycle1100 = true;
 						while cycle1100
 							xf = xpf(isf);
 							tf = tpf(isf);
@@ -747,7 +744,7 @@ function main(filePathIn, filePathOut)
 							if irayf == 0
 								xshotf = xf;
 								idf = 1.0 .* sign(tf);
-								if abs(xshotr-xshotf) < 0.001 & idr(is) == idf
+								if abs(xshotr-xshotf) < 0.001 && idr(is) == idf
 									i2flag = 1;
 									isf = isf + 1;
 								else
@@ -756,7 +753,7 @@ function main(filePathIn, filePathOut)
 									isf = ilshot(nsfc);
 								end
 							else
-								if i2flag==1 & ivray(ii)==irayf
+								if i2flag==1 && ivray(ii)==irayf
 									no2pt = no2pt + 1;
 									if no2pt > min(pnrayf,pnobsf)
 										% 896
@@ -768,6 +765,8 @@ function main(filePathIn, filePathOut)
 								end
 								isf = isf + 1;
 							end
+							continue; % go to 1100
+							break; % go to nothing
 						end % -------------------- cycle1100 end
 						% 1199
 						if no2pt==0, ni2pt=0; end
@@ -791,8 +790,8 @@ function main(filePathIn, filePathOut)
 						cycle90 = true;
 						while cycle90
 							ir = ir + 1;
-							if ir>nrayr & ni2pt<=1, break; end % go to 890
-							if i2pt==0 & iend==1, break; end % go to 890
+							if ir>nrayr && ni2pt<=1, break; end % go to 890
+							if i2pt==0 && iend==1, break; end % go to 890
 							ircbnd = 1; iccbnd = 1;
 							iwave = 1; ihdw = 0;
 							if icbnd(1) == 0
@@ -819,7 +818,7 @@ function main(filePathIn, filePathOut)
 										iend = 1;
 									end
 								end
-								if ir==nrayr & nrayr>1, angled=amaxr; end
+								if ir==nrayr && nrayr>1, angled=amaxr; end
 							else
 								isGoto890 = false;
 								% 891 % -------------------- cycle891 begin
@@ -827,11 +826,11 @@ function main(filePathIn, filePathOut)
 								while cycle891
 									nco2pt = nco2pt + 1;
 									if nco2pt>no2pt, isGoto890=true; break; end % go to 890 step1
-									if ifo2pt(nco2pt)~=0 & ii2pt>0, continue; end % go to 891
+									if ifo2pt(nco2pt)~=0 && ii2pt>0, continue; end % go to 891
 									xobs = xo2pt(nco2pt);
 									tt2min = 1.0e10;
 									for jj = 1: nc2pt-1 % 892
-										if (ra2pt(jj)>=xobs & ra2pt(jj+1)<=xobs) | (ra2pt(jj)<=xobs & ra2pt(jj+1)>=xobs)
+										if (ra2pt(jj)>=xobs && ra2pt(jj+1)<=xobs) || (ra2pt(jj)<=xobs && ra2pt(jj+1)>=xobs)
 											denom = ra2pt(jj+1) - ra2pt(jj);
 											if denom ~= 0
 												tpos = (tt2pt(jj+1)-tt2pt(jj)) ./ denom .* (xobs-ra2pt(jj)) + tt2pt(jj);
@@ -856,19 +855,19 @@ function main(filePathIn, filePathOut)
 											end
 										end
 									end % 892
-									if tt2min > 1.0e9 | (ifo2pt(nco2pt)~=0 & ii2pt>0)
+									if tt2min > 1.0e9 || (ifo2pt(nco2pt)~=0 && ii2pt>0)
 										continue; % go to 891
 									end
-									break;
+									break; % go to nothing
 								end % -------------------- cycle891 end
 								if isGoto890, break; end % go to 890 step2
 							end
-							angle = fid .* (90.0-angled) ./ pi18;
-							if ir > 1 & ihdwf ~= 1
-								if angle == am, continue; end % go to 90
+							angle_angle = fid .* (90.0-angled) ./ pi18;
+							if ir > 1 && ihdwf ~= 1
+								if angle_angle == am, continue; end % go to 90
 							end
-							am = angle;
-							if fid1 .* angle < 0.0
+							am = angle_angle;
+							if fid1 .* angle_angle < 0.0
 								id = -id; fid = id; % float
 							end
 							layer = layer1;
@@ -877,11 +876,11 @@ function main(filePathIn, filePathOut)
 							xr(1) = xshotr;
 							zr(1) = zshotr;
 							arar(1,1) = 0.0;
-							arar(1,2) = angle;
+							arar(1,2) = angle_angle;
 							vr(1,1) = 0.0;
 							vp(1,1) = 0.0;
 							vs(1,1) = 0.0;
-							vp(1,2) = vel(xshotr,zshotr);
+							vp(1,2) = fun_vel(xshotr,zshotr);
 							vs(1,2) = vp(1,2) .* vsvp(layer1,iblk1);
 							if iwave == 1, vr(1,2) = vp(1,2);
 							else vr(1,2) = vs(1,2); end
@@ -890,7 +889,7 @@ function main(filePathIn, filePathOut)
 
 							if ii2pt > 0, irs = 0;
 							else irs = ir; end
-							if invr==1 & irs>0
+							if invr==1 && irs>0
 								ninv = ninv + 1;
 								% 80 cycle
 								fpart(ninv,1:nvar) = 0.0;
@@ -918,11 +917,11 @@ function main(filePathIn, filePathOut)
 								if ihdwf ~= 1, ta2pt(ic2pt) = angled;
 								else ta2pt(ic2pt) = tdhw-hws; end
 								ra2pt(ic2pt) = xr(npt);
-								tt2pt(ic2pt) = timer;
+								tt2pt(ic2pt) = timertimer;
 								if vr(npt,2)<=0.0, tt2pt(ic2pt)=1.0e20; end
 							end
 
-							if ((iray==1 | (iray==2 & vr(npt,2)>0.0)) & mod(ir-1,nrskip)==0 & irs>0) | (irays==1 & irs==0)
+							if ((iray==1 || (iray==2 && vr(npt,2)>0.0)) && mod(ir-1,nrskip)==0 && irs>0) || (irays==1 && irs==0)
 								% call pltray()
 								% [npt,max(nskip,nhskip),idot,irayps,istep,angled] = fun_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
 								if i33 == 1
@@ -933,12 +932,12 @@ function main(filePathIn, filePathOut)
 								end
 							end
 
-							if vr(npt,2) > 0 & irs > 0 & abs(modout) >= 2
+							if vr(npt,2) > 0 && irs > 0 && abs(modout) >= 2
 								% call cells()
 								[~,~,~,~] = fun_cells(npt,xmmin,dxmod,dzmod);
 							end
 
-							if invr==1 & irs>0
+							if invr==1 && irs>0
 								% call fxtinv(npt)
 								[~] = fun_fxtinv(npt);
 							end
@@ -957,8 +956,9 @@ function main(filePathIn, filePathOut)
 						if ii2pt > 0
 							nc2pt = ic2pt;
 							if ni2pt > 1
-								% call sort3()
-								[ta2pt,ipos,~] = fun_sort3(ta2pt,ipos,nc2pt);
+								% replace fun_sort3 with matlab built-in function 'sort'
+								% [ta2pt,ipos,~] = fun_sort3(ta2pt,ipos,nc2pt);
+								[ta2pt,ipos] = sort(ta2pt(1:nc2pt));
 								% 893 cycle
 								ho2pt(1:nc2pt) = ra2pt(1:nc2pt);
 								% 894 cycle
@@ -977,12 +977,11 @@ function main(filePathIn, filePathOut)
 					end % -------------------- cycle91 end
 
 					if ninv > 0
-						% call calprt()
-						% [xshotr,ii,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ii,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt);
+						iflagw = [];
 						[~,~,~,~,~,iflagw,~,~] = fun_calprt(xshotr,ii,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt);
 					end
 					if iflagw == 1, iflagi = 1; end
-					if iray > 0 | irays == 1
+					if iray > 0 || irays == 1
 						% call empty
 						% fun_empty();
 					end
@@ -1003,7 +1002,7 @@ function main(filePathIn, filePathOut)
 				end
 			end % 70
 			if isGoto1000, break; end % go to 1000 step2
-			if isep==2 & ((itx>0 & ntt>1) | idata~=0 | itxout>0)
+			if isep==2 && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
 				% ?... call plttx() % float
 				% [ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline] ...
 				% = fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
@@ -1014,8 +1013,8 @@ function main(filePathIn, filePathOut)
 	if onDev, disp('========================= tick 1000 ========================='); end
 
 	% 1000
-	if (isep<2 | isep==3) & ((itx>0 & ntt>1) | idata~=0 | itxout>0)
-		if isep>0 & iplots==1
+	if (isep<2 || isep==3) && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
+		if isep>0 && iplots==1
 			% call aldone
 			% fun_aldone();
 		end
@@ -1077,7 +1076,7 @@ function [col1,col2,col3,col4,len] = fun_load_txin(file_txin)
 	% 910 % 930
 	txData = load(file_txin,'-ascii');
 	% tx.in的结束行为 0 0 0 -1
-	endLine = find(txData(:,2)==0 & txData(:,4)==-1,1);
+	endLine = find(txData(:,2)==0 && txData(:,4)==-1,1);
 	len = endLine - 1;
 	txData = txData(1:len,:);
 	[col1,col2,col3,col4] = deal(txData(:,1),txData(:,2),txData(:,3),txData(:,4));
@@ -1104,7 +1103,7 @@ function fun__writeNamelist(fid,name,namelist)
 	for h = 1:length(clist)
 		if isempty(strtrim(clist{h})), clist(h)=[]; end
 	end
-	fprintf(fid, '&%s\n', name);
+	fprintf(fid, '&&%s\n', name);
 	for h = 1:length(clist)
 		parname = clist{h};
 		par = eval(parname);
@@ -1137,26 +1136,26 @@ function fun_goto900()
 	ntblk = sum(nblk(1:nlayer));
 
 	% 935
-	tempstr = sprintf(['\n|------------------------------------------',...
-		'----------------------|\n|%64s|\n'], '');
+	tempstr = sprintf(['\n||------------------------------------------',...
+		'----------------------||\n||%64s||\n'], '');
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
 	if ntpts > 0
 		% 905
-		tempstr = sprintf(['| total of %6d rays consisting of %8d points ',...
-			'were traced |\n|%64s|\n'], ntray,ntpts,'');
+		tempstr = sprintf(['|| total of %6d rays consisting of %8d points ',...
+			'were traced ||\n||%64s||\n'], ntray,ntpts,'');
 	else
 		% 915
-		tempstr = sprintf('|%20s***  no rays traced  ***%20s|\n|%64s|\n','','','');
+		tempstr = sprintf('||%20s***  no rays traced  ***%20s||\n||%64s||\n','','','');
 	end
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
 	% 925
-	tempstr = sprintf(['|           model consists of %2d layers and %3d ',...
-		'blocks           |\n|%64s|\n|----------------------------------',...
-		'------------------------------|\n\n'], nlayer,ntblk,'');
+	tempstr = sprintf(['||           model consists of %2d layers and %3d ',...
+		'blocks           ||\n||%64s||\n||----------------------------------',...
+		'------------------------------||\n\n'], nlayer,ntblk,'');
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
@@ -1251,14 +1250,14 @@ function fun_goto900()
 					sumsum = 0.0; sumx = 0.0;
 					nars = 0;
 					for ii = 1:narinv % 852
-						if xscalc(ii)==xsc & sign(icalc(ii))==icc & icalc(ii)~=0
+						if xscalc(ii)==xsc && sign(icalc(ii))==icc && icalc(ii)~=0
 							tdiff = abs(tobs(ii)-tcalc(ii));
 							sumsum = sumsum + tdiff .^ 2;
 							sumx = sumx + (tdiff./uobs(ii)) .^ 2;
 							nars = nars + 1;
 							icalc(ii) = 0;
 						else
-							if iflagn==1 & icalc(ii)~=0
+							if iflagn==1 && icalc(ii)~=0
 								xsn = xscalc(ii);
 								icn = sign(icalc(ii));
 								iflagn = 0;

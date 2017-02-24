@@ -27,14 +27,14 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     fid = fid1;
     ir = 0;
     invr = 0;
-    angle = fid .* (90.0 - ang) ./ pi18;
+    angle_angle = fid .* (90.0 - ang) ./ pi18;
     layer = layer1;
     iblk = iblk1;
     npt = 1;
     xr(1) = xshot;
     zr(1) = zshot;
     arar(1,1) = 0.0;
-    arar(1,2) = angle;
+    arar(1,2) = angle_angle;
     vr(1,1) = 0.0;
     vp(1,1) = 0.0;
     vs(1,1) = 0.0;
@@ -48,12 +48,11 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     idray(1) = layer1;
     idray(2) = 1;
     ifcbnd = 0;
-
-    [npt,ifam,ir,iturn,invr,~,iflag2,~,idr,~,~,~,~] = ...
-    fun_trace(npt,ifam,ir,iturn,invr,0.0,iflag2,0,idr,0,0,0,0);
+    [npt,~,~,~,~,~,iflag2,~,~,~,~,~,~] = fun_trace(npt,ifam,ir,iturn,invr,0.0,iflag2,0,idr,0,0,0,0);
 
     if irays == 1
         % call pltray(npt,nskip,idot,irayps,istep,ang)
+        % fun_pltray();
     end
 
     if idump == 1

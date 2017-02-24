@@ -201,14 +201,14 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     if icase == 1
     	% ray intersects upper boundary
     	if ibsmth == 0
-    	    alpha = atan(s(layer,iblk,1));
+    	    alphaalpha = atan(s(layer,iblk,1));
     	else
 			npl = ifix((xr(n)-xmin-0.001)./xsinc) + 1;
 			npr = npl + 1;
 			xpl = xmin + (npl-1) .* xsinc;
-			alpha = (cosmth(layer,npr)-cosmth(layer,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer,npl);
+			alphaalpha = (cosmth(layer,npr)-cosmth(layer,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer,npl);
     	end
-    	a1 = pi - fid .* (ar(n,1)+alpha);
+    	a1 = pi - fid .* (ar(n,1)+alphaalpha);
     	if abs(a1)>=pi2 & n3<=nstepr & dstepf<1.0e6
     	    % go to 999
     	    fun_goto999(); return;
@@ -303,10 +303,10 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
         % fprintf(fID_32,'%10.3f%10.3f%10d\n',xfr,zfr);
     end
     slope = (zfrefl(ifcbnd,ifrpt+1)-zfrefl(ifcbnd,ifrpt)) ./ (xfrefl(ifcbnd,ifrpt+1)-xfrefl(ifcbnd,ifrpt));
-    alpha = atan(slope);
-    a1 = fid .* (ar(n,1)+alpha);
+    alphaalpha = atan(slope);
+    a1 = fid .* (ar(n,1)+alphaalpha);
     a2 = a1;
-    ar(n,2) = fid .* (pi-a2) - alpha;
+    ar(n,2) = fid .* (pi-a2) - alphaalpha;
     vp(n,1) = vel(xr(n),zr(n));
     vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
     vr(n,1) = vp(n,1);
@@ -332,7 +332,7 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     nbnd = nbnd + 1;
     if npskp~=1, nbnda(nbnd)=n; end
     if ir ~= 0 & invr == 1
-        [vr(n,1),a1,alpha,n,ifrpt] = fun_frprt(vr(n,1),a1,alpha,n,ifrpt);
+        [vr(n,1),a1,alphaalpha,n,ifrpt] = fun_frprt(vr(n,1),a1,alphaalpha,n,ifrpt);
     end
     return;
 end % fun_frefl end
@@ -340,7 +340,7 @@ end % fun_frefl end
 % --------------------------------------------------------------------------------
 
 % inv.f
-function [vfr,afr,alpha,npt,ifrpt] = fun_frprt(vfr,afr,alpha,npt,ifrpt)
+function [vfr,afr,alphaalpha,npt,ifrpt] = fun_frprt(vfr,afr,alphaalpha,npt,ifrpt)
 % calculate partial derivatives for floating reflectors
 
     global file_rayinvr_par file_rayinvr_com;
@@ -359,7 +359,7 @@ function [vfr,afr,alpha,npt,ifrpt] = fun_frprt(vfr,afr,alpha,npt,ifrpt)
                 else
                     ind = ifrpt;
                 end
-                slptrm = cos(alpha) .* abs(xfrefl(ifcbnd,ind)-xr(npt)) ./ (x2-x1);
+                slptrm = cos(alphaalpha) .* abs(xfrefl(ifcbnd,ind)-xr(npt)) ./ (x2-x1);
             else
                 slptrm = 1.0;
             end

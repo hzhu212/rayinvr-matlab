@@ -11,9 +11,10 @@ function [dstep] = fun_dstep(x,z)
 % absolute values of the velocity gradients in the x and z
 % directions
 
-	global file_rayinvr_par file_rayinvr_com;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	% global file_rayinvr_par file_rayinvr_com;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+	global c layer iblk stepstep smin smax;
 
 	vx = (c(layer,iblk,8).*x + c(layer,iblk,9).*x.*x + c(layer,iblk,10).*z + ...
 		c(layer,iblk,11)) ./ (c(layer,iblk,6).*x + c(layer,iblk,7)).^2;

@@ -1,7 +1,6 @@
 % calmod.f
 
-function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] ...
- = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
+function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
  % calculate model
  % ncont: 模型总层数（包括最后一层）
  % pois: Poisson's ratio，数组，保存模型中每一层的泊松比
@@ -1227,10 +1226,10 @@ function     [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,ins
                 z2sum = z2sum + xblk*(z21+z22)/2.0;
                 if vm(ii,jj,1) > 0.001
                     layer = ii; iblk = jj;
-                    v11 = vel(xb1,z11);
-                    v12 = vel(xb2,z12);
-                    v21 = vel(xb1,z21);
-                    v22 = vel(xb2,z22);
+                    v11 = fun_vel(xb1,z11);
+                    v12 = fun_vel(xb2,z12);
+                    v21 = fun_vel(xb1,z21);
+                    v22 = fun_vel(xb2,z22);
                     vp1sum = vp1sum + xblk*(v11+v12)/2.0;
                     vs1sum = vs1sum + xblk*(v11+v12)*vsvp(ii,jj)/2.0;
                     vp2sum = vp2sum + xblk*(v21+v22)/2.0;

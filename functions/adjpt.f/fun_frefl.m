@@ -1,7 +1,7 @@
 % adjpt.f
 % [~,~,~,~,~,~,~]
 % called by: fun_adjpt; fun_trace;
-% call: fun_frprt; done.
+% call: fun_frprt; fun_vel; done.
 
 function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr)
 % calculate angles of incidence and reflection at floating reflector
@@ -21,14 +21,14 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     xr(n) = xfr;
     zr(n) = zfr;
     if ir>0 & modout == 1
-        % fprintf(fID_32,'%10.3f%10.3f%10d\n',xfr,zfr);
+        fprintf(fID_32,'%10.3f%10.3f%10d\n',xfr,zfr);
     end
     slope = (zfrefl(ifcbnd,ifrpt+1)-zfrefl(ifcbnd,ifrpt)) ./ (xfrefl(ifcbnd,ifrpt+1)-xfrefl(ifcbnd,ifrpt));
-    alpha = atan(slope);
-    a1 = fid .* (arar(n,1)+alpha);
+    alphaalpha = atan(slope);
+    a1 = fid .* (arar(n,1)+alphaalpha);
     a2 = a1;
-    arar(n,2) = fid .* (pi-a2) - alpha;
-    vp(n,1) = vel(xr(n),zr(n));
+    arar(n,2) = fid .* (pi-a2) - alphaalpha;
+    vp(n,1) = fun_vel(xr(n),zr(n));
     vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
     vr(n,1) = vp(n,1);
     if iwave==-1, vr(n,1)=vs(n,1); end
@@ -53,7 +53,7 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     nbnd = nbnd + 1;
     if npskp~=1, nbnda(nbnd)=n; end
     if ir ~= 0 & invr == 1
-        [vr(n,1),a1,alpha,n,ifrpt] = fun_frprt(vr(n,1),a1,alpha,n,ifrpt);
+        [vr(n,1),a1,alphaalpha,n,ifrpt] = fun_frprt(vr(n,1),a1,alphaalpha,n,ifrpt);
     end
     return;
 end % fun_frefl end

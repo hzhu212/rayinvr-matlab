@@ -7,12 +7,13 @@ function [npt] = fun_fxtinv(npt)
 % keep track of those rays in the current family which reach the
 % surface of the model
 
-	global file_rayinvr_par file_rayinvr_com;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	% global file_rayinvr_par file_rayinvr_com;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+	global vr xfinv tfinv ninv rangerange tt ntt;
 
 	if vr(npt,2) ~= 0.0
-		xfinv(ninv) = range(ntt-1);
+		xfinv(ninv) = rangerange(ntt-1);
 		tfinv(ninv) = tt(ntt-1);
 	else
 		ninv = ninv - 1;

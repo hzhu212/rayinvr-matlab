@@ -3,7 +3,7 @@
 % called by: fun_frefl;
 % call: none.
 
-function [vfr,afr,alpha,npt,ifrpt] = fun_frprt(vfr,afr,alpha,npt,ifrpt)
+function [vfr,afr,alphaalpha,npt,ifrpt] = fun_frprt(vfr,afr,alphaalpha,npt,ifrpt)
 % calculate partial derivatives for floating reflectors
 
     global file_rayinvr_par file_rayinvr_com;
@@ -22,7 +22,7 @@ function [vfr,afr,alpha,npt,ifrpt] = fun_frprt(vfr,afr,alpha,npt,ifrpt)
                 else
                     ind = ifrpt;
                 end
-                slptrm = cos(alpha) .* abs(xfrefl(ifcbnd,ind)-xr(npt)) ./ (x2-x1);
+                slptrm = cos(alphaalpha) .* abs(xfrefl(ifcbnd,ind)-xr(npt)) ./ (x2-x1);
             else
                 slptrm = 1.0;
             end
