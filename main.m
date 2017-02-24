@@ -1,4 +1,6 @@
 % \bvar\b(\(.*\))*\s*=[^=]
+% rayinvr_par.m, rayinvr_com.m, main_par.m, blkdat.m, input/r.in, -old/*.*
+
 % call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
 % fun_ttime; fun_cells; fun_fxtinv; fun_sort3; fun_calprt; fun_fd;
 % fun_load_vin; fun_trans_rin2m; fun_load_txin; fun_load_fin;
@@ -790,6 +792,7 @@ function main(filePathIn, filePathOut)
 						cycle90 = true;
 						while cycle90
 							ir = ir + 1;
+						if onDev, fprintf('========================= in cycle90# %12d =========================\n',ir); end
 							if ir>nrayr && ni2pt<=1, break; end % go to 890
 							if i2pt==0 && iend==1, break; end % go to 890
 							ircbnd = 1; iccbnd = 1;
@@ -897,20 +900,20 @@ function main(filePathIn, filePathOut)
 							nrg = nrg + 1;
 							nhskip = 0;
 
-							if onDev, disp('========================= tick before fun_trace ========================='); end
+							% if onDev, disp('========================= tick before fun_trace ========================='); end
 
 							% [npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout] ...
 							[npt,~,~,~,~,~,iflag,~,~,~,~,~,~] ...
 							= fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
 
-							if onDev, disp('========================= tick after fun_trace ========================='); end
-							if onDev, disp('========================= tick before fun_ttime ========================='); end
+							% if onDev, disp('========================= tick after fun_trace ========================='); end
+							% if onDev, disp('========================= tick before fun_ttime ========================='); end
 
 							% [ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf] ...
 							[~,~,~,~,~,~,itt,~,~,~,~] ...
 							= fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
 
-							if onDev, disp('========================= tick after fun_ttime ========================='); end
+							% if onDev, disp('========================= tick after fun_ttime ========================='); end
 
 							if irs == 0
 								ic2pt = ic2pt + 1;
@@ -976,8 +979,8 @@ function main(filePathIn, filePathOut)
 						break; % go to nothing
 					end % -------------------- cycle91 end
 
+					if ~exist('iflagw','var'), iflagw = []; end
 					if ninv > 0
-						iflagw = [];
 						[~,~,~,~,~,iflagw,~,~] = fun_calprt(xshotr,ii,ivraya(ifam),idr(is),ximax,iflagw,iszero,x2pt);
 					end
 					if iflagw == 1, iflagi = 1; end
@@ -1136,26 +1139,26 @@ function fun_goto900()
 	ntblk = sum(nblk(1:nlayer));
 
 	% 935
-	tempstr = sprintf(['\n||------------------------------------------',...
-		'----------------------||\n||%64s||\n'], '');
+	tempstr = sprintf(['\n|------------------------------------------',...
+		'----------------------|\n|%64s|\n'], '');
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
 	if ntpts > 0
 		% 905
-		tempstr = sprintf(['|| total of %6d rays consisting of %8d points ',...
-			'were traced ||\n||%64s||\n'], ntray,ntpts,'');
+		tempstr = sprintf(['| total of %6d rays consisting of %8d points ',...
+			'were traced |\n|%64s|\n'], ntray,ntpts,'');
 	else
 		% 915
-		tempstr = sprintf('||%20s***  no rays traced  ***%20s||\n||%64s||\n','','','');
+		tempstr = sprintf('|%20s***  no rays traced  ***%20s|\n|%64s|\n','','','');
 	end
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
 	% 925
-	tempstr = sprintf(['||           model consists of %2d layers and %3d ',...
-		'blocks           ||\n||%64s||\n||----------------------------------',...
-		'------------------------------||\n\n'], nlayer,ntblk,'');
+	tempstr = sprintf(['|           model consists of %2d layers and %3d ',...
+		'blocks           |\n|%64s|\n|----------------------------------',...
+		'------------------------------|\n\n'], nlayer,ntblk,'');
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
 
@@ -1211,7 +1214,7 @@ function fun_goto900()
 				cycle951 = true;
 				while cycle951
 					jj = jj + 1;
-					sumsum = 0.0; sumx = 0.0; nars = 0
+					sumsum = 0.0; sumx = 0.0; nars = 0;
 					for ii = 1:narinv % 952
 						if abs(icalc(ii)) == jj
 							sumsum = sumsum + (tobs(ii)-tcalc(ii)) .^ 2;

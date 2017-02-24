@@ -8,10 +8,14 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 % time picks by interpolating across the end points of a single
 % ray family
 
-	global file_rayinvr_par file_rayinvr_com;
+	% global file_rayinvr_par file_rayinvr_com;
+	% global fID_11;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
 	global fID_11;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	global apart fpart ilshot ipf ipinv icalc ircalc narinv ninv nvar ray ...
+		tpf tfinv time tcalc tobs upf uobs xfinv xpf xcalc xscalc;
 
 	npick = 0;
 	iflagw = 0;
@@ -22,14 +26,14 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 	cycle100 = true;
 	while cycle100
 		xf = xpf(isf);
-		tf = tpf(isf);
+		tftf = tpf(isf);
 		uf = upf(isf);
 		irayf = ipf(isf);
 
 		if irayf < 0, return; end % go to 999
 		if irayf == 0
 			xshotf = xf;
-			idf = 1.0 .* sign(tf);
+			idf = 1.0 .* sign(tftf);
 			if abs(xshotr-xshotf) < 0.001 & idr == idf
 				iflag = 1;
 				npick = isf - nsfc;
@@ -47,7 +51,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 				else
 					xpick = abs(xshotr-xf);
 				end
-				tpick = tf;
+				tpick = tftf;
 				upick = uf;
 				tvmin = 99999.0;
 				if ninv > 1

@@ -12,7 +12,8 @@ function [vel] = fun_vel(x,z)
 	% global file_rayinvr_par file_rayinvr_com;
 	% run(file_rayinvr_par);
 	% run(file_rayinvr_com);
-	global c layer iblk;
+
+	global c iblk layer;
 
 	vel=(c(layer,iblk,1).*x + c(layer,iblk,2).*x.^2 + c(layer,iblk,3).*z + ...
 		c(layer,iblk,4).*x.*z + c(layer,iblk,5)) ./ (c(layer,iblk,6).*x + ...

@@ -3,13 +3,15 @@
 % called by: fun_auto;
 % call: fun_vel; done.
 
-function [xshot,zshot,ls,ibs,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,ls,ibs,l,vshot,vtop,vbotom)
+function [xshot,zshot,lsls,ibs,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,lsls,ibs,l,vshot,vtop,vbotom)
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
 
-    layer = ls;
+    global iblk iwave iccbnd icbnd layer nblk vm vsvp xbnd;
+
+    layer = lsls;
     iblk = ibs;
     iwave = 1;
     iccbnd = 1;

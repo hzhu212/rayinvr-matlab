@@ -18,14 +18,23 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
 %   中所列出的层一旦超出该范围将不做光滑处理
 % pncntr: player+1，player为模型分层数，pncntr则为模型层界面数
 
-    global file_rayinvr_par file_rayinvr_com;
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_12;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
     global fID_12;
-    run(file_rayinvr_par);
+    global b cosmth c cz dvmax dsmax idvmax idsmax ivarz ivarv ivv ivg izv ...
+        ivarf iblk idump ibsmth layer ldvmax ldsmax nzed nvel nlayer ...
+        nvar nblk npbnd nfrefl npfref nbsmth papois pnsmth ppcntr ppvel ...
+        player pncntr partyp parorg ptrap pnvar pi18 s vsvp vm vf xm xvel ...
+        xmax xbnd xmin xsinc zm zfrefl;
+
     % xa = zeros(1,2*(ppcntr+ppvel));
+
     xa = [];
     zsmth = zeros(1,pnsmth);
     % zsmth = [];
-    run(file_rayinvr_com);
     iflagm = 0;
     idvmax = 0;
     idsmax = 0;

@@ -11,7 +11,8 @@ function [iflag,x,z] = fun_check(iflag,x,z)
     % global file_rayinvr_par file_rayinvr_com;
     % run(file_rayinvr_par);
     % run(file_rayinvr_com);
-    global xbnd layer iblk s b id;
+
+    global b iblk id layer s xbnd;
 
     if iflag == 0
         if x < xbnd(layer,iblk,1), x = xbnd(layer,iblk,1) - 0.001; end

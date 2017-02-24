@@ -7,12 +7,19 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 % ray has intersected a model boundary so must determine correct
 % (x,z) coordinates and angle at boundary
 
-	global file_rayinvr_par file_rayinvr_com;
+	% global file_rayinvr_par file_rayinvr_com;
+	% global fID_11 fID_32;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
 	global fID_11 fID_32;
-	run(file_rayinvr_par);
+	global arar b c cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
+		idray istop ibsmth icbnd iheadf idifff ihdw layer nbnd nptbnd npskp ...
+		n2 n3 nblk nstepr nccbnd nbnda nlayer piray pi2 pit2 ray refll s vm ...
+		vr vp vs vsvp xmin xr xsinc zr;
+
 	% real lef
 	% integer icasec(5)
-	run(file_rayinvr_com);
 
 	[xn,zn,an,xb,zb,ab,xt,zt,at,xl,zl,al,xri,zri,ari] = deal([]); % for fun_adhoc
 	ib = []; % for fun_block

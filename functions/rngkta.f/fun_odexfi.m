@@ -11,7 +11,8 @@ function [x,y,f] = fun_odexfi(x,y,f)
     % run(file_rayinvr_par);
     % real y(2),f(2)
     % run(file_rayinvr_com);
-    global factan mcotan bcotan c layer iblk;
+
+    global bcotan c factan iblk layer mcotan;
 
     sa = 1.0 .* sign(y(2));
     n1 = fix(sa.*y(2).*factan) + 1;

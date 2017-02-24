@@ -9,10 +9,16 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 % traveled a distance hws further than previous ray, it
 % is directed upward into the model.
 
-	global file_rayinvr_par file_rayinvr_com;
+	% global file_rayinvr_par file_rayinvr_com;
+	% global fID_11 fID_12;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
 	global fID_11 fID_12;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	global arar b cosmth dhw fid hws iblk ihdwf ivg iwave id idray iccbnd ...
+		ihdw ihdwf icbnd idump ibsmth idiff layer nlayer nccbnd nbnd npskp ...
+		nhskip nbnda nblk pi2 pi18 ppray piray ray s tdhw vr vp vs vsvp ...
+		vm xr xsinc xbnd xmin zr;
 
 	dhw = 0.0;
 

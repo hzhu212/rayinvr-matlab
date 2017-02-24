@@ -6,9 +6,11 @@
 function [npt,xmmin,dx,dz] = fun_cells(npt,xmmin,dx,dz)
 % identify grid cells that have been sampled by ray path
 
-	global file_rayinvr_par file_rayinvr_com;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	% global file_rayinvr_par file_rayinvr_com;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
+	global sample xr zmin zr;
 
 	for ii = 1:npt-1 % 10
 		nspts = round((((xr(ii+1)-xr(ii)).^2+(zr(ii+1)-zr(ii)).^2).^0.5) ./ min(dx,dz)) + 1;

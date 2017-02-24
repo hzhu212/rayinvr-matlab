@@ -7,10 +7,14 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 % output the velocity model on a uniform grid for input to the
 % plotting program MODPLT
 
-	global file_rayinvr_par file_rayinvr_com;
+	% global file_rayinvr_par file_rayinvr_com;
+	% global fID_31 fID_32 fID_35 fID_63;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
 	global fID_31 fID_32 fID_35 fID_63;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	global iblk layer npfref nlayer nfrefl pxgrid player s sample xbnd xfrefl ...
+		zmin zmax zfrefl;
 
 	% real vzgrid(pxgrid),xgrid(player+1),xgmt(pxgrid),zgmt(pxgrid)
 	% integer igrid(player+1),modi(player),zsmax(pxgrid)

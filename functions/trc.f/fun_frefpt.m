@@ -6,9 +6,11 @@
 function [ir,npt,xfr,zfr,ifrpt,iflagf] = fun_frefpt(ir,npt,xfr,zfr,ifrpt,iflagf)
 % determine intersection point of ray with a floating reflector
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
+    global ifcbnd npfref ray xfrefl xr zfrefl zr;
 
     a1 = zr(npt-1) - zr(npt);
     b1 = xr(npt) - xr(npt-1);

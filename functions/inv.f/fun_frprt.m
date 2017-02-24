@@ -6,9 +6,11 @@
 function [vfr,afr,alphaalpha,npt,ifrpt] = fun_frprt(vfr,afr,alphaalpha,npt,ifrpt)
 % calculate partial derivatives for floating reflectors
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
+    global fpart ifcbnd ivarf ninv xfrefl xr;
 
     x1 = xfrefl(ifcbnd,ifrpt);
     x2 = xfrefl(ifcbnd,ifrpt+1);

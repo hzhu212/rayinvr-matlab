@@ -4,13 +4,15 @@
 % call: none.
 
 function [xpt,zpt,layers,iblks,iflag] = fun_xzpt(xpt,zpt,layers,iblks,iflag)
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
+    global b nblk nlayer s xbnd;
 
     iflag = 0;
-    for ii = 1:nlayer
-        for jj = 1:nblk(ii)
+    for ii = 1:nlayer % 10
+        for jj = 1:nblk(ii) % 20
             top = s(ii,jj,1) .* xpt + b(ii,jj,1);
             bottom = s(ii,jj,2) .* xpt + b(ii,jj,2);
             left = xbnd(ii,jj,1);

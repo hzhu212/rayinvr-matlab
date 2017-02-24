@@ -14,7 +14,8 @@ function [dstep] = fun_dstep(x,z)
 	% global file_rayinvr_par file_rayinvr_com;
 	% run(file_rayinvr_par);
 	% run(file_rayinvr_com);
-	global c layer iblk stepstep smin smax;
+
+	global c iblk layer smax smin stepstep;
 
 	vx = (c(layer,iblk,8).*x + c(layer,iblk,9).*x.*x + c(layer,iblk,10).*z + ...
 		c(layer,iblk,11)) ./ (c(layer,iblk,6).*x + c(layer,iblk,7)).^2;

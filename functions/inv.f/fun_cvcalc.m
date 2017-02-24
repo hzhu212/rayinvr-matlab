@@ -6,9 +6,11 @@
 function fun_cvcalc(ii,jj,ipos,itype,cf)
 % calculate coefficients of velocity partial derivatives
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
+    global b cv s xbnd;
 
     if itype == 1
         ssign = 1.0;

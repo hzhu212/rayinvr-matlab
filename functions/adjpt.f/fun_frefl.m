@@ -6,10 +6,14 @@
 function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr)
 % calculate angles of incidence and reflection at floating reflector
 
-    global file_rayinvr_par file_rayinvr_com;
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_32;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
     global fID_32;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    global arar dstepf fid ifcbnd id iblk iwave idray icasel layer n2 n3 ...
+        nbnd nptbnd npskp nbnda pit2 vp vr vs vsvp xr xfrefl zr zfrefl;
 
     d1 = ((xr(n-1)-xfr).^2 + (zr(n-1)-zfr).^2).^0.5;
     d2 = ((xr(n)-xfr).^2 + (zr(n)-zfr).^2).^0.5;

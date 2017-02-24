@@ -7,10 +7,14 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
 % trace a single ray through model to its turning point
 % (iturn=1) or to completion (iturn=0)
 
-    global file_rayinvr_par file_rayinvr_com;
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_12;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
     global fID_12;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    global arar fid fid1 ircbnd iwave iccbnd icbnd id iblk idray ifcbnd ...
+        idump layer nptbnd nbnd npskp npskip nccbnd pi18 ray vp vr vs vsvp xr zr;
 
     ircbnd = 1;
     iccbnd = 1;

@@ -3,12 +3,14 @@
 % called by: fun_hdwave; fun_adjpt;
 % call: none.
 
-function [lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype)
+function [lulu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lulu,iu,v1,v2,a1,a2,alphaalpha,npt,itype)
 % calculate boundary partial derivatives
 
-	global file_rayinvr_par file_rayinvr_com;
-	run(file_rayinvr_par);
-	run(file_rayinvr_com);
+	% global file_rayinvr_par file_rayinvr_com;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
+	global cz fpart izv ninv nzed xr;
 
 	if abs(itype)==2, a2=pi-2; end % iabs -> abs
 	if itype > 0
@@ -20,10 +22,10 @@ function [lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2
 	end
 
 	for ii = iz1:iz2 % 10
-	    if izv(lu,iu,ii) ~= 0
-	        jv = izv(lu,iu,ii);
-	        if cz(lu,iu,ii,2) ~= 0.0
-	            slptrm = cos(alphaalpha) .* abs(cz(lu,iu,ii,1)-xr(npt)) ./ cz(lu,iu,ii,2);
+	    if izv(lulu,iu,ii) ~= 0
+	        jv = izv(lulu,iu,ii);
+	        if cz(lulu,iu,ii,2) ~= 0.0
+	            slptrm = cos(alphaalpha) .* abs(cz(lulu,iu,ii,1)-xr(npt)) ./ cz(lulu,iu,ii,2);
 	        else
 	        	slptrm = 1.0;
 	        end
@@ -32,7 +34,7 @@ function [lu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lu,iu,v1,v2,a1,a2
 	        else
 	        	ibz = 1;
 	        end
-	        if nzed(lu+ibz) == 1
+	        if nzed(lulu+ibz) == 1
 	            fudge = 2.0;
 	        else
 	        	fudge = 1.0;

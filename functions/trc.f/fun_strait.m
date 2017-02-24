@@ -16,7 +16,8 @@ function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
     % global file_rayinvr_par file_rayinvr_com;
     % run(file_rayinvr_par);
     % run(file_rayinvr_com);
-    global xr fid smax dstepf zr arar pi2;
+
+    global arar dstepf fid pi2 smax xr zr;
 
     if iflag == 0
         x = xr(npt) + fid.*smax./dstepf;

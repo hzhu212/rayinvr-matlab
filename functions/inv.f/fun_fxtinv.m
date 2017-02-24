@@ -10,7 +10,8 @@ function [npt] = fun_fxtinv(npt)
 	% global file_rayinvr_par file_rayinvr_com;
 	% run(file_rayinvr_par);
 	% run(file_rayinvr_com);
-	global vr xfinv tfinv ninv rangerange tt ntt;
+
+	global ninv ntt rangerange tfinv tt vr xfinv;
 
 	if vr(npt,2) ~= 0.0
 		xfinv(ninv) = rangerange(ntt-1);

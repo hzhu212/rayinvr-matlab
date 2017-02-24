@@ -10,12 +10,17 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 %
 % for the travel time between two points a distance h apart
 
-	global file_rayinvr_par file_rayinvr_com;
+	% global file_rayinvr_par file_rayinvr_com;
+	% global fID_11 fID_12;
+	% run(file_rayinvr_par);
+	% run(file_rayinvr_com);
+
 	global fID_11 fID_12;
-	run(file_rayinvr_par);
+	global arar fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
+		rangerange rayid time timertimer tr tt vr vred xr xshtar zr;
+
 	% real vave(ppray)
 	% integer itt(1)
-	run(file_rayinvr_com);
 
 	if idump == 1
 		% 15

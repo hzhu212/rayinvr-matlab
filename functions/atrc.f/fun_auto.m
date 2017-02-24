@@ -6,10 +6,13 @@
 function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin] = fun_auto(xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin)
 % determine min. and max. take-off angles for a specific ray code
 
-    global file_rayinvr_par file_rayinvr_com;
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_11;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
     global fID_11;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    global fid idray isrch id idiff layer nlayer nblk pi18 ray tang vm vr xr zr;
 
     [vshot,vtop,vbotom] = deal([]); % for fun_calvel
     [npt,iflag2] = deal([]); % for fun_autotr

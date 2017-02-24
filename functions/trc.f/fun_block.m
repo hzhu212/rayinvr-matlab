@@ -6,9 +6,11 @@
 function [x,layer1,iblk1] = fun_block(x,layer1,iblk1)
 % determine block of point x in layer
 
-    global file_rayinvr_par file_rayinvr_com;
-    run(file_rayinvr_par);
-    run(file_rayinvr_com);
+    % global file_rayinvr_par file_rayinvr_com;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
+    global nblk xbnd;
 
     for ii = 1:nblk(layer1) % 10
         if x>=xbnd(layer1,ii,1) & x<= xbnd(layer1,ii,2)

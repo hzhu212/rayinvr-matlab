@@ -8,12 +8,18 @@
 function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout)
 % trace a single ray through the model
 
-    global file_rayinvr_par file_rayinvr_com;
+    % global file_rayinvr_par file_rayinvr_com;
+    % global fID_11 fID_12;
+    % run(file_rayinvr_par);
+    % run(file_rayinvr_com);
+
     global fID_11 fID_12;
-    run(file_rayinvr_par);
+    global arar b dstepf fid hdenom hmin iblk ivg ifcbnd idray iwave idump ...
+        id ifast isrkc icasel ihdw layer ntray ntpts n2 n3 nptbnd pi2 pi4 pi18 ...
+        ppray pi34 ray s smax tol vr vp vs vsvp xr xbnd zr;
+
     % external odex,odez,odexfi,odezfi
     % real y(2),f(2),w1(2),w2(2),w3(2),left
-    run(file_rayinvr_com);
 
     [xfr,zfr,ifrpt] = deal([]); % for fun_frefpt
     [lstart,istart] = deal([]); % for fun_adjpt

@@ -11,6 +11,7 @@ function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
 
 	% dimension y(2),dydx(2),yt(2),dyt(2),dym(2)
 	% [y,yt] = deal(zeros(1,2));
+
 	[dydx,dyt,dym] = deal([]); % for function derivs
 	x = x1;
 	h = x2 - x1;

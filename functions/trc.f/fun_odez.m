@@ -14,8 +14,9 @@ function [x,y,f] = fun_odez(x,y,f)
     % real y(2),f(2)
     % logical ok
     % common /rkcs/ ok
-    global c layer iblk isrkc idump irkc;
+
     global fID_12;
+    global c iblk idump irkc isrkc layer;
     global ok;
 
     f(1) = tan(y(2));
