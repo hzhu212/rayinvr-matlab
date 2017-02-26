@@ -1,0 +1,53 @@
+shot#   1:   ray code  2.2:    59 rays traced
+shot#   1:   ray code  3.2:    60 rays traced
+shot#  -2:   ray code  2.2:    17 rays traced
+shot#  -2:   ray code  3.2:     7 rays traced
+shot#   2:   ray code  2.2:    63 rays traced
+shot#   2:   ray code  3.2:    73 rays traced
+shot#  -3:   ray code  2.2:    34 rays traced
+shot#  -3:   ray code  3.2:    26 rays traced
+shot#   3:   ray code  2.2:    65 rays traced
+shot#   3:   ray code  3.2:    73 rays traced
+shot#  -4:   ray code  2.2:    60 rays traced
+shot#  -4:   ray code  3.2:    59 rays traced
+shot#   4:   ray code  2.2:    60 rays traced
+shot#   4:   ray code  3.2:    61 rays traced
+shot#  -5:   ray code  2.2:    74 rays traced
+shot#  -5:   ray code  3.2:    83 rays traced
+shot#   5:   ray code  2.2:    46 rays traced
+shot#   5:   ray code  3.2:    36 rays traced
+shot#  -6:   ray code  2.2:    67 rays traced
+shot#  -6:   ray code  3.2:    74 rays traced
+shot#   6:   ray code  2.2:    53 rays traced
+shot#   6:   ray code  3.2:    47 rays traced
+shot#  -7:   ray code  2.2:    61 rays traced
+shot#  -7:   ray code  3.2:    63 rays traced
+shot#   7:   ray code  2.2:    61 rays traced
+shot#   7:   ray code  3.2:    61 rays traced
+shot#  -8:   ray code  2.2:    48 rays traced
+shot#  -8:   ray code  3.2:    50 rays traced
+shot#   8:   ray code  2.2:    70 rays traced
+shot#   8:   ray code  3.2:    69 rays traced
+shot#  -9:   ray code  2.2:    48 rays traced
+shot#  -9:   ray code  3.2:    43 rays traced
+shot#   9:   ray code  2.2:    52 rays traced
+shot#   9:   ray code  3.2:    57 rays traced
+shot# -10:   ray code  2.2:    58 rays traced
+shot# -10:   ray code  3.2:    60 rays traced
+shot#  10:   ray code  2.2:    21 rays traced
+shot#  10:   ray code  3.2:    19 rays traced
+shot# -11:   ray code  2.2:    59 rays traced
+shot# -11:   ray code  3.2:    58 rays traced
+
+|----------------------------------------------------------------|
+|                                                                |
+| total of   8882 rays consisting of    97226 points were traced |
+|                                                                |
+|           model consists of  4 layers and  40 blocks           |
+|                                                                |
+|----------------------------------------------------------------|
+
+
+Number of data points used:     2154
+RMS traveltime residual:       0.071
+Normalized chi-squared:       50.151

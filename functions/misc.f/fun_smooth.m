@@ -7,7 +7,7 @@ function [x,n] = fun_smooth(x,n)
 % three point triangular smoothing filter
 
     % real x(n)
-    x = zeros(1,n);
+    % x = zeros(1,n); % error!
 
     m = n-1;
     a = 0.77*x(1) + 0.23*x(2);
