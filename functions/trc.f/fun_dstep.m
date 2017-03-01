@@ -15,13 +15,13 @@ function [dstep] = fun_dstep(x,z)
 	% run(file_rayinvr_par);
 	% run(file_rayinvr_com);
 
-	global c iblk layer smax smin stepstep;
+	global c iblk layer smax smin step_;
 
 	vx = (c(layer,iblk,8).*x + c(layer,iblk,9).*x.*x + c(layer,iblk,10).*z + ...
 		c(layer,iblk,11)) ./ (c(layer,iblk,6).*x + c(layer,iblk,7)).^2;
 	vz = (c(layer,iblk,3) + c(layer,iblk,4).*x) ./ (c(layer,iblk,6).*x + ...
 		c(layer,iblk,7));
-	dstep = stepstep .* fun_vel(x,z) ./ (abs(vx)+abs(vz));
+	dstep = step_ .* fun_vel(x,z) ./ (abs(vx)+abs(vz));
 
 	if dstep < smin
 	    dstep = smin;

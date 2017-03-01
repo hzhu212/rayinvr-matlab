@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_axis;
+% called by: fun_axis; fun_plttx;
 
 function fun_symbol(x,y,ht,label,ang,nchar)
 % plot the character string label; special symbols can be plotted

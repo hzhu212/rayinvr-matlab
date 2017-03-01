@@ -1,7 +1,7 @@
 % pltsub.f
 % [~,~,amint,amaxt,ntick,ndeci]
 % call:
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function [amin,amax,amint,amaxt,ntick,ndeci] = fun_axtick(amin,amax,amint,amaxt,ntick,ndeci)
 % determine appropriate values for the minimum and maximum position
@@ -41,7 +41,7 @@ function [amin,amax,amint,amaxt,ntick,ndeci] = fun_axtick(amin,amax,amint,amaxt,
 			amint = amint + tcinc(ipos);
 		end
 	end
-	if amax < -999998.0
+	if amaxt < -999998.0
 		amaxt = round(amax./tcinc(ipos)) .* tcinc(ipos); % float % nint -> round
 		if abs(amaxt-amax) < 0.00001
 			amaxt = amax;

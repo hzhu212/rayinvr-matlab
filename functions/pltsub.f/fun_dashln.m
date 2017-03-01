@@ -1,7 +1,7 @@
 % pltsub.f
 % []
 % call:
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function fun_dashln(x,y,npts,dash)
 % connect the npts (x,y) points with dashed straight line segments

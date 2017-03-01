@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_axis; fun_box;
+% called by: fun_axis; fun_box; fun_plttx;
 
 function fun_plot(x,y,ipen)
 % move to the point (x,y); pen up if ipen=3, pen down if ipen=2

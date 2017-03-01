@@ -16,7 +16,7 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 	% run(file_rayinvr_com);
 
 	global fID_11 fID_12;
-	global arar fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
+	global ar_ fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
 		range_ rayid time timertimer tr tt vr vred xr xshtar zr;
 
 	% real vave(ppray)
@@ -25,7 +25,7 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 	if idump == 1
 		% 15
 	    fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-	    	ifam,nr,npt,xr(npt),zr(npt),arar(npt,1).*pi18,arar(npt,2).*pi18,vr(npt,1),vr(npt,2),layer,iblk,id,iwave);
+	    	ifam,nr,npt,xr(npt),zr(npt),ar_(npt,1).*pi18,ar_(npt,2).*pi18,vr(npt,1),vr(npt,2),layer,iblk,id,iwave);
 	end
 
 	time = 0.0;
@@ -45,7 +45,7 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 		time = time + tr(ii) ./ vave(ii);
 	end % 10
 
-	a2 = fid1 .* (90.0-fid.*arar(npt,1).*pi18) ./ fid;
+	a2 = fid1 .* (90.0-fid.*ar_(npt,1).*pi18) ./ fid;
 	nptr = npt;
 	if vred == 0.0
 	    timertimer = time;

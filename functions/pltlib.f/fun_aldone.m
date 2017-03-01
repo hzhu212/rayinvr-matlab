@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by:
+% called by: main; fun_plttx;
 
 function fun_aldone()
 % wait unitl the user is ready for the next plot

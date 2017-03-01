@@ -2,9 +2,10 @@
 
 global has_rayinvr_com_init;
 
-% changed 'ar' to 'arar' to avoid name conflict.
-% changed 'step' to 'stepstep'.
+% changed 'ar' to 'ar_' to avoid name conflict.
+% changed 'step' to 'step_'.
 % changed 'range' to 'range_'.
+% changed 'title' to 'title_'.
 
 % common
 global layer iblk id fid fid1;  %  blk1
@@ -12,16 +13,16 @@ global c ivg;  %  blk2
 global s b vm;  %  blk3
 global xbnd nblk nlayer;  %  blk4
 global xm zm vf nzed nvel xvel;  %  blk5
-global xr zr arar vr tr vp vs;  %  blk6
+global xr zr ar_ vr tr vp vs;  %  blk6
 global refll ircbnd;  %  blk7
 global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
 global itx vred time timertimer;  %  blk9
-global stepstep smin smax;  %  blk10
+global step_ smin smax;  %  blk10
 global range_ tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
        xtmaxt xmmt ndecxt xscalt ntckxt zmin zmax ztmin ztmax zmm ndeciz ...
        zscale ntickz tmin tmax ttmin ttmax tmm ndecit tscale ntickt symht ...
-       albht iplots orig sep titletitle ititle xtitle ytitle ircol mcol irrcol ...
+       albht iplots orig sep title_ ititle xtitle ytitle ircol mcol irrcol ...
        itcol ncol colour;  %  blk12
 global icasel dstepf n2 n3 istop nstepr;  %  blk13
 global iwave nccbnd iccbnd icbnd vsvp;  %  blk14
@@ -53,7 +54,7 @@ global ok;
 %     nzed = ones(1,pncntr);
 %     % nvel = ones(1,pinvel);
 %     nvel = ones(player,2);
-%     [stepstep,smin,smax] = deal(0.05,-1.0,-1.0);
+%     [step_,smin,smax] = deal(0.05,-1.0,-1.0);
 %     ntt = 1;
 %     ray = zeros(1,prayf);
 %     [xmin,xmax,xmm,ndecix,ntickx] = deal(0.0,-99999.0,250.0,-2,-1);
@@ -118,7 +119,7 @@ if isempty(has_rayinvr_com_init)
     xr = zeros(1,ppray);
     zr = zeros(1,ppray);
     parorg = zeros(1,pnvar);
-    arar = zeros(ppray,2);
+    ar_ = zeros(ppray,2);
     vr = zeros(ppray,2);
     tr = zeros(1,ppray);
     tfinv = zeros(1,pnrayf);
@@ -153,7 +154,7 @@ if isempty(has_rayinvr_com_init)
     bcotan = zeros(1,pitan2);
 
     % character
-    titletitle = '';
+    title_ = '';
 end
 
 if isempty(has_rayinvr_com_init)

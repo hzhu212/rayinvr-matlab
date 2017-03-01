@@ -1,7 +1,7 @@
 % pltsub.f
 % []
 % call:
-% called by:
+% called by: fun_plttx;
 
 function fun_ssymbl(x,y,ht,isymbl)
 % plot special symbols centred at (x,y) of height ht

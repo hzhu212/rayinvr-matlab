@@ -12,15 +12,15 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     % run(file_rayinvr_com);
 
     global fID_32;
-    global arar dstepf fid ifcbnd id iblk iwave idray icasel layer n2 n3 ...
+    global ar_ dstepf fid ifcbnd id iblk iwave idray icasel layer n2 n3 ...
         nbnd nptbnd npskp nbnda pit2 vp vr vs vsvp xr xfrefl zr zfrefl;
 
     d1 = ((xr(n-1)-xfr).^2 + (zr(n-1)-zfr).^2).^0.5;
     d2 = ((xr(n)-xfr).^2 + (zr(n)-zfr).^2).^0.5;
     if (d1+d2) == 0.0
-        arar(n,1) = (arar(n-1,2)+arar(n,1)) ./ 2.0;
+        ar_(n,1) = (ar_(n-1,2)+ar_(n,1)) ./ 2.0;
     else
-        arar(n,1) = (d1.*arar(n,1) + d2.*arar(n-1,2)) ./ (d1+d2);
+        ar_(n,1) = (d1.*ar_(n,1) + d2.*ar_(n-1,2)) ./ (d1+d2);
     end
     xr(n) = xfr;
     zr(n) = zfr;
@@ -29,9 +29,9 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     end
     slope = (zfrefl(ifcbnd,ifrpt+1)-zfrefl(ifcbnd,ifrpt)) ./ (xfrefl(ifcbnd,ifrpt+1)-xfrefl(ifcbnd,ifrpt));
     alphaalpha = atan(slope);
-    a1 = fid .* (arar(n,1)+alphaalpha);
+    a1 = fid .* (ar_(n,1)+alphaalpha);
     a2 = a1;
-    arar(n,2) = fid .* (pi-a2) - alphaalpha;
+    ar_(n,2) = fid .* (pi-a2) - alphaalpha;
     vp(n,1) = fun_vel(xr(n),zr(n));
     vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
     vr(n,1) = vp(n,1);
@@ -39,12 +39,12 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     vr(n,2) = vr(n,1);
     vp(n,2) = vp(n,1);
     vs(n,2) = vs(n,1);
-    if (fid .* arar(n,2) < 0.0)
+    if (fid .* ar_(n,2) < 0.0)
         id = -id;
         fid = id; % fid = float(id)
     end
-    if fid .* arar(n,2) > pi
-        arar(n,2) = fid .* pit2 + arar(n,2);
+    if fid .* ar_(n,2) > pi
+        ar_(n,2) = fid .* pit2 + ar_(n,2);
         id = -id;
         fid = id; % fid = float(id)
     end

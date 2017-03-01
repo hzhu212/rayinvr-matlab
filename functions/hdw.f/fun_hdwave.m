@@ -15,7 +15,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	% run(file_rayinvr_com);
 
 	global fID_11 fID_12;
-	global arar b cosmth dhw fid hws iblk ihdwf ivg iwave id idray iccbnd ...
+	global ar_ b cosmth dhw fid hws iblk ihdwf ivg iwave id idray iccbnd ...
 		ihdw ihdwf icbnd idump ibsmth idiff layer nlayer nccbnd nbnd npskp ...
 		nhskip nbnda nblk pi2 pi18 ppray piray ray s tdhw vr vp vs vsvp ...
 		vm xr xsinc xbnd xmin zr;
@@ -128,7 +128,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        else
 	        	a2 = asin(vratio);
 	        end
-	        arar(n,2) = fid .* (pi-a2) - alphaalpha;
+	        ar_(n,2) = fid .* (pi-a2) - alphaalpha;
 	        if invr==1 & ir> 0
 	            [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),pi2,a2,alphaalpha,n,-1);
 	        end
@@ -138,7 +138,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	    	if idump == 1
 	    		% 5
 	    	    fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-	    	    	ifam,ir,n,xr(n),zr(n),arar(n,1).*pi18,arar(n,2).*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
+	    	    	ifam,ir,n,xr(n),zr(n),ar_(n,1).*pi18,ar_(n,2).*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
 	    	end
 		end
 
@@ -174,7 +174,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        else
 		        	vr(n,1) = vs(n,1);
 		        end
-		        arar(n,1) = arar(n-1,2);
+		        ar_(n,1) = ar_(n-1,2);
 		        iblk = iblk + id;
 		        if iblk < 1 | iblk > nblk(layer)
 					[vr,~,iflag,ihdwf] = fun_goto999(vr,n,iflag,ihdwf);
@@ -206,14 +206,14 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        	vr(n,2) = vs(n,2);
 		        end
 		        alphaalpha = atan(s(layer,iblk,1));
-		        arar(n,2) = fid .* pi2 - alphaalpha;
+		        ar_(n,2) = fid .* pi2 - alphaalpha;
 		        if invr == 1 & ir > 0
 		            [~,~,~] = fun_velprt(layer,iblk,n);
 		        end
 
 		        if idump == 1
 		            fprintf(fID_12, '%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n', ...
-		            	ifam,ir,n,xr(n),zr(n),arar(n,1)*pi18,arar(n,2)*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
+		            	ifam,ir,n,xr(n),zr(n),ar_(n,1)*pi18,ar_(n,2)*pi18,vr(n,1),vr(n,2),layer,iblk,id,iwave);
 		        end
 
 		        continue; % go to 500
@@ -242,11 +242,11 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        else
 		        	vr(n,1) = vs(n,1);
 		        end
-		        arar(n,1) = arar(n-1,2);
+		        ar_(n,1) = ar_(n-1,2);
 		        vp(n,2) = vp(n,1);
 		        vs(n,2) = vs(n,1);
 		        vr(n,2) = vr(n,1);
-		        arar(n,2) = arar(n,1);
+		        ar_(n,2) = ar_(n,1);
 		        if invr == 1 & ir > 0
 		            [~,~,~] = fun_velprt(layer,iblk,n);
 		        end

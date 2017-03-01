@@ -1,7 +1,7 @@
 % pltsub.f
 % []
 % call: fun_plot; fun_number; fun_symbol;
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function fun_axis(xorig,yorig,amin,amax,amm,ascale,theta,iside,amint,amaxt,ntick,ndeci,label,nchar,albht)
 % plot axis
@@ -75,7 +75,7 @@ function fun_axis(xorig,yorig,amin,amax,amm,ascale,theta,iside,amint,amaxt,ntick
 
 	if albht < 0.0, return; end
 	if amaxt ~= 0.0
-		maxdig = fix(alog10(abs(amaxt))) + ndeci + 2; % int -> fix
+		maxdig = fix(log10(abs(amaxt))) + ndeci + 2; % int -> fix % alog10 --> log10
 	else
 		maxdig = 1;
 	end
@@ -117,7 +117,7 @@ function fun_axis(xorig,yorig,amin,amax,amm,ascale,theta,iside,amint,amaxt,ntick
 
 	% plot axis label
 
-	alblen=float(nchar)*albht*whrat
+	alblen = nchar .* albht .* whrat;
 	if iplt == 1
 		ypos = ypos - iside.*albht.*1.5;
 		xpos = xorig + (amm-alblen)./2.0;

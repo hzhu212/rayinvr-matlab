@@ -13,7 +13,7 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     % run(file_rayinvr_com);
 
     global fID_12;
-    global arar fid fid1 ircbnd iwave iccbnd icbnd id iblk idray ifcbnd ...
+    global ar_ fid fid1 ircbnd iwave iccbnd icbnd id iblk idray ifcbnd ...
         idump layer nptbnd nbnd npskp npskip nccbnd pi18 ray vp vr vs vsvp xr zr;
 
     ircbnd = 1;
@@ -37,8 +37,8 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     npt = 1;
     xr(1) = xshot;
     zr(1) = zshot;
-    arar(1,1) = 0.0;
-    arar(1,2) = angle_angle;
+    ar_(1,1) = 0.0;
+    ar_(1,2) = angle_angle;
     vr(1,1) = 0.0;
     vp(1,1) = 0.0;
     vs(1,1) = 0.0;
@@ -61,7 +61,7 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
 
     if idump == 1
         fprintf(fID_12,'%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n',...
-            ifam,ir,npt,xr(npt),zr(npt),arar(npt,1).*pi18,arar(npt,2).*pi18,...
+            ifam,ir,npt,xr(npt),zr(npt),ar_(npt,1).*pi18,ar_(npt,2).*pi18,...
             vr(npt,1),vr(npt,2),layer,iblk,id,iwave);
     end
 

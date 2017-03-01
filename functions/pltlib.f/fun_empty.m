@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_pltmod;
+% called by: main; fun_pltmod; fun_plttx;
 
 function fun_empty()
 % flush the graphics buffer

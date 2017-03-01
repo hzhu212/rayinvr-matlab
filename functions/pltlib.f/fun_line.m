@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function fun_line(x,y,npts)
 % connect the (x,y) points with straight line segments

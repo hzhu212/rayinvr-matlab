@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function fun_erase()
 % erase the screen

@@ -1,7 +1,7 @@
 % pltlib.f
 % [x,y,~]
 % call:
-% called by: fun_pltmod;
+% called by: fun_pltmod; fun_plttx;
 
 function [x,y,iroute] = fun_plots(x,y,iroute)
 % initialize the plot; this must be the first plot call

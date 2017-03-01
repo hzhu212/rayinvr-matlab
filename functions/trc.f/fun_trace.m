@@ -14,7 +14,7 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
     % run(file_rayinvr_com);
 
     global fID_11 fID_12;
-    global arar b dstepf fid hdenom hmin iblk ivg ifcbnd idray iwave idump ...
+    global ar_ b dstepf fid hdenom hmin iblk ivg ifcbnd idray iwave idump ...
         id ifast isrkc icasel ihdw layer ntray ntpts n2 n3 nptbnd pi2 pi4 pi18 ...
         ppray pi34 ray s smax tol vr vp vs vsvp xr xbnd zr;
 
@@ -40,7 +40,7 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
     while cycle1000
         if idump == 1
             fprintf(fID_12,'%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n',...
-                ifam,ir,npt,xr(npt),zr(npt),arar(npt,1).*pi18,arar(npt,2).*pi18,...
+                ifam,ir,npt,xr(npt),zr(npt),ar_(npt,1).*pi18,ar_(npt,2).*pi18,...
                 vr(npt,1),vr(npt,2),layer,iblk,id,iwave); % 5
         end
         if iwave == -1 && vr(npt,2) <= 0.001
@@ -54,7 +54,7 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
             return; % go to 900
         end
         if npt > 1
-            if ((arar(npt,2) - fid.*pi2) .* (arar(npt-1,2) - fid.*pi2)) <= 0.0
+            if ((ar_(npt,2) - fid.*pi2) .* (ar_(npt-1,2) - fid.*pi2)) <= 0.0
                 if iturn ~= 0
                     [~,~,~,vr,~,iflag,ntpts] = fun_goto900(ifcbnd,idray,ii2pt,vr,npt,iflag,ntpts);
                     return; % go to 900
@@ -63,12 +63,12 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
         end
 
         isrkc = 1;
-        if (fid .* arar(npt,2)) >= pi4 && (fid .* arar(npt,2)) <= pi34
+        if (fid .* ar_(npt,2)) >= pi4 && (fid .* ar_(npt,2)) <= pi34
             % solve o.d.e.'s w.r.t. x
 
             x = xr(npt);
             y(1) = zr(npt);
-            y(2) = arar(npt,2);
+            y(2) = ar_(npt,2);
 
             if ivg(layer,iblk) == 0
                 [x,y,~,~] = fun_strait(x,y,npt,0);
@@ -98,12 +98,12 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
 
             x = zr(npt);
             y(1) = xr(npt);
-            y(2) = arar(npt,2);
+            y(2) = ar_(npt,2);
 
             if ivg(layer,iblk) == 0
                 [x,y,~,~] = fun_strait(x,y,npt,1);
             else
-                if (fid.*arar(npt,2)) <= pi2
+                if (fid.*ar_(npt,2)) <= pi2
                     z = x + fun_dstep(xr(npt),zr(npt)) ./ dstepf;
                 else
                     z = x - fun_dstep(xr(npt),zr(npt)) ./ dstepf;
@@ -129,8 +129,8 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
             zr(npt) = x;
         end
 
-        arar(npt,1) = y(2);
-        arar(npt,2) = y(2);
+        ar_(npt,1) = y(2);
+        ar_(npt,2) = y(2);
         vp(npt,1) = fun_vel(xr(npt),zr(npt));
         vs(npt,1) = vp(npt,1) .* vsvp(layer,iblk);
         if iwave == 1

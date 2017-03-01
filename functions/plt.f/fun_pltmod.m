@@ -13,7 +13,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 	global fID_33;
 	global albht b cosmth ibsmth ifcol iplots isep ititle itx ivg mcol nblk ...
 		ndecix ndeciz nfrefl nlayer npbnd npfref ntickx ntickz nzed orig s ...
-		sep titletitle tmm vm vsvp xbnd xfrefl xm xmax xmin xmm xscale xsinc ...
+		sep title_ tmm vm vsvp xbnd xfrefl xm xmax xmin xmm xscale xsinc ...
 		xtitle xtmax xtmin xwndow ytitle ywndow zfrefl zm zmax zmin zmm zscale ...
 		ztmax ztmin;
 
@@ -35,10 +35,10 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 	end
 	fun_box(orig,sep,orig+xmm,sep+zmm);
 
-	if ititle == 0 && titletitle ~= ' '
+	if ititle == 0 & title_ ~= ' '
 		if xtitle < -999999.0, xtitle = 0.0; end
 		if ytitle < -999999.0, ytitle = 0.0; end
-		fun_symbol(xtitle,ytitle,albht,titletitle,0.0,80);
+		fun_symbol(xtitle,ytitle,albht,title_,0.0,80);
 		ititle = 1;
 	end
 

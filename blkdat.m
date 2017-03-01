@@ -7,7 +7,7 @@
 nzed = ones(1,pncntr);
 % nvel = ones(1,pinvel);
 nvel = ones(player,2);
-[stepstep,smin,smax] = deal(0.05,-1.0,-1.0);
+[step_,smin,smax] = deal(0.05,-1.0,-1.0);
 ntt = 1;
 ray = zeros(1,prayf);
 [xmin,xmax,xmm,ndecix,ntickx] = deal(0.0,-99999.0,250.0,-2,-1);

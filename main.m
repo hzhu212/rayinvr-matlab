@@ -29,7 +29,7 @@ function main(filePathIn, filePathOut)
 
 	clear('global');
 	global file_rayinvr_par file_rayinvr_com file_main_par;
-	global fID_11 fID_12 fID_19 fID_31 fID_32 fID_33 fID_35;
+	global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35;
 	global file_iout file_nout;
 
 	file_rayinvr_par = 'rayinvr_par.m';
@@ -547,7 +547,7 @@ function main(filePathIn, filePathOut)
 
 				if (imod==1 || iray > 0 || irays==1) && isep > 1
 					if iflagp == 1
-						% fun_aldone();
+						fun_aldone();
 					end
 					iflagp = 1;
 					fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
@@ -876,8 +876,8 @@ function main(filePathIn, filePathOut)
 							npt = 1;
 							xr(1) = xshotr;
 							zr(1) = zshotr;
-							arar(1,1) = 0.0;
-							arar(1,2) = angle_angle;
+							ar_(1,1) = 0.0;
+							ar_(1,2) = angle_angle;
 							vr(1,1) = 0.0;
 							vp(1,1) = 0.0;
 							vs(1,1) = 0.0;
@@ -898,20 +898,11 @@ function main(filePathIn, filePathOut)
 							nrg = nrg + 1;
 							nhskip = 0;
 
-							% if onDev, disp('========================= tick before fun_trace ========================='); end
-
-							% [npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout] ...
 							[npt,~,~,~,~,~,iflag,~,~,~,~,~,~] ...
 							= fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
 
-							% if onDev, disp('========================= tick after fun_trace ========================='); end
-							% if onDev, disp('========================= tick before fun_ttime ========================='); end
-
-							% [ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf] ...
 							[~,~,~,~,~,~,itt,~,~,~,~] ...
 							= fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
-
-							% if onDev, disp('========================= tick after fun_ttime ========================='); end
 
 							if irs == 0
 								ic2pt = ic2pt + 1;
@@ -934,12 +925,10 @@ function main(filePathIn, filePathOut)
 							end
 
 							if vr(npt,2) > 0 && irs > 0 && abs(modout) >= 2
-								% call cells()
 								[~,~,~,~] = fun_cells(npt,xmmin,dxmod,dzmod);
 							end
 
 							if invr==1 && irs>0
-								% call fxtinv(npt)
 								[~] = fun_fxtinv(npt);
 							end
 
@@ -983,8 +972,7 @@ function main(filePathIn, filePathOut)
 					end
 					if iflagw == 1, iflagi = 1; end
 					if iray > 0 || irays == 1
-						% call empty
-						% fun_empty();
+						fun_empty();
 					end
 
 					nrayr = nrg;
@@ -1004,9 +992,7 @@ function main(filePathIn, filePathOut)
 			end % 70
 			if isGoto1000, break; end % go to 1000 step2
 			if isep==2 && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
-				% ?... call plttx() % float
-				% [ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline] ...
-				% = fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
+				fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
 			end
 		end % 60
 	end % -------------------- ~ go to 1000 block end
@@ -1016,12 +1002,9 @@ function main(filePathIn, filePathOut)
 	% 1000
 	if (isep<2 || isep==3) && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
 		if isep>0 && iplots==1
-			% call aldone
-			% fun_aldone();
+			fun_aldone();
 		end
-		% call plttx()
-		% [ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,~,itxbox,iroute,iline] ...
-		% = fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,iline);
+		fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,iline);
 	end
 
 	if itxout > 0
@@ -1055,12 +1038,10 @@ function main(filePathIn, filePathOut)
 	end
 
 	if abs(modout) ~= 0
-		% [modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax);
 		[~,~,~,~,~,frz,~,~]= fun_modwr(modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax);
 	end
 
 	if ifd > 0
-		% [dxzmod,xmmin,xmmax,ifd] = fun_fd(dxzmod,xmmin,xmmax,ifd);
 		[~,~,~,~] = fun_fd(dxzmod,xmmin,xmmax,ifd);
 	end
 
@@ -1283,7 +1264,8 @@ function fun_goto900()
 		fclose(fID_18);
 	end
 	if iplots == 1
-		% fun_plotnd(1);
+		% ? call plotnd(1)
+		fun_plotnd();
 	end
 	fun_goto9999(); return;
 end
