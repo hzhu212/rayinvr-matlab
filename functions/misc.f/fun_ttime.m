@@ -17,7 +17,7 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 
 	global fID_11 fID_12;
 	global arar fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
-		rangerange rayid time timertimer tr tt vr vred xr xshtar zr;
+		range_ rayid time timertimer tr tt vr vred xr xshtar zr;
 
 	% real vave(ppray)
 	% integer itt(1)
@@ -60,9 +60,9 @@ function [is,xshot,npt,nr,a1,ifam,itt,iszero,iflag,uf,irayf] = fun_ttime(is,xsho
 	if vr(npt,2) ~= 0.0
 	    itt(ifam) = itt(ifam) + 1;
 	    if iszero == 0
-	        rangerange(ntt) = xr(npt);
+	        range_(ntt) = xr(npt);
 	    else
-	    	rangerange(ntt) = abs(xr(npt)-xshot);
+	    	range_(ntt) = abs(xr(npt)-xshot);
 	    end
 	    tt(ntt) = timertimer;
 	    xshtar(ntt) = xshot;

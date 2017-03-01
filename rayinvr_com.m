@@ -4,7 +4,7 @@ global has_rayinvr_com_init;
 
 % changed 'ar' to 'arar' to avoid name conflict.
 % changed 'step' to 'stepstep'.
-% changed 'rangerange' to 'rangerange'.
+% changed 'range' to 'range_'.
 
 % common
 global layer iblk id fid fid1;  %  blk1
@@ -17,7 +17,7 @@ global refll ircbnd;  %  blk7
 global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
 global itx vred time timertimer;  %  blk9
 global stepstep smin smax;  %  blk10
-global rangerange tt rayid xshtar fidarr idray ntt ray;  %  blk11
+global range_ tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
        xtmaxt xmmt ndecxt xscalt ntckxt zmin zmax ztmin ztmax zmm ndeciz ...
        zscale ntickz tmin tmax ttmin ttmax tmm ndecit tscale ntickt symht ...
@@ -133,7 +133,7 @@ if isempty(has_rayinvr_com_init)
     cz = zeros(player,ptrap,4,2);
     tang = zeros(player,4);
     cosmth = zeros(pncntr,pnsmth);
-    rangerange = zeros(1,pray);
+    range_ = zeros(1,pray);
     apart = zeros(prayi,pnvar);
     fpart = zeros(pnrayf,pnvar);
     tobs = zeros(1,prayi);

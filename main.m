@@ -29,7 +29,7 @@ function main(filePathIn, filePathOut)
 
 	clear('global');
 	global file_rayinvr_par file_rayinvr_com file_main_par;
-	global fID_11 fID_12 fID_31 fID_32 fID_35;
+	global fID_11 fID_12 fID_19 fID_31 fID_32 fID_33 fID_35;
 	global file_iout file_nout;
 
 	file_rayinvr_par = 'rayinvr_par.m';
@@ -402,8 +402,7 @@ function main(filePathIn, filePathOut)
 	% plot velocity model
 
 	if (imod==1 || iray>0 || irays==1) && isep<2
-		% [ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33] ...
-		% = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+		fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 	end
 
 	% calculation of smooth layer boundaries
@@ -551,8 +550,7 @@ function main(filePathIn, filePathOut)
 						% fun_aldone();
 					end
 					iflagp = 1;
-					% [ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33] ...
-					% = fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+					fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 				end
 			end
 			irbnd = 0;
