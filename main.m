@@ -403,7 +403,10 @@ function main(filePathIn, filePathOut)
 
 	if (imod==1 || iray>0 || irays==1) && isep<2
 		fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+		fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 	end
+
+	return;
 
 	% calculation of smooth layer boundaries
 
@@ -551,6 +554,7 @@ function main(filePathIn, filePathOut)
 					end
 					iflagp = 1;
 					fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+					fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 				end
 			end
 			irbnd = 0;
