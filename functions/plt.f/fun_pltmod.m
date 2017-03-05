@@ -17,6 +17,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 		xtitle xtmax xtmin xwndow ytitle ywndow zfrefl zm zmax zmin zmm zscale ...
 		ztmax ztmin;
 
+	% 初始化绘图
 	if iplots == 0
 		if (isep==0 || isep==2) && (itx>0 || idata~=0)
 			sep = sep + orig + tmm;
@@ -27,14 +28,19 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 	end
 	fun_erase();
 	ititle = 0;
+
+	% 绘制坐标轴
 	if iaxlab == 1
 		[~,~,xtmin,xtmax,ntickx,ndecix] = fun_axtick(xmin,xmax,xtmin,xtmax,ntickx,ndecix);
 		[~,~,ztmin,ztmax,ntickz,ndeciz] = fun_axtick(zmin,zmax,ztmin,ztmax,ntickz,ndeciz);
 		fun_axis(orig,sep+zmm,xmin,xmax,xmm,xscale,0.0,-1,xtmin,xtmax,ntickx,ndecix,'DISTANCE (km)',13,albht);
 		fun_axis(orig,sep,zmin,zmax,zmm,zscale,90.0,1,ztmin,ztmax,ntickz,ndeciz,'DEPTH (km)',10,albht);
 	end
+
+	% 绘制图像边框
 	fun_box(orig,sep,orig+xmm,sep+zmm);
 
+	% 绘制坐标轴标题
 	if ititle == 0 & title_ ~= ' '
 		if xtitle < -999999.0, xtitle = 0.0; end
 		if ytitle < -999999.0, ytitle = 0.0; end
@@ -42,9 +48,13 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 		ititle = 1;
 	end
 
+	% 绘制模型轮廓
 	if imod == 1
+
+		% 绘制模型层界面（水平方向）
 		fun_pcolor(mcol(1));
 
+		% 对模型的每个层边界进行循环(ncont为层边界数)
 		for ii = 1:ncont % 10
 			nptsc = nzed(ii);
 			if nptsc == 1
@@ -71,6 +81,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 			end
 		end % 10
 
+		% 绘制 floating-reflectors
 		fun_pcolor(mcol(3));
 
 		if ifrbnd == 1
@@ -92,6 +103,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 			end % 110
 		end
 
+		% 绘制模型中每个 block 的竖直边界
 		if ibnd == 1
 			fun_pcolor(mcol(2));
 
@@ -120,6 +132,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 			end % 30
 		end
 
+		% 绘制 smoothed bounderies
 		if ibsmth == 2
 
 			fun_pcolor(mcol(4));
@@ -140,6 +153,7 @@ function fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,
 		end
 	end
 
+	% 在模型中每个小梯形中写上 P 波和 S 波的速度值
 	if ivel ~= 0
 
 		fun_pcolor(mcol(5));

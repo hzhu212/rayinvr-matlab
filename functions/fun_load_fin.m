@@ -30,7 +30,7 @@ function [nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel]=fun_load_fin(file_fin)
         value=sscanf(line,'%i');
         nn=value;   %the number of nodes
         if nn<2 || nn>ppfref
-            error('e:test','\n***  error in f.in file  ***\n');
+            error('e:error','\n***  error in f.in file  ***\n');
         end
         over10=1; % assume nodes number larger than 10
         final=[];

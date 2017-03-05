@@ -5,6 +5,7 @@
 
 function fun_line(x,y,npts)
 % connect the (x,y) points with straight line segments
+% x,y 均为长度为 npts 的数组
 
 	global fID_19;
 	% common /cplot/ iplot,isep,iseg,nseg,xwndow,ywndow,ibcol,ifcol,sf

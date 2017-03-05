@@ -10,7 +10,7 @@ function fun_symbol(x,y,ht,label,ang,nchar)
 	global fID_19;
 	% common /cplot/ iplot,isep,iseg,nseg,xwndow,ywndow,ibcol,ifcol,sf
 	global iplot isep iseg nseg xwndow ywndow ibcol ifcol sf;
-	label = ' ';
+	% label = ' ';
 
 	if iplot >= 0
 		% call rtxhei(ht)
@@ -20,7 +20,7 @@ function fun_symbol(x,y,ht,label,ang,nchar)
 
 	if iplot <= 0
 		% 5
-		fprintf(fID_19, '%2d\n%10d\n%15.5e%15.5e%15.5e%15.5e\n%1s\n', 3,nchar,x,y,ht,ang,label(1:nchar));
+		fprintf(fID_19, ['%2d\n%10d\n%15.5e%15.5e%15.5e%15.5e\n%',num2str(nchar),'s\n'], 3,nchar,x,y,ht,ang,label(1:nchar));
 	end
 
 	return;
