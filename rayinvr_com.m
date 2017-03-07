@@ -2,7 +2,7 @@
 
 global has_rayinvr_com_init;
 
-% changed 'ar' to 'ar_' to avoid name conflict.
+% changed 'ar' to 'ar_' to avoid conflict with matlab keywords.
 % changed 'step' to 'step_'.
 % changed 'range' to 'range_'.
 % changed 'title' to 'title_'.
@@ -155,6 +155,7 @@ if isempty(has_rayinvr_com_init)
 
     % character
     title_ = '';
+
 end
 
 if isempty(has_rayinvr_com_init)

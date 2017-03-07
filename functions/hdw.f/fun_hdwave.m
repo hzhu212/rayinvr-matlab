@@ -44,7 +44,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	hwsl = hws;
 	ilr = (id+3) ./ 2;
 	irl = (3-id) ./ 2;
-	alphaalpha = atan(s(layer,iblk,1));
+	alpha_ = atan(s(layer,iblk,1));
 
 	% 1000 % -------------------- cycle1000 begin
 	cycle1000 = true;
@@ -102,12 +102,12 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	            return;
 	        end
 	        if ibsmth == 0
-	            alphaalpha = atan(s(layer,iblk,2));
+	            alpha_ = atan(s(layer,iblk,2));
 	        else
 				npl = fix((xr(n)-xmin-0.001)./xsinc) + 1; % ifix -> fix
 				npr = npl + 1;
 				xpl = xmin + (npl-1) .* xsinc; % float
-				alphaalpha = (cosmth(layer+1,npr)-cosmth(layer+1,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer+1,npl);
+				alpha_ = (cosmth(layer+1,npr)-cosmth(layer+1,npl)) .* (xr(n)-xpl) ./ xsinc + cosmth(layer+1,npl);
 	        end
 	        if i1ray == 1
 	            nhskip = 0;
@@ -128,9 +128,9 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        else
 	        	a2 = asin(vratio);
 	        end
-	        ar_(n,2) = fid .* (pi-a2) - alphaalpha;
+	        ar_(n,2) = fid .* (pi-a2) - alpha_;
 	        if invr==1 & ir> 0
-	            [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),pi2,a2,alphaalpha,n,-1);
+	            [~,~,~,~,~,~,~,~,~] = fun_bndprt(lstart,istart,vr(n,1),vr(n,2),pi2,a2,alpha_,n,-1);
 	        end
 	        iflag = 0;
 	        return;
@@ -147,9 +147,9 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		while cycle500
 			isGoto1000 = false;
 
-			xrp = xr(n) + fid.*hwsl.*cos(alphaalpha);
+			xrp = xr(n) + fid.*hwsl.*cos(alpha_);
 			if fid.*xrp > fid.*xbnd(layer,iblk,ilr)
-			    hl = abs(xbnd(layer,iblk,ilr)-xr(n)) ./ cos(alphaalpha);
+			    hl = abs(xbnd(layer,iblk,ilr)-xr(n)) ./ cos(alpha_);
 		        hwsl = hwsl - hl;
 		        if n == ppray
 		            [~,vr,~,iflag,ihdwf] = fun_goto900(fID_11,vr,n,iflag,ihdwf)
@@ -205,8 +205,8 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        else
 		        	vr(n,2) = vs(n,2);
 		        end
-		        alphaalpha = atan(s(layer,iblk,1));
-		        ar_(n,2) = fid .* pi2 - alphaalpha;
+		        alpha_ = atan(s(layer,iblk,1));
+		        ar_(n,2) = fid .* pi2 - alpha_;
 		        if invr == 1 & ir > 0
 		            [~,~,~] = fun_velprt(layer,iblk,n);
 		        end

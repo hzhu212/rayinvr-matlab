@@ -32,6 +32,12 @@ function main(filePathIn, filePathOut)
 	global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35;
 	global file_iout file_nout;
 
+	% 控制绘图颜色
+	global matlabColors currentColor;
+
+	% 图像句柄，1-模型图像，2-走时图像
+	global hFigure1 hFigure2;
+
 	file_rayinvr_par = 'rayinvr_par.m';
 	file_rayinvr_com = 'rayinvr_com.m';
 	file_main_par = 'main_par.m';
@@ -72,6 +78,10 @@ function main(filePathIn, filePathOut)
 	file_rin_m = fun_trans_rin2m(file_rin); % 将r.in文件转化为r_in.m脚本
 	run(file_rin_m); % 载入脚本，为r.in中所有变量赋值
 
+    % matlab colors，设定当前颜色为默认色（前景色）
+    matlabColors = 'krgbcmyw';
+    currentColor = matlabColors(ifcol);
+
 	if onDev, disp('========================= tick 1 ========================='); end
 
 	%% 2 main
@@ -93,15 +103,6 @@ function main(filePathIn, filePathOut)
 	% [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
 	[model,LN,xmin,xmax,zmin,zmax,~,~,~,mError] = fun_load_vin(file_vin);
 	error(mError);
-	% 将得到的模型（model）转为源程序中的形式：xm,zm,ivarz；xvel,vf,ivarv
-	% 由于模型每层存储的数组是不等长的，所以通过cell来保存，而不是二维矩阵。
-	% xm = arrayfun(@(x) x.bd(1,:),model,'UniformOutput',false);
-	% zm = arrayfun(@(x) x.bd(2,:),model,'UniformOutput',false);
-	% ivarz = arrayfun(@(x) x.bd(3,:),model(1:end-1),'UniformOutput',false);
-
-	% xvel = arrayfun(@(x) [x.tv(1,:);x.bv(1,:)],model(1:end-1),'UniformOutput',false);
-	% vf = arrayfun(@(x) [x.tv(2,:);x.bv(2,:)],model(1:end-1),'UniformOutput',false);
-	% ivarv = arrayfun(@(x) [x.tv(3,:);x.bv(3,:)],model(1:end-1),'UniformOutput',false);
 	for ii = 1:length(model)
 		t_thisLayer = model(ii);
 		[~,t_xlen] = size(t_thisLayer.bd);
@@ -402,11 +403,11 @@ function main(filePathIn, filePathOut)
 	% plot velocity model
 
 	if (imod==1 || iray>0 || irays==1) && isep<2
-		fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 		fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+		% fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 	end
 
-	return;
+	% return;
 
 	% calculation of smooth layer boundaries
 
@@ -553,8 +554,8 @@ function main(filePathIn, filePathOut)
 						fun_aldone();
 					end
 					iflagp = 1;
-					fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 					fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+					% fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 				end
 			end
 			irbnd = 0;
@@ -918,8 +919,8 @@ function main(filePathIn, filePathOut)
 							end
 
 							if ((iray==1 || (iray==2 && vr(npt,2)>0.0)) && mod(ir-1,nrskip)==0 && irs>0) || (irays==1 && irs==0)
-								% call pltray()
-								% [npt,max(nskip,nhskip),idot,irayps,istep,angled] = fun_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
+								fun_my_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
+								% [~,~,~,~,istep,~] = fun_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
 								if i33 == 1
 									if iszero == 1, xwr=abs(xshtar(ntt-1)-xobs);
 									else xwr = xobs; end
@@ -1008,7 +1009,7 @@ function main(filePathIn, filePathOut)
 		if isep>0 && iplots==1
 			fun_aldone();
 		end
-		fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.,itxbox,iroute,iline);
+		fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
 	end
 
 	if itxout > 0

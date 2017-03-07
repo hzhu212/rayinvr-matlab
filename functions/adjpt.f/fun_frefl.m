@@ -28,10 +28,10 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
         fprintf(fID_32,'%10.3f%10.3f%10d\n',xfr,zfr);
     end
     slope = (zfrefl(ifcbnd,ifrpt+1)-zfrefl(ifcbnd,ifrpt)) ./ (xfrefl(ifcbnd,ifrpt+1)-xfrefl(ifcbnd,ifrpt));
-    alphaalpha = atan(slope);
-    a1 = fid .* (ar_(n,1)+alphaalpha);
+    alpha_ = atan(slope);
+    a1 = fid .* (ar_(n,1)+alpha_);
     a2 = a1;
-    ar_(n,2) = fid .* (pi-a2) - alphaalpha;
+    ar_(n,2) = fid .* (pi-a2) - alpha_;
     vp(n,1) = fun_vel(xr(n),zr(n));
     vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
     vr(n,1) = vp(n,1);
@@ -57,7 +57,7 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     nbnd = nbnd + 1;
     if npskp~=1, nbnda(nbnd)=n; end
     if ir ~= 0 & invr == 1
-        [vr(n,1),a1,alphaalpha,n,ifrpt] = fun_frprt(vr(n,1),a1,alphaalpha,n,ifrpt);
+        [vr(n,1),a1,alpha_,n,ifrpt] = fun_frprt(vr(n,1),a1,alpha_,n,ifrpt);
     end
     return;
 end % fun_frefl end

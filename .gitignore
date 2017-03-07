@@ -2,5 +2,6 @@
 /old/
 /input/
 /output/
+*.py
 *.o
 *.exe

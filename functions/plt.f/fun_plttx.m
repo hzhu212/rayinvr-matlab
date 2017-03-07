@@ -4,7 +4,7 @@
 % fun_pcolor; fun_erase; fun_ssymbl; fun_box; fun_symbol; fun_dashln; fun_pltdat; fun_dot;
 % called by: main;
 
-function fun_plttx(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33)
+function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,fidrr,itxbox,iroute,iline)
 % plot the travel time curves for all rays reaching the surface -
 % for each group of rays a separate curve is drawn for each
 % ray code
@@ -92,7 +92,7 @@ function fun_plttx(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i
 				rh(jj) = rayid(jj+nh1);
 				xsh(jj) = xshtar(jj+nh1);
 				fh(jj) = fidarr(jj+nh1);
-				n = n+1
+				n = n + 1;
 			end % 20
 			if isep == 2 && (abs(xsh(1)-xshotr) > 0.001 || fh(1) ~= fidrr)
 				continue; % go to 10

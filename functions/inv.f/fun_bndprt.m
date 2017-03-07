@@ -3,7 +3,7 @@
 % called by: fun_hdwave; fun_adjpt;
 % call: none.
 
-function [lulu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lulu,iu,v1,v2,a1,a2,alphaalpha,npt,itype)
+function [lulu,iu,v1,v2,a1,a2,alpha_,npt,itype] = fun_bndprt(lulu,iu,v1,v2,a1,a2,alpha_,npt,itype)
 % calculate boundary partial derivatives
 
 	% global file_rayinvr_par file_rayinvr_com;
@@ -25,7 +25,7 @@ function [lulu,iu,v1,v2,a1,a2,alphaalpha,npt,itype] = fun_bndprt(lulu,iu,v1,v2,a
 	    if izv(lulu,iu,ii) ~= 0
 	        jv = izv(lulu,iu,ii);
 	        if cz(lulu,iu,ii,2) ~= 0.0
-	            slptrm = cos(alphaalpha) .* abs(cz(lulu,iu,ii,1)-xr(npt)) ./ cz(lulu,iu,ii,2);
+	            slptrm = cos(alpha_) .* abs(cz(lulu,iu,ii,1)-xr(npt)) ./ cz(lulu,iu,ii,2);
 	        else
 	        	slptrm = 1.0;
 	        end
