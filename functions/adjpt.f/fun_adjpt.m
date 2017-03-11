@@ -13,7 +13,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	% run(file_rayinvr_com);
 
 	global fID_11 fID_32;
-	global ar_ b c cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
+	global ar_ b c crit cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
 		idray istop ibsmth icbnd iheadf idifff ihdw layer nbnd nptbnd npskp ...
 		n2 n3 nblk nstepr nccbnd nbnda nlayer piray pi2 pit2 ray refll s vm ...
 		vr vp vs vsvp xmin xr xsinc zr;
@@ -143,7 +143,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
         if dfrefl <= dtrap
             lstart = layer;
             istart = iblk;
-            [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr);
+            [~,~,~,~,~,~,~] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr);
             return;
         end
 	end
@@ -536,12 +536,12 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 		    end
 		    if iheadf(layer) == 1 & vr(n,1) < vo
 		        crita = asin(vr(n,1)./vo);
-		        diff = abs(abs(a1)-crita);
+		        diff_ = abs(abs(a1)-crita);
 		        if fid ~= fid1
 		            fid = fid1;
 		            id = -id;
 		        end
-		        if diff <= crit
+		        if diff_ <= crit
 		            isGoto3300 = true;
 		            break; % go to 3300
 		        end

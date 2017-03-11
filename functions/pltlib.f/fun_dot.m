@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_plttx;
+% called by: fun_plttx; fun_pltdat;
 
 function fun_dot(x,y,size_,icol)
 % plot a dot centred at (x,y) of size isize pixels or mm and colour

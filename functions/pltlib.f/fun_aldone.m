@@ -1,6 +1,6 @@
 % pltlib.f
 % []
-% call:
+% call: fun_aldone; fun_plotnd; fun_segmnt;
 % called by: main; fun_plttx;
 
 function fun_aldone()

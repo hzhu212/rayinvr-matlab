@@ -4,7 +4,7 @@
 % call: fun_cvcalc; fun_smooth; fun_smooth2; fun_vel; done.
 
 function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns] = fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
-% calculate model
+% calculate model parameters now for use later in program
 % ncont: 模型总层数（包括最后一层）
 % pois: Poisson's ratio，数组，保存模型中每一层的泊松比
 % poisl: Poisson layer, 数组，泊松比的层索引
@@ -40,19 +40,20 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
     idsmax = 0;
 
     % 1. 检查形状模型是否有误
-    for ii = 1:ncont
-        for jj = 1:ppcntr
-            if abs(xm(ii,jj)-xmax) < 0.0001, break; end
+    for ii = 1:ncont % 10
+        for jj = 1:ppcntr % 20
+            if abs(xm(ii,jj)-xmax) < 0.0001, break; end % go to 30
             nzed(ii) = nzed(ii) + 1;
         end % 20
+        % 30
         if nzed(ii) > 1
-            for jj = 1: nzed(ii)-1
+            for jj = 1: nzed(ii)-1 % 40
                 if xm(ii,jj) >= xm(ii,jj+1)
                     fprintf('%12d%12d%12d\n',1,ii,jj);
                     iflagm=1; fun_goto999();
                 end
             end % 40
-            if abs(xm(ii,1)-xmin)>0.001 | abs(xm(ii,nzed(ii))-xmax)>0.001
+            if abs(xm(ii,1)-xmin) > 0.001 | abs(xm(ii,nzed(ii))-xmax) > 0.001
                 fprintf('%11d %11d\n',2,ii);
                 iflagm=1; fun_goto999();
             end
@@ -62,144 +63,171 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
     end % 10
 
     % 2. 检查速度模型（顶界面）是否有误
-    for ii = 1:nlayer
-        for jj = 1:ppvel
-            if abs(xvel(ii,jj,1)-xmax) < 0.0001, break; end
+    for ii = 1:nlayer % 11
+        for jj = 1:ppvel % 21
+            if abs(xvel(ii,jj,1)-xmax) < 0.0001, break; end % go to 31
             nvel(ii,1) = nvel(ii,1) + 1;
-        end
+        end % 21
+        % 31
         if nvel(ii,1) > 1
-            isError3 = xvel(ii,1:nvel(ii,1)-1,1) >= xvel(ii,2:nvel(ii,1),1);
-            if any(isError3)
-                fprintf('%11d %11d %11d\n',3,ii,find(isError3,1));
-                iflagm=1; fun_goto999();
-            end
-            if abs(xvel(ii,1,1)-xmin)>0.001 | abs(xvel(ii,nvel(ii,1),1)-xmax)>0.001
+            for jj = 1:nvel(ii,1)-1 % 41
+                if xvel(ii,jj,1) >= xvel(ii,jj+1,1)
+                    fprintf('%11d %11d %11d\n',3,ii,jj);
+                    iflagm = 1; fun_goto999();
+                end
+            end % 41
+            % isError3 = xvel(ii,1:nvel(ii,1)-1,1) >= xvel(ii,2:nvel(ii,1),1);
+            % if any(isError3)
+            %     fprintf('%11d %11d %11d\n',3,ii,find(isError3,1));
+            %     iflagm=1; fun_goto999();
+            % end
+            if abs(xvel(ii,1,1)-xmin) > 0.001 | abs(xvel(ii,nvel(ii,1),1)-xmax) > 0.001
                 fprintf('%11d %11d\n',4,ii);
                 iflagm=1; fun_goto999();
             end
         else
-            if vf(ii,1,1)>0, xvel(ii,1,1)=xmax;
+            if vf(ii,1,1) > 0
+                xvel(ii,1,1) = xmax;
             else
-                if ii == 1, fprintf('%11d\n',5); iflagm=1; fun_goto999();
-                else nvel(ii,1) = 0; end
+                if ii == 1
+                    fprintf('%11d\n',5);
+                    iflagm=1; fun_goto999();
+                else
+                    nvel(ii,1) = 0;
+                end
             end
         end
-    end
+    end % 11
 
     % 3. 检查速度模型（底界面）是否有误
-    for ii = 1:nlayer
-        for jj = 1:ppvel
-            if abs(xvel(ii,jj,2)-xmax) < 0.0001, break; end
+    for ii = 1:nlayer % 12
+        for jj = 1:ppvel % 22
+            if abs(xvel(ii,jj,2)-xmax) < 0.0001, break; end % go to 32
             nvel(ii,2) = nvel(ii,2) + 1;
-        end
+        end % 22
+        % 32
         if nvel(ii,2) > 1
-            isError6 = xvel(ii,1:nvel(ii,2)-1,2) >= xvel(ii,2:nvel(ii,2),2);
-            if any(isError6)
-                fprintf('%11d %11d %11d\n',6,ii,find(isError6,1));
-                iflagm=1; fun_goto999();
-            end
-            if abs(xvel(ii,1,2)-xmin)>0.001 | abs(xvel(ii,nvel(ii,2),2)-xmax)>0.001
+            for jj = 1:nvel(ii,2)-1 % 42
+                if xvel(ii,jj,2) >= xvel(ii,jj+1,2)
+                    fprintf('%11d %11d %11d\n',6,ii,jj);
+                    iflagm=1; fun_goto999();
+                end
+            end % 42
+            % isError6 = xvel(ii,1:nvel(ii,2)-1,2) >= xvel(ii,2:nvel(ii,2),2);
+            % if any(isError6)
+            %     fprintf('%11d %11d %11d\n',6,ii,find(isError6,1));
+            %     iflagm=1; fun_goto999();
+            % end
+            if abs(xvel(ii,1,2)-xmin) > 0.001 | abs(xvel(ii,nvel(ii,2),2)-xmax) > 0.001
                 fprintf('%11d %11d\n',7,ii);
                 iflagm=1; fun_goto999();
             end
         else
-            if vf(ii,1,2)>0, xvel(ii,1,2)=xmax;
-            else nvel(ii,2) = 0; end
+            if vf(ii,1,2) > 0
+                xvel(ii,1,2) = xmax;
+            else
+                nvel(ii,2) = 0;
+            end
         end
-    end
+    end % 12
 
     % 4. 将模型的每一层都切分成小梯形
-    for ii = 1:nlayer
-        xa = [];
+    for ii = 1:nlayer % 50
+        % xa = [];
         xa(1) = xmin;
         xa(2) = xmax;
         ib = 2;
         ih = ib;
 
-        for jj = 1:nzed(ii)
-            if any(abs(xm(ii,jj)-xa(1:ih))<0.005), continue; end
+        for jj = 1:nzed(ii) % 60
+            if any(abs(xm(ii,jj)-xa(1:ih))<0.005), continue; end % go to 60
             ib = ib + 1;
             xa(ib) = xm(ii,jj);
         end % 60
         ih = ib;
 
-        for jj = 1:nzed(ii+1)
-            if any(abs(xm(ii+1,jj)-xa(1:ih))<0.005), continue; end
+        for jj = 1:nzed(ii+1) % 70
+            if any(abs(xm(ii+1,jj)-xa(1:ih))<0.005), continue; end % go to 70
             ib = ib + 1;
             xa(ib) = xm(ii+1,jj);
         end % 70
         ih = ib;
 
-        if nvel(ii,1)>0, il = ii; is = 1;
+        if nvel(ii,1) > 0, il = ii; is = 1;
         else
-            if nvel(ii-1,2)>0, il = ii-1; is = 2;
+            if nvel(ii-1,2) > 0, il = ii-1; is = 2;
             else il = ii-1; is = 1; end
         end
 
-        for jj = 1:nvel(il,is)
-            if any(abs(xvel(il,jj,is)-xa(1:ih))<0.005), continue; end % 81
+        for jj = 1:nvel(il,is) % 71
+            if any(abs(xvel(il,jj,is)-xa(1:ih))<0.005), continue; end % go to 71
             ib = ib + 1;
             xa(ib) = xvel(il,jj,is);
         end % 71
 
         if nvel(ii,2) > 0
             ih = ib;
-            for jj = 1:nvel(ii,2)
-                if any(abs(xvel(ii,jj,2)-xa(1:ih))<0.005), continue; end % 82
+            for jj = 1:nvel(ii,2) % 72
+                if any(abs(xvel(ii,jj,2)-xa(1:ih))<0.005), continue; end % go to 72
                 ib = ib + 1;
                 xa(ib) = xvel(ii,jj,2);
             end % 72
         end
 
         if ib > (ptrap+1)
-            iflagm = 1;
-            error('e:test','\n***  maximum number of blocks in layer %d exceeded  ***\n',ii);
+            fprintf('\n***  maximum number of blocks in layer %2d exceeded  ***\n\n',ii);
+            iflagm = 1; return;
         end
 
-        xa = sort(xa);
+        xa = sort(xa(1:ib));
 
         nblk(ii) = ib - 1;
+        % 90
         xbnd(ii,1:nblk(ii),1) = xa(1:nblk(ii));
-        xbnd(ii,1:nblk(ii),2) = xa(2:nblk(ii)+1); % 90
+        xbnd(ii,1:nblk(ii),2) = xa(2:nblk(ii)+1);
     end % 50
 
     % disp(xbnd(1,1:15,1));
     % disp(xbnd(1,1:15,2));
 
     if invr == 1
-        for ii = 1:nlayer
+        for ii = 1:nlayer % 310
             ivlyr = 0;
-            for jj = 1:nzed(ii)
-                if ivarz(ii,jj)~=1 & ivarz(ii,jj)~=-1, ivarz(ii,jj) = 0; end
-                if ivarz(ii,jj)==-1, ivlyr=1; end
+            for jj = 1:nzed(ii) % 320
+                if ivarz(ii,jj) ~= 1 & ivarz(ii,jj) ~= -1
+                    ivarz(ii,jj) = 0;
+                end
+                if ivarz(ii,jj) == -1, ivlyr = 1; end
             end % 320
             if ivlyr == 1
-                if ii==1
-                    fprintf('%12d\n',8); iflagm=1; fun_goto999();
+                if ii == 1
+                    fprintf('%12d\n',8);
+                    iflagm=1; fun_goto999();
                 end
                 if nzed(ii) ~= nzed(ii-1)
-                    fprintf('%12d%12d\n',9,ii); iflagm=1; fun_goto999();
+                    fprintf('%12d%12d\n',9,ii);
+                    iflagm=1; fun_goto999();
                 end
-                for jj = 1:nzed(ii)
+                for jj = 1:nzed(ii) % 327
                     if xm(ii,jj) ~= xm(ii-1,jj)
                         fprintf('%12d%12d%12d\n',10,ii,jj);
                         iflagm=1; fun_goto999();
                     end
-                    if zm(ii,jj) ~= zm(ii-1,jj)
+                    if zm(ii,jj) < zm(ii-1,jj)
                         fprintf('%12d%12d%12d\n',11,ii,jj);
                         iflagm=1; fun_goto999();
                     end
-                    if ivarz(ii-1,jj)==0 & ivarz(ii,jj)==-1
+                    if ivarz(ii-1,jj) == 0 & ivarz(ii,jj) == -1
                         ivarz(ii,jj) = 0;
                     end
                 end % 327
             end
-            for jj = 1:nvel(ii,1)
-                if ivarv(ii,jj,1)~=1, ivarv(ii,jj,1)=0; end
+            for jj = 1:nvel(ii,1) % 321
+                if ivarv(ii,jj,1) ~= 1, ivarv(ii,jj,1) = 0; end
             end % 321
             ivgrad = 0;
             if nvel(ii,2) > 0
-                for jj = 1:nvel(ii,2)
+                for jj = 1:nvel(ii,2) % 322
                     if ivarv(ii,jj,2)~=1 & ivarv(ii,jj,2)~=-1
                         ivarv(ii,jj,2) = 0;
                     end
@@ -212,8 +240,8 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                         iflag = 1; ig = ii; jg = 1;
                         isGoto326 = true;
                     end
-                    if ~isGoto326 & ii>1 & nvel(ii,1)==0
-                        for jj = ii-1 : -1 : 1
+                    if ~isGoto326 && ii > 1 && nvel(ii,1) == 0
+                        for jj = ii-1 : -1 : 1 % 324
                             if nvel(jj,2) > 0
                                 iflag = 1; ig = jj; jg = 2;
                                 break; % go to 326
@@ -225,18 +253,18 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                         end % 324
                     end
                     % 326
-                    if iflag==1 & nvel(ig,jg)==nvel(ii,2)
-                        for jj = 1:nvel(ig,jg)
+                    if iflag==1 && nvel(ig,jg)==nvel(ii,2)
+                        for jj = 1:nvel(ig,jg) % 323
                             if xvel(ig,jj,jg) ~= xvel(ii,jj,2)
-                                fprintf('%12d\n',12,ii,jj,ig,jg);
+                                fprintf('%12d',12,ii,jj,ig,jg); fprintf('\n');
                                 iflagm=1; fun_goto999();
                             end
-                            if ivarv(ig,jj,jg)==0 & ivarv(ii,jj,2)==-1
+                            if ivarv(ig,jj,jg)==0 && ivarv(ii,jj,2)==-1
                                 ivarv(ii,jj,2) = 0;
                             end
                         end % 323
                     else
-                        fprintf('%12d\n',13,ii,ig,jg);
+                        fprintf('%12d',13,ii,ig,jg); fprintf('\n');
                         iflagm=1; fun_goto999();
                     end
                 end
@@ -244,25 +272,27 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
         end % 310
 
         nvar = 0;
-        for ii = 1:nlayer
-            for jj = 1:nzed(ii)
+        for ii = 1:nlayer % 410
+            for jj = 1:nzed(ii) % 420
+
                 % check for layer pinchouts
+
                 iflag = 0;
                 if ii > 1
-                    for k = 1:ii-1
+                    for k = 1:ii-1 % 427
                         isGoto429 = false;
-                        for l = 1:nzed(k)
-                            if abs(xm(ii,jj)-xm(k,l))<0.005 & abs(zm(ii,jj)-zm(k,l))<0.005
+                        for l = 1:nzed(k) % 428
+                            if abs(xm(ii,jj)-xm(k,l)) < 0.005 && abs(zm(ii,jj)-zm(k,l)) < 0.005
                                 iflag = 1;
                                 iv = ivarz(k,l);
-                                isGoto429 = true; break; % go to 429
+                                isGoto429 = true; break; % go to 429 step1
                             end
                         end % 428
-                        if isGoto429, break; end
+                        if isGoto429, break; end % go to 429 step2
                     end % 427
                 end
                 % 429
-                if ivarz(ii,jj)==1 & iflag==0
+                if ivarz(ii,jj) == 1 && iflag == 0
                     nvar = nvar + 1;
                     ivarz(ii,jj) = nvar;
                     partyp(nvar) = 1;
@@ -275,7 +305,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end
             end % 420
 
-            for jj = 1:nvel(ii,1)
+            for jj = 1:nvel(ii,1) % 421
                 if ivarv(ii,jj,1) == 1
                     nvar = nvar + 1;
                     ivarv(ii,jj,1) = nvar;
@@ -286,7 +316,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end
             end % 421
             if nvel(ii,2) > 0
-                for jj = 1:nvel(ii,2)
+                for jj = 1:nvel(ii,2) % 422
                     if ivarv(ii,jj,2) == 1
                         nvar = nvar + 1;
                         ivarv(ii,jj,2) = nvar;
@@ -297,10 +327,10 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
         end % 410
 
-
         % check for inverting floating reflectors
-        for ii = 1:nfrefl
-            for jj = 1:npfref(ii)
+
+        for ii = 1:nfrefl % 426
+            for jj = 1:npfref(ii) % 431
                 if ivarf(ii,jj) == 1
                     nvar = nvar + 1;
                     ivarf(ii,jj) = nvar;
@@ -316,23 +346,23 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
         end
 
         if nvar > pnvar
-            iflagm = 1;
-            error('e:test','\n***  too many parameters varied for inversion  ***\n\n');
+            fprintf('\n***  too many parameters varied for inversion  ***\n\n');
+            iflagm = 1; return;
         end
     end
 
-
     % calculate slopes and intercepts of each block boundary
-    for ii = 1:nlayer
-        for jj = 1:nblk(ii)
+
+    for ii = 1:nlayer % 100
+        for jj = 1:nblk(ii) % 110
             xbndc = xbnd(ii,jj,1) + 0.001;
             if nzed(ii) > 1
-                for k = 1 : nzed(ii)-1
-                    if xbndc>=xm(ii,k) & xbndc<=xm(ii,k+1)
+                for k = 1 : nzed(ii)-1 % 120
+                    if xbndc >= xm(ii,k) && xbndc <= xm(ii,k+1)
                         dx = xm(ii,k+1) - xm(ii,k);
-                        c1 = (xm(ii,k+1)-xbnd(ii,jj,1)) / dx;
-                        c2 = (xbnd(ii,jj,1)-xm(ii,k)) / dx;
-                        z1 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
+                        c1 = (xm(ii,k+1)-xbnd(ii,jj,1)) ./ dx;
+                        c2 = (xbnd(ii,jj,1)-xm(ii,k)) ./ dx;
+                        z1 = c1 .* zm(ii,k) + c2 .* zm(ii,k+1);
                         if ivarz(ii,k) >= 0
                             iv = ivarz(ii,k);
                         else
@@ -344,9 +374,9 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                             cz(ii,jj,1,2) = xm(ii,k+1) - xm(ii,k);
                         end
 
-                        c1 = (xm(ii,k+1)-xbnd(ii,jj,2)) / dx;
-                        c2 = (xbnd(ii,jj,2)-xm(ii,k)) / dx;
-                        z2 = c1 * zm(ii,k) + c2 * zm(ii,k+1);
+                        c1 = (xm(ii,k+1)-xbnd(ii,jj,2)) ./ dx;
+                        c2 = (xbnd(ii,jj,2)-xm(ii,k)) ./ dx;
+                        z2 = c1 .* zm(ii,k) + c2 .* zm(ii,k+1);
                         if ivarz(ii,k+1) >= 0
                             iv = ivarz(ii,k+1);
                         else
@@ -376,15 +406,15 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 izv(ii,jj,2) = 0;
             end
             % 130
-            s(ii,jj,1) = (z2-z1) / (xbnd(ii,jj,2)-xbnd(ii,jj,1));
-            b(ii,jj,1) = z1 - s(ii,jj,1) * xbnd(ii,jj,1);
+            s(ii,jj,1) = (z2-z1) ./ (xbnd(ii,jj,2)-xbnd(ii,jj,1));
+            b(ii,jj,1) = z1 - s(ii,jj,1) .* xbnd(ii,jj,1);
             if nzed(ii+1) > 1
-                for k = 1: nzed(ii+1)-1
-                    if xbndc>=xm(ii+1,k) & xbndc<=xm(ii+1,k+1)
+                for k = 1: nzed(ii+1)-1 % 140
+                    if xbndc >= xm(ii+1,k) && xbndc <= xm(ii+1,k+1)
                         dx = xm(ii+1,k+1) - xm(ii+1,k);
-                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,1)) / dx;
-                        c2 = (xbnd(ii,jj,1)-xm(ii+1,k)) / dx;
-                        z3 = c1 * zm(ii+1,k) + c2 * zm(ii+1,k+1);
+                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,1)) ./ dx;
+                        c2 = (xbnd(ii,jj,1)-xm(ii+1,k)) ./ dx;
+                        z3 = c1 .* zm(ii+1,k) + c2 .* zm(ii+1,k+1);
                         if ii == nlayer
                             izv(ii,jj,3) = 0;
                         else
@@ -400,9 +430,9 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                             end
                         end
 
-                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,2)) / dx;
-                        c2 = (xbnd(ii,jj,2)-xm(ii+1,k)) / dx;
-                        z4 = c1 * zm(ii+1,k) + c2 * zm(ii+1,k+1);
+                        c1 = (xm(ii+1,k+1)-xbnd(ii,jj,2)) ./ dx;
+                        c2 = (xbnd(ii,jj,2)-xm(ii+1,k)) ./ dx;
+                        z4 = c1 .* zm(ii+1,k) + c2 .* zm(ii+1,k+1);
                         if ii == nlayer
                             izv(ii,jj,4) = 0;
                         else
@@ -440,22 +470,24 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 izv(ii,jj,4) = 0;
             end
             % 150
-            s(ii,jj,2) = (z4-z3) / (xbnd(ii,jj,2)-xbnd(ii,jj,1));
-            b(ii,jj,2) = z3 - s(ii,jj,2) * xbnd(ii,jj,1);
+            s(ii,jj,2) = (z4-z3) ./ (xbnd(ii,jj,2)-xbnd(ii,jj,1));
+            b(ii,jj,2) = z3 - s(ii,jj,2) .* xbnd(ii,jj,1);
 
             % check for layer pinchouts
+
             ivg(ii,jj) = 1;
-            if abs(z3-z1)<0.0005, ivg(ii,jj)=2; end
-            if abs(z4-z2)<0.0005, ivg(ii,jj)=3; end
-            if abs(z3-z1)<0.0005 & abs(z4-z2)<0.0005, ivg(ii,jj)=-1; end
+            if abs(z3-z1) < 0.0005, ivg(ii,jj) = 2; end
+            if abs(z4-z2) < 0.0005, ivg(ii,jj) = 3; end
+            if abs(z3-z1) < 0.0005 && abs(z4-z2) < 0.0005, ivg(ii,jj) = -1; end
         end % 110
     end % 100
 
 
     % assign velocities to each model block
-    for ii = 1:nlayer
+
+    for ii = 1:nlayer % 160
         if nvel(ii,1) == 0
-            for jj = ii-1 : -1 : 1
+            for jj = ii-1 : -1 : 1 % 161
                 if nvel(jj,2) > 0
                     ig = jj; jg = 2; n1g = nvel(jj,2);
                     break; % go to 162
@@ -470,14 +502,14 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
         end
 
         % 162
-        if n1g> 1 & nvel(ii,2)> 1, ivcase=1; end
-        if n1g> 1 & nvel(ii,2)==1, ivcase=2; end
-        if n1g==1 & nvel(ii,2)> 1, ivcase=3; end
-        if n1g==1 & nvel(ii,2)==1, ivcase=4; end
-        if n1g> 1 & nvel(ii,2)==0, ivcase=5; end
-        if n1g==1 & nvel(ii,2)==0, ivcase=6; end
+        if n1g> 1 && nvel(ii,2)> 1, ivcase = 1; end
+        if n1g> 1 && nvel(ii,2)==1, ivcase = 2; end
+        if n1g==1 && nvel(ii,2)> 1, ivcase = 3; end
+        if n1g==1 && nvel(ii,2)==1, ivcase = 4; end
+        if n1g> 1 && nvel(ii,2)==0, ivcase = 5; end
+        if n1g==1 && nvel(ii,2)==0, ivcase = 6; end
 
-        for jj = 1:nblk(ii)
+        for jj = 1:nblk(ii) % 170
             if ivg(ii,jj)==-1, continue; end % go to 170
 
             isGoto171 = false;
@@ -489,7 +521,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
 
             % 1001
             if ivcase == 1
-                for k = 1: n1g-1
+                for k = 1: n1g-1 % 180
                     if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
@@ -523,7 +555,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 180
 
                 % 1811
-                for k = 1: n1g-1
+                for k = 1: n1g-1 % 1812
                     if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
@@ -553,7 +585,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 1812
 
                 % 181
-                for k = 1: nvel(ii,2)-1
+                for k = 1: nvel(ii,2)-1 % 182
                     if xbndcl>=xvel(ii,k,2) & xbndcl<=xvel(ii,k+1,2)
                         dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
                         c1 = xvel(ii,k+1,2) - xbnd(ii,jj,1);
@@ -609,7 +641,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 182
 
                 % 187
-                for k = 1: nvel(ii,2)-1
+                for k = 1: nvel(ii,2)-1 % 1822
                     if xbndcr>=xvel(ii,k,2) & xbndcr<=xvel(ii,k+1,2)
                         dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
                         c1 = xvel(ii,k+1,2) - xbnd(ii,jj,2);
@@ -666,8 +698,8 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
 
             % 1002
-            if ~isGoto171 & ivcase<=2
-                for k = 1: n1g-1
+            if ~isGoto171 && ivcase <= 2
+                for k = 1: n1g-1 % 183
                     if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
@@ -695,7 +727,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 183
 
                 % 1833
-                for k = 1: n1g-1
+                for k = 1: n1g-1 % 1832
                     if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
@@ -740,7 +772,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
 
             % 1003
-            if ~isGoto171 & ivcase<=3
+            if ~isGoto171 && ivcase <= 3
                 vm(ii,jj,1) = vf(ig,1,jg);
                 vm(ii,jj,2) = vf(ig,1,jg);
                 if ig ~= ii
@@ -757,7 +789,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                     end
                 end
 
-                for k = 1: nvel(ii,2)-1
+                for k = 1: nvel(ii,2)-1 % 185
                     if xbndcl>=xvel(ii,k,2) & xbndcl<=xvel(ii,k+1,2)
                         dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
                         c1 = xvel(ii,k+1,2) - xbnd(ii,jj,1);
@@ -811,7 +843,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 185
 
                 % 188
-                for k = 1: nvel(ii,2)-1
+                for k = 1: nvel(ii,2)-1 % 1851
                     if xbndcr>=xvel(ii,k,2) & xbndcr<=xvel(ii,k+1,2)
                         dxx = xvel(ii,k+1,2) - xvel(ii,k,2);
                         c1 = xvel(ii,k+1,2) - xbnd(ii,jj,2);
@@ -866,7 +898,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
 
             % 1004
-            if ~isGoto171 & ivcase<=4
+            if ~isGoto171 && ivcase <= 4
                 vm(ii,jj,1) = vf(ig,1,jg);
                 vm(ii,jj,2) = vf(ig,1,jg);
                 if ig ~= ii
@@ -907,8 +939,8 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
 
             % 1005
-            if ~isGoto171 & ivcase<=5
-                for k = 1: n1g-1
+            if ~isGoto171 && ivcase <= 5
+                for k = 1: n1g-1 % 186
                     if xbndcl>=xvel(ig,k,jg) & xbndcl<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,1);
@@ -943,7 +975,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 186
 
                 % 1861
-                for k = 1: n1g-1
+                for k = 1: n1g-1 % 1862
                     if xbndcr>=xvel(ig,k,jg) & xbndcr<=xvel(ig,k+1,jg)
                         dxx = xvel(ig,k+1,jg) - xvel(ig,k,jg);
                         c1 = xvel(ig,k+1,jg) - xbnd(ii,jj,2);
@@ -977,9 +1009,9 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
 
             % 1006
-            if ~isGoto171 & ivcase<=6
+            if ~isGoto171 && ivcase <= 6
                 vm(ii,jj,1) = vf(ig,1,jg);
-                if ig~=ii, vm(ii,jj,1)=vm(ii,jj,1)+0.001; end
+                if ig ~= ii, vm(ii,jj,1) = vm(ii,jj,1) + 0.001; end
                 vm(ii,jj,2:4) = vm(ii,jj,1); % ?...
                 if invr == 1
                     iv = ivarv(ig,1,jg);
@@ -1083,7 +1115,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
 
     % 400
     if ibsmth > 0
-        xsinc = (xmax-xmin) / (npbnd-1);
+        xsinc = (xmax-xmin) ./ (npbnd-1);
         for ii = 1: nlayer+1 % 600
             if ii < nlayer+1
                 il = ii; ib = 1;
@@ -1092,14 +1124,14 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
             end
             iblk = 1;
             for jj = 1:npbnd % 610
-                x = xmin + (jj-1)*xsinc;
-                if x<xmin, x=xmin+0.001; end
-                if x>xmax, x=xmax-0.001; end
+                x = xmin + (jj-1).*xsinc;
+                if x < xmin, x = xmin + 0.001; end
+                if x > xmax, x = xmax - 0.001; end
 
                 % 620 % -------------------- cycle620 begin
                 cycle620 = true;
                 while cycle620
-                    if x>=xbnd(il,iblk,1) & x<=xbnd(il,iblk,2)
+                    if x >= xbnd(il,iblk,1) && x <= xbnd(il,iblk,2)
                         cosmth(ii,jj) = s(il,iblk,ib).*x + b(il,iblk,ib);
                         break; % go to 610
                     else
@@ -1110,10 +1142,10 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % -------------------- cycle620 begin
             end % 610
         end % 600
-        n1ns = round(xminns/xsinc) + 1;
-        n2ns = round(xmaxns/xsinc) + 1;
+        n1ns = round(xminns./xsinc) + 1;
+        n2ns = round(xmaxns./xsinc) + 1;
         iflag12 = 0;
-        if n1ns>=1 & n1ns<=npbnd & n2ns>=1 & n2ns<=npbnd and n1ns<n2ns
+        if n1ns >= 1 && n1ns <= npbnd && n2ns >= 1 && n2ns <= npbnd && n1ns < n2ns
             iflag12 = 1;
         end
         if nbsmth > 0

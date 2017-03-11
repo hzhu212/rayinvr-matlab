@@ -14,8 +14,10 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 	if npts < 2, return; end
 
 	% x,z 为射线控制点的横纵坐标
-	x(1:npts) = xr(nskip+1:npt) - xmin;
-	z(1:npts) = zr(nskip+1:npt) - zmin;
+	% x(1:npts) = xr(nskip+1:npt) - xmin;
+	% z(1:npts) = zr(nskip+1:npt) - zmin;
+	x(1:npts) = xr(nskip+1:npt);
+	z(1:npts) = zr(nskip+1:npt);
 	vra(1:npts) = vr(nskip+1:npt,2);
 	vpa(1:npts) = vp(nskip+1:npt,2);
 

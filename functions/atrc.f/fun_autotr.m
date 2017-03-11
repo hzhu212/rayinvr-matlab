@@ -1,5 +1,5 @@
 % atrc.f
-% [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~]
+% [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~]
 % called by: fun_auto;
 % call: fun_trace; fun_vel; done.
 

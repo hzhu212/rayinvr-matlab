@@ -1,5 +1,5 @@
 % inv.f
-% [~,~,~,~,~]
+% []
 % called by: fun_calmod;
 % call: none.
 

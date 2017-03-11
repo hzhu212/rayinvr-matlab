@@ -21,6 +21,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		vm xr xsinc xbnd xmin zr;
 
 	dhw = 0.0;
+	ib = []; % for fun_block
 
 	% 10 % -------------------- cycle10 begin
 	cycle10 = true;
@@ -115,7 +116,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        else
 	        	nhskip = n - 1;
 	        end
-	        if hdw~=0, vh=vr(n,1); end
+	        if dhw ~= 0, vh = vr(n,1); end
 	        vratio = vr(n,2) ./ vh;
 	        if vratio >= 1
 	            if idiff == 0

@@ -1,5 +1,5 @@
 % rngkta.f
-% [x,~,y,~,h,~,~,~,g,s,t]
+% [x,~,y,f,h,~,~,~,g,s,t]
 % called by: fun_trace;
 % call: none.
 

@@ -1,7 +1,7 @@
 % pltlib.f
 % []
 % call:
-% called by: fun_pltmod; fun_plttx;
+% called by: fun_pltmod; fun_plttx; fun_pltdat;
 
 function fun_pcolor(icol)
 % set the colour for polylines

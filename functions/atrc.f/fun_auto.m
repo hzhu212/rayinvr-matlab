@@ -20,7 +20,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     iflag = 0;
     if idr == 0
         % ray take-off angles input by user
-        if abs(amina)>180.0 | abs(amaxa)>180.0
+        if abs(amina) > 180.0 || abs(amaxa) > 180.0
             fprintf(fID_11, '\n***  error in specification of amin or amax  ***\n\n');
             iflag = 1;
             return;
@@ -32,16 +32,18 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     end
 
     % check to see if layer of ray code is above shot or below model
-    if l<layer1 | l>nlayer | (l>=nlayer & idr>1)
+    if l < layer1 || l > nlayer || (l >= nlayer && idr > 1)
         iflag = 1;
         return;
     end
 
     if idr == 1
+
         % search for refracted rays
+
         [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
 
-        if l>layer1 & abs(vtop-vbotom)<=0.000001
+        if l > layer1 && abs(vtop-vbotom) <= 0.000001
             [~,~,ib] = fun_block(xshot+fid.*0.0005,l,ib);
             if id == 1
                 i1 = ib; i2 = nblk(l);
@@ -69,11 +71,11 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             a1 = 0.0;
             amin = -999999.0;
             amax = -999999.0;
-            if isrch == 0 & tang(l,1) < 100.0
+            if isrch == 0 && tang(l,1) < 100.0
                 amin = tang(l,1);
             else
                 for n = 1:nsmax % 101
-                    [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                    [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] ...
                     = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                     if idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0
                         amin = ang;
@@ -113,13 +115,13 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             if amin < -999998.0
                 iflag = 1;
             else
-                if isrch == 0 & tang(l,2) < 100.0
+                if isrch == 0 && tang(l,2) < 100.0
                     amax = tang(l,2);
                 else
                     a2 = 0.0;
                     ang = amax + ainc;
                     for n = 1:nsmax % 102
-                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                        [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] ...
                         = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                         if idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0
                             amin = ang;
@@ -158,8 +160,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                     amin = -999999.0;
                     isGoto111 = false;
                     for n = 1:nsmax % 110
-                        % [ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = ...
-                        [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                        [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] ...
                         = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                         if idray(1) >= l
                             a2 = ang;
@@ -195,7 +196,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                 a1 = 0.0; a2 = 0.0;
                 amax = -999999.0;
                 for n = 1:nsmax % 130
-                    [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] ...
+                    [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] ...
                     = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                     if idray(1)<l | (idray(1)==l & idray(2)==1 & vr(npt,2)~=0.0)
                         a1 = ang;
@@ -242,8 +243,10 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     end
 
     if idr == 2
+
         % search for reflected ray
-        if isrch == 0 & tang(l,3) < 100.0
+
+        if isrch == 0 && tang(l,3) < 100.0
             amin = tang(l,3);
             amax = aamax;
         else
@@ -258,7 +261,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             ang = amin;
             amin = -999999.0;
             for n = 1:nsmax % 210
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if (idray(1)<l) | (idray(1)==l & idray(2)==1) | (idray(1)==l & idray(2)==2 & vr(npt,2)==0.0) | ...
                     (xsmax>0.0 & it==1 & idray(1)==l & idray(2)==2 & 2.0*abs(xshot-xr(npt))>xsmax) | ...
                     (xsmax>0.0 & it==0 & idray(1)==l & idray(2)==2 & abs(xshot-xr(npt))>xsmax)
@@ -287,8 +290,10 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     end
 
     if idr == 3
+
         % search for head wave
-        if isrch == 0 & tang(l,4) < 100.0
+
+        if isrch == 0 && tang(l,4) < 100.0
             amin = tang(l,4);
             amax = tang(l,4);
         else
@@ -310,7 +315,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             if ainc < aaimin, ainc = aaimin; end
             angm = ang;
             for n = 1:nsmax % 1100
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if idray(1) == l & iflag2 == 2
                     amax = ang;
                     amin = ang;
@@ -330,7 +335,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             ang = angm;
             a1 = 0.0; a2 = 0.0;
             for n = 1:nsmax % 1200
-                [~,~,~,~,~,~,~,npt,~,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
+                [~,~,~,~,~,~,~,npt,iflag2,~,~,~,~,~,~] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,it,npt,iflag2,irays,nskip,idot,idr,irayps,istep);
                 if idray(1) == l & iflag2 == 2
                     amax = ang;
                     amin = ang;
@@ -347,7 +352,7 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
                     else ang = (a1+a2) ./ 2.0; end
                 end
             end % 1200
-            if idiff == 2 & idray(1) >= l
+            if idiff == 2 && idray(1) >= l
                 amax = a2;
                 amin = a2;
                 tang(l,4) = ang;
@@ -357,5 +362,6 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
             iflag = 1;
         end
     end
+
     return;
-end % function end
+end % fun_auto end

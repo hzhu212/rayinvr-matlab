@@ -1,4 +1,5 @@
 % \bvar\b(\(.*\))*\s*=[^=]
+% (\[.*)?\bvar\b(.*\])?(\(.*\))*\s*=[^=]
 % rayinvr_par.m, rayinvr_com.m, main_par.m, blkdat.m, input/r.in, -old/*.*
 
 % call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
@@ -15,9 +16,9 @@ function main(filePathIn, filePathOut)
 	% filePathIn: file path for all input files. That means you'd better put all of your ".in" files in the same path. Default: 'input'.
 
 	if nargin < 2
-		filePathOut = 'output';
+		filePathOut = 'output\examples\e1';
 		if nargin < 1
-			filePathIn = 'input';
+			filePathIn = 'input\examples\e1';
 		end
 	end
 
@@ -61,20 +62,20 @@ function main(filePathIn, filePathOut)
 	file_vout = fullfile(filePathOut,'v.out');
 
 
-	%% 1 variables
-	%% 1.1 声明rayinvr.par文件中的变量并赋值
+	% 1 variables
+	% 1.1 声明rayinvr.par文件中的变量并赋值
 	run(file_rayinvr_par);
 
-	%% 1.2 声明main函数中的变量并赋值
+	% 1.2 声明main函数中的变量并赋值
 	run(file_main_par);
 
-	%% 1.3 声明rayinvr.com文件中的变量并赋值
+	% 1.3 声明rayinvr.com文件中的变量并赋值
 	run(file_rayinvr_com);
 
-	%% 为全局变量赋初值
+	% 为全局变量赋初值
 	run(file_block_data);
 
-	%% 1.4 为r.in中的所有变量赋值
+	% 1.4 为r.in中的所有变量赋值
 	file_rin_m = fun_trans_rin2m(file_rin); % 将r.in文件转化为r_in.m脚本
 	run(file_rin_m); % 载入脚本，为r.in中所有变量赋值
 
@@ -84,7 +85,7 @@ function main(filePathIn, filePathOut)
 
 	if onDev, disp('========================= tick 1 ========================='); end
 
-	%% 2 main
+	% 2 main
 	% 如果未指定xmax，则程序结束
 	if xmax < -99998
 		error('e:stop','\n***  xmax not specified  ***\n\n');
@@ -126,6 +127,7 @@ function main(filePathIn, filePathOut)
 		xm(ii,1:t_xlen) = t_thisLayer.bd(1,:);
 		zm(ii,1:t_xlen) = t_thisLayer.bd(2,:);
 		% the last layer has no bd(3), tv and bv, so jump out
+		% if ii==length(model)-1, break; end
 		if ii==length(model), break; end
 		ivarz(ii,1:t_xlen) = t_thisLayer.bd(3,:);
 
@@ -237,7 +239,7 @@ function main(filePathIn, filePathOut)
 	% 50
 	if ngroup == 0
 		% 55
-		disp(sprintf('\n***  no ray codes specified  ***\n\n'));
+		fprintf('\n***  no ray codes specified  ***\n\n');
 		% go to 900
 		fun_goto900(); return;
 	end
@@ -264,7 +266,7 @@ function main(filePathIn, filePathOut)
 
 	if onDev, disp('========================= tick 4 ========================='); end
 
-	%% calculate velocity model parameters
+	% calculate velocity model parameters
 
 	iflagm = [];
 	[~,~,poisb,poisl,~,invr,iflagm,~,xmin1d,xmax1d,~,~,~] ...
@@ -686,10 +688,7 @@ function main(filePathIn, filePathOut)
 
 					if onDev, disp('========================= tick 10: before fun_auto ========================='); end
 
-					% [xshotr,zshotr,ii,ifam,idl,idt,aminr,amaxr,aamin,aamax,...
-						% layer1,iblk1,aainc,aaimin,nsmax(ii),iflag,iturn(ii),amin(ia0),...
-						% amax(ia0),ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin(ii)] ..
-					[aminr,amaxr,iflag] = deal([]); % for fun_auto
+					if ~exist('aminr','var'), [aminr,amaxr,iflag] = deal([]); end % for fun_auto
 					[~,~,~,~,~,~,aminr,amaxr,~,~,~,~,~,~,~,iflag,~,~,~,ia0,~,~,~,~,~,~,~,~] ...
 					= fun_auto(xshotr,zshotr,ii,ifam,idl,idt,aminr,amaxr,aamin,aamax,...
 						layer1,iblk1,aainc,aaimin,nsmax(ii),iflag,iturn(ii),amin(ia0),...
@@ -903,7 +902,7 @@ function main(filePathIn, filePathOut)
 							nrg = nrg + 1;
 							nhskip = 0;
 
-							[npt,~,~,~,~,~,iflag,~,~,~,~,~,~] ...
+							[npt,~,~,~,~,~,iflag,~,~,~,~,i1ray,~] ...
 							= fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
 
 							[~,~,~,~,~,~,itt,~,~,~,~] ...

@@ -37,6 +37,8 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 		rvred = 0.0;
 	end
 
+	% 绘制坐标轴标题
+	% 若vred=0,则t轴标题为'TIME (s)',否则，t轴标题为'T-D/{{vred}} (s)'
 	if iaxlab == 1
 		if vred == 0
 			nchart = 8;
@@ -65,6 +67,7 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 		end
 	end
 
+	% 反转t轴，使之朝下
 	if itrev ~= 1
 		tadj = tmin;
 	else
@@ -125,11 +128,12 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 						fun_empty();
 						fun_aldone();
 					end
-					if (isep < 2 || isep == 3) && (iflag1 ~= 0 || isep == 1.0 || isep == 3)
+					if (isep < 2 || isep == 3) && (iflag1 ~= 0 || isep == 1 || isep == 3)
 						fun_erase();
 						ititle = 0;
 					end
 
+					% 绘制坐标轴
 					if iaxlab == 1
 						[~,~,xtmint,xtmaxt,ntckxt,ndecxt] = fun_axtick(xmint,xmaxt,xtmint,xtmaxt,ntckxt,ndecxt);
 						[~,~,ttmin,ttmax,ntickt,ndecit] = fun_axtick(tmin,tmax,ttmin,ttmax,ntickt,ndecit);
@@ -138,8 +142,11 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 						fun_axis(orig,orig,xmint,xmaxt,xmmt,xscalt,0.0,1,xtmint,xtmaxt,ntckxt,ndecxt,'DISTANCE (km)',13,albht);
 						fun_axis(orig,orig,tmin,tmax,tmm,tscale,90.0,1,ttmin,ttmax,ntickt,ndecit,tlab,nchart,albht);
 					end
+
+					% 绘制图像区域边框
 					fun_box(orig,orig,orig+xmmt,orig+tmm);
 
+					% 绘制图像标题
 					if ititle == 0 & title_ ~= ' '
 						if xtitle < -999999.0, xtitle = 0.0; end
 						if ytitle < -999999.0, ytitle = 0.0; end
@@ -147,8 +154,9 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 						ititle = 1;
 					end
 
+					% 垂直t轴每刻度(s)绘制一根虚线作为参考线
 					if itx == 4
-						ntlmax = fix(tmax - 0.001) % int --> fix
+						ntlmax = fix(tmax - 0.001); % int --> fix
 						for jj = 1:ntlmax % 310
 							tp = (jj-tadj) ./ tscale + orig;
 							x(1) = orig;
@@ -159,17 +167,22 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 						end % 310
 					end
 
+					% plot observed travel times
 					if idata ~= 0
 						fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida);
 					end
 				end % -------------------- block ~isGoto1010 end
 
 				% 1010
+				% 这些条件表明前面的计算中进行了反演(invr=1)
 				if (itx >= 3 || itxout == 3) && narinv > 0
 					ichold = -999999;
+					% 对所有走时点进行循环
 					for jj = 1:narinv % 120
+						% 不满足以下条件的点跳过，不予绘制
 						if (abs(xscalc(jj)-xshota) < 0.001 && icalc(jj).*fh(1) > 0.0 && isep == 2) ...
 							|| (abs(xscalc(jj)-xshota) < 0.001 && isep == 3) || isep < 2
+							% itx>=3 表明进行了反转/绘制时需要在实际观测点进行插值
 							if itx >= 3
 								xplot = (xcalc(jj)-xmint) ./ xscalt + orig;
 								if itx == 3
@@ -177,6 +190,7 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 								else
 									tplot = (tcalc(jj)-tobs(jj)+abs(icalc(jj))-tadj) ./ tscale + orig;
 								end
+								% 如果itxbox=1，那么落在图像边框外的点不绘制
 								if itxbox == 0 || (xplot >= xbmin && xplot <= xbmax && tplot >= tbmin && tplot <= tbmax)
 									if itcol == 3
 										ipcol = colour(mod(ircalc(jj)-1,ncol)+1);
@@ -196,6 +210,7 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 									end
 								end
 							end
+							% 输出到 tx.out 文件
 							if itxout == 3
 								% fcalc=sign(1.,icalc(jj))
 								fcalc = sign(icalc(jj)) .* 1.0;
@@ -258,6 +273,7 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 				npt = k - 1;
 				nh2 = nh2 + npt;
 				if ibrka(ii) == 0 || itx == 2 || npt < 3
+					% 输出到 tx.out 文件
 					if itxout == 1 || itxout == 2
 						if xs(1) ~= xshoth || f(1) ~= fidh
 							ib = 0;
@@ -282,6 +298,8 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 							fprintf(fID_17, '%10.3f%10.3f%10.3f%10d\n', xw,tw,ttunc,ib);
 						end % 40
 					end
+
+					% 走时数据点多于 1 个
 					if npt > 1
 						if itx ~= 2
 							if itx < 3 && itxbox == 0

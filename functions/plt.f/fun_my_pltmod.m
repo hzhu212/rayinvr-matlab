@@ -59,7 +59,7 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 		currentColor = matlabColors(mcol(3));
 
 		% 绘制 floating-reflectors
-		ifrbnd = 1;
+		% ifrbnd = 1;
 		if ifrbnd == 1
 			for ii = 1:nfrefl
 				xcp = xfrefl(ii,1:npfref(ii));
@@ -69,7 +69,7 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 		end
 
 		% 绘制模型中每个 block 的竖直边界
-		ibnd = 1;
+		% ibnd = 1;
 		if ibnd == 1
 		    currentColor = matlabColors(mcol(2));
 		    for ii = 1:nlayer

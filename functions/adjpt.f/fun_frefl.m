@@ -57,7 +57,7 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     nbnd = nbnd + 1;
     if npskp~=1, nbnda(nbnd)=n; end
     if ir ~= 0 & invr == 1
-        [vr(n,1),a1,alpha_,n,ifrpt] = fun_frprt(vr(n,1),a1,alpha_,n,ifrpt);
+        [~,~,~,~,~] = fun_frprt(vr(n,1),a1,alpha_,n,ifrpt);
     end
     return;
 end % fun_frefl end
