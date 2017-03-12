@@ -55,14 +55,14 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 	hold on;
 
 	if ircol ~= 0
-	    currentColor = matlabColors(irrcol);
+		currentColor = matlabColors(irrcol);
 	end
 
 	% 设置线型与节点符号
 	lineStyle = '-';
 	lineSymbol = '';
 	if idot == 2
-	    lineStyle = '';
+		lineStyle = '';
 	else
 		if irayps ~= 1
 			;
@@ -73,14 +73,14 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 
 	% 100
 	if idot > 0
-	    lineSymbol = 's';
+		lineSymbol = 's';
 	end
 
-    plot(x(1:npts),z(1:npts),[lineStyle,currentColor,lineSymbol],'MarkerSize',4);
+	plot(x(1:npts),z(1:npts),[lineStyle,currentColor,lineSymbol],'MarkerSize',4);
 
-    if ircol ~= 0
-        currentColor = matlabColors(ifcol);
-    end
+	if ircol ~= 0
+		currentColor = matlabColors(ifcol);
+	end
 
 	hold off;
 

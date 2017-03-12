@@ -71,60 +71,60 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 		% 绘制模型中每个 block 的竖直边界
 		% ibnd = 1;
 		if ibnd == 1
-		    currentColor = matlabColors(mcol(2));
-		    for ii = 1:nlayer
-		        if nblk(ii) > 1
-		            for jj = 1:nblk(ii)
-		            	coorx = xbnd(ii,jj,2);
-		                xcp = [coorx, coorx];
-		                zcp = squeeze(s(ii,jj,1:2) .* coorx + b(ii,jj,1:2));
+			currentColor = matlabColors(mcol(2));
+			for ii = 1:nlayer
+				if nblk(ii) > 1
+					for jj = 1:nblk(ii)
+						coorx = xbnd(ii,jj,2);
+						xcp = [coorx, coorx];
+						zcp = squeeze(s(ii,jj,1:2) .* coorx + b(ii,jj,1:2));
 						plot(xcp,zcp,[lineStyle,currentColor]);
-		            end
-		        end
-		    end
+					end
+				end
+			end
 		end
 
 		% 绘制 smoothed bounderies
 		% ibsmth = 2;
 		if ibsmth == 2
-		    currentColor = matlabColors(mcol(4));
-		    xcp = ((1:npbnd) - 1) .* xsinc;
-		    for ii = 1:nlayer+1
-		        % zcp = cosmth(ii,1:npbnd) - zmax;
-		        zcp = cosmth(ii,1:npbnd) - zmin;
+			currentColor = matlabColors(mcol(4));
+			xcp = ((1:npbnd) - 1) .* xsinc;
+			for ii = 1:nlayer+1
+				% zcp = cosmth(ii,1:npbnd) - zmax;
+				zcp = cosmth(ii,1:npbnd) - zmin;
 				plot(xcp,zcp,[lineStyle,currentColor]);
-		    end
+			end
 		end
 
 		% 在模型中每个小梯形中写上 P 波和 S 波的速度值
 		% ivel = 1;
 		if ivel ~= 0
-		    currentColor = matlabColors(mcol(5));
-		    % currentColor = 'r';
-		    for ii = 1:nlayer
-		        for jj = 1:nblk(ii)
-		            if ivg(ii,jj) ~= -1
-		                x1 = xbnd(ii,jj,1);
-		                x2 = xbnd(ii,jj,2);
-		                x3 = x1;
-		                x4 = x2;
-		                z1 = s(ii,jj,1) .* x1 + b(ii,jj,1);
-		                z2 = s(ii,jj,1) .* x2 + b(ii,jj,1);
-		                z3 = s(ii,jj,2) .* x1 + b(ii,jj,2);
-		                z4 = s(ii,jj,2) .* x2 + b(ii,jj,2);
-		                % x = [x1,x2,x3,x4];
-		                % z = [z1,z2,z3,z4];
-		                v = squeeze(vm(ii,jj,1:4));
-		                if ivel < 0
-		                    v = v .* vsvp(ii,jj);
-		                end
-		                text(x1,z1,sprintf('%4.2f',v(1)),'FontSize',8,'Color',currentColor,'VerticalAlignment','top');
-		                text(x2,z2,sprintf('%4.2f',v(2)),'FontSize',8,'Color',currentColor,'VerticalAlignment','top','HorizontalAlignment','right');
-		                text(x3,z3,sprintf('%4.2f',v(3)),'FontSize',8,'Color',currentColor,'VerticalAlignment','bottom');
-		                text(x4,z4,sprintf('%4.2f',v(4)),'FontSize',8,'Color',currentColor,'VerticalAlignment','bottom','HorizontalAlignment','right');
-		            end
-		        end
-		    end
+			currentColor = matlabColors(mcol(5));
+			% currentColor = 'r';
+			for ii = 1:nlayer
+				for jj = 1:nblk(ii)
+					if ivg(ii,jj) ~= -1
+						x1 = xbnd(ii,jj,1);
+						x2 = xbnd(ii,jj,2);
+						x3 = x1;
+						x4 = x2;
+						z1 = s(ii,jj,1) .* x1 + b(ii,jj,1);
+						z2 = s(ii,jj,1) .* x2 + b(ii,jj,1);
+						z3 = s(ii,jj,2) .* x1 + b(ii,jj,2);
+						z4 = s(ii,jj,2) .* x2 + b(ii,jj,2);
+						% x = [x1,x2,x3,x4];
+						% z = [z1,z2,z3,z4];
+						v = squeeze(vm(ii,jj,1:4));
+						if ivel < 0
+							v = v .* vsvp(ii,jj);
+						end
+						text(x1,z1,sprintf('%4.2f',v(1)),'FontSize',8,'Color',currentColor,'VerticalAlignment','top');
+						text(x2,z2,sprintf('%4.2f',v(2)),'FontSize',8,'Color',currentColor,'VerticalAlignment','top','HorizontalAlignment','right');
+						text(x3,z3,sprintf('%4.2f',v(3)),'FontSize',8,'Color',currentColor,'VerticalAlignment','bottom');
+						text(x4,z4,sprintf('%4.2f',v(4)),'FontSize',8,'Color',currentColor,'VerticalAlignment','bottom','HorizontalAlignment','right');
+					end
+				end
+			end
 		end
 	end
 

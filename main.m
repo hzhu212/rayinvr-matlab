@@ -16,9 +16,9 @@ function main(filePathIn, filePathOut)
 	% filePathIn: file path for all input files. That means you'd better put all of your ".in" files in the same path. Default: 'input'.
 
 	if nargin < 2
-		filePathOut = 'output\examples\e3';
+		filePathOut = 'output\examples\e2';
 		if nargin < 1
-			filePathIn = 'input\examples\e3';
+			filePathIn = 'input\examples\e2';
 		end
 	end
 

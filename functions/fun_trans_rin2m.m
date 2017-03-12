@@ -20,20 +20,21 @@ function fileOut = fun_trans_rin2rm(file_rin)
             inSection = true;
             currentLine = strtrim(strjoin(split));
             sectionName = tokens{1}{1};
-            fprintf(fout, ['%%',sectionName,'\n']);
+            fprintf(fout, ['%% ',sectionName,'\n']);
         else
             % 未被section包括的部分直接作为注释输出
-            fprintf(fout, ['%%',currentLine,'\n']);
+            fprintf(fout, ['%% ',currentLine,'\n']);
             continue;
         end
         while(inSection)
             % 将同一小节连接成一个字符串
             tempLine = strtrim(fgetl(fin));
+            if isempty(tempLine), continue; end
             [tokens] = regexp(tempLine, '(&\w+)\s*', 'tokens');
             if ~isempty(tokens)
                 sectionEnd = tokens{1}{1};
                 if ~strcmp(sectionEnd, '&end')
-                    error(sprintf(['Section should be closed up by ''&end''!\nin file [',fileIn,'] line: ',tempLine]));
+                    error('e:input_error',sprintf('Section should be closed up by ''&end''!\nin file [%s] line: %d\n',fileIn,tempLine));
                 end
                 inSection = false;
             else
@@ -48,7 +49,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
         currentLine = regexprep(currentLine, ',(\s*\w+=)', ']; $1'); % 将每个完整的赋值语句后面的逗号替换成分号
         currentLine = regexprep(currentLine, ',$', ']; '); % 上一步不能识别最末尾的逗号，此处作为上一步的补充
         currentLine = strrep(currentLine, '=', '(1)=['); % 为赋值的开头添加方括号，对所有的数组默认加上下标1(后面再根据赋值的长度作调整)
-        currentLine = regexprep(currentLine, ',\n', ',...\n'); %将数组折行处加上matlab折行语法
+        currentLine = regexprep(currentLine, ',\n', ',...\n'); % 将数组折行处加上matlab折行语法
         % 处理*号
         [tokens,split] = regexp(currentLine,'([\d\.]+)\*([\d\.]+)','tokens','split');
         replaced = {};
@@ -65,12 +66,12 @@ function fileOut = fun_trans_rin2rm(file_rin)
         replaced = {};
         for t = tokens
             arrayLength = sum(t{1}{1}==',') + 1; % 数组长度即数组中逗号的个数加1
-            replaced = [replaced, sprintf('(1:%d)=[\n%s',arrayLength,t{1}{1})];
+            replaced = [replaced, sprintf('(1:%d)=[%s',arrayLength,t{1}{1})];
         end
         currentLine = strjoin(split,replaced);
 
         fprintf(fout, [currentLine,'\n']);
-        fprintf(fout, '%%&end\n');
+        fprintf(fout, '%% &end\n\n');
     end
     fclose(fin);
     fclose(fout);
