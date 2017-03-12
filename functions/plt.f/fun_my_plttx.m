@@ -31,18 +31,19 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 	end
 
 	% 创建一个新的 figure 对象
-	hFigure2 = figure();
+	hFigure2 = figure('Position',[230,100,900,500]);
 
 	% 创建 axes 对象
-	hAxes = axes();
+	hAxes = axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
 
-	% 绘制t轴标题
+	hold on;
+
+	% t 轴标题
 	if iaxlab == 1
 		tlab = 'TIME (s)';
 	    if vred ~= 0
-	        tlab = sprintf('T-D/%f (s)', vred);
+	        tlab = sprintf('Time-Distance/%4.2f (s)', vred);
 	    end
-	    ylabel(tlab);
 	end
 
 	% 反转t轴，使之朝下
@@ -50,6 +51,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 		tadj = tmin;
 	else
 		tadj = tmax;
+		set(hAxes,'YDir','reverse');
 	end
 
 	xshoth = -99999.0;
@@ -88,21 +90,17 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 
 	        if iflaga == 1
 	            if ipflag ~= 0
-	                if iplots == 0
-	                	% fun_plots(xwndow,ywndow,iroute);
-	                	% fun_segmnt(1);
-	                    iplots = 1;
-	                end
-	                if (isep < 2 || isep == 3) && iflag1 ~= 0
-	                	% fun_empty();
-	                	% fun_aldone();
-	                end
 	                if (isep < 2 || isep == 3) && (iflag1 ~= 0 || isep == 1 || isep == 3)
 	                	% fun_erase();
 	                	ititle = 0;
 	                end
 
 	                % 绘制坐标轴
+	                if iaxlab == 1
+						xlabel('Distance (km)','FontName','Consolas','FontSize',11);
+					    ylabel(tlab,'FontName','Consolas','FontSize',11);
+	                end
+
 	                % 显示图像区域边框
 	                box on;
 
@@ -125,7 +123,8 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 
 	                % plot observed travel times
 	                if idata ~= 0
-	                	fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida);
+	                	fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida);
+	                	% fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida);
 	                end
 	            end
 
@@ -159,9 +158,10 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
                         lineSymbol = '';
                         if iline == 0
                             lineStyle = '';
-                            lineSymbol = 'o';
+                            lineSymbol = 's';
                         end
-                        plot(xplot,tplot,[lineStyle,currentColor,lineSymbol]);
+                        markerSize = symht .* 5;
+                        plot(xplot,tplot,[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
                     end
 
                     % 输出到 tx.out 跳过
@@ -222,11 +222,15 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
         		    	if itxbox ~= 0
         		    	    index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
         		    	end
-    		            plot(x(1:npt),t(1:npt),[lineStyle,currentColor,lineSymbol],'MarkerSize',symht);
+    		            plot(x(1:npt),t(1:npt),[lineStyle,currentColor,lineSymbol],'MarkerSize',symht.*4);
         		    end
 
 	        	% end
 	        end % -------------------- cycle1000 end
 	    end
 	end % 10
+
+	hold off;
+
+	return;
 end % fun_my_plttx end

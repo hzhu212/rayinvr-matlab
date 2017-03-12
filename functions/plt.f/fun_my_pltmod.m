@@ -14,20 +14,20 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 	global matlabColors currentColor hFigure1;
 
 	% 创建一个 figure 对象
-	hFigure1 = figure();
+	hFigure1 = figure('Position',[200,130,900,500]);
 
-	% (在当前 figure 对象上)创建一个 axes 子对象，并设定x轴位置为顶部，y轴方向朝下
-	hAxes = axes('XAxisLocation','top','YDir','reverse');
+	% (在当前 figure 对象上)创建一个 axes 子对象
+	hAxes = axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
 
-	% 将 x 轴放在顶部，并将 y 轴方向朝下
-	% set(hAxes,'XAxisLocation','top','YDir','reverse');
+	% 设定x轴位置为顶部，y轴方向朝下
+	set(hAxes,'XAxisLocation','top','YDir','reverse');
 
 	hold on;
 
 	% 绘制坐标轴标题
 	if iaxlab == 1
-		xlabel('DISTANCE (km)');
-		ylabel('DEPTH (km)');
+		xlabel('Distance (km)','FontName','Consolas','FontSize',11);
+		ylabel('Depth (km)','FontName','Consolas','FontSize',11);
 	end
 
 	% 绘制图像边框

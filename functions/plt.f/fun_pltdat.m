@@ -15,6 +15,10 @@ function fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,t
 		tpf tscale upf xmint xpf xscalt;
 	global imod iray;
 
+	% npick: 当前处理到 tx.in 中的第几条射线
+	% nsfc: 当前处理到第 tx.in 中的第几个炮点
+	% ilshot: i-line-shot. tx.in 中所有炮点位于的行编号
+	% isf: 当前处理到 tx.in 中的第几行
 	npick = 0;
 	nsfc = 1;
 	isf = ilshot(nsfc);
@@ -22,18 +26,16 @@ function fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,t
 	% 100 % -------------------- cycle 100 begin
 	cycle100 = true;
 	while cycle100
+		% xpf tpf upf ipf 分别为 tx.in 中的第 1、2、3、4 列
 		xp = xpf(isf);
 		tp = tpf(isf);
 		up = upf(isf);
 		ip = ipf(isf);
 
-		if ip < 0
-		    % go to 999
-		    if itcol ~= 0
-		        fun_pcolor(ifcol);
-		    end
-		    return;
-		end
+		% ip < 0 说明到达 tx.in 的结尾
+		if ip < 0, break; end % go to 999
+
+		% ip = 0 说明到达一个新的炮点
 		if ip == 0
 		    xsp = xp;
 		    idp = 1.0 .* sign(tp);
@@ -57,7 +59,10 @@ function fun_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,t
 		    nsfc = nsfc + 1;
 		    isf = ilshot(nsfc);
 		    continue; % go to 100
+
+		% 否则，说明是一个接收点
 		else
+			% abs(data) = 2 时，只绘制反演过的走时，未反演的跳过
 			if abs(idata) == 2
 			    npick = npick + 1;
 			    iflag = 0;

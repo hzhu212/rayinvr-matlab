@@ -16,9 +16,9 @@ function main(filePathIn, filePathOut)
 	% filePathIn: file path for all input files. That means you'd better put all of your ".in" files in the same path. Default: 'input'.
 
 	if nargin < 2
-		filePathOut = 'output\examples\e1';
+		filePathOut = 'output\examples\e3';
 		if nargin < 1
-			filePathIn = 'input\examples\e1';
+			filePathIn = 'input\examples\e3';
 		end
 	end
 
@@ -996,7 +996,8 @@ function main(filePathIn, filePathOut)
 			end % 70
 			if isGoto1000, break; end % go to 1000 step2
 			if isep==2 && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
-				fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
+				fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
+				% fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
 			end
 		end % 60
 	end % -------------------- ~ go to 1000 block end
@@ -1008,7 +1009,8 @@ function main(filePathIn, filePathOut)
 		if isep>0 && iplots==1
 			fun_aldone();
 		end
-		fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
+		fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
+		% fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
 	end
 
 	if itxout > 0
