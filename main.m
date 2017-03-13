@@ -16,9 +16,9 @@ function main(filePathIn, filePathOut)
 	% filePathIn: file path for all input files. That means you'd better put all of your ".in" files in the same path. Default: 'input'.
 
 	if nargin < 2
-		filePathOut = 'output\examples\e2';
+		filePathOut = 'output\examples\e1';
 		if nargin < 1
-			filePathIn = 'input\examples\e2';
+			filePathIn = 'input\examples\e1';
 		end
 	end
 
@@ -902,11 +902,10 @@ function main(filePathIn, filePathOut)
 							nrg = nrg + 1;
 							nhskip = 0;
 
-							[npt,~,~,~,~,~,iflag,~,~,~,~,i1ray,~] ...
-							= fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
-
-							[~,~,~,~,~,~,itt,~,~,~,~] ...
-							= fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
+							[npt,~,~,~,~,~,iflag,~,~,~,~,i1ray,~] = fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
+							if ~exist('uf','var'), uf = []; end
+							if ~exist('irayf','var'), irayf = []; end
+							[~,~,~,~,~,~,itt,~,~,~,~] = fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
 
 							if irs == 0
 								ic2pt = ic2pt + 1;

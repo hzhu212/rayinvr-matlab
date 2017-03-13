@@ -61,6 +61,7 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 	% 设置线型与节点符号
 	lineStyle = '-';
 	lineSymbol = '';
+	markerSize = symht .* 5;
 	if idot == 2
 		lineStyle = '';
 	else
@@ -76,7 +77,7 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 		lineSymbol = 's';
 	end
 
-	plot(x(1:npts),z(1:npts),[lineStyle,currentColor,lineSymbol],'MarkerSize',4);
+	plot(x(1:npts),z(1:npts),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
 
 	if ircol ~= 0
 		currentColor = matlabColors(ifcol);

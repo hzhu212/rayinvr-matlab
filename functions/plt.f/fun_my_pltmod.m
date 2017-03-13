@@ -13,14 +13,18 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 		ztmax ztmin;
 	global matlabColors currentColor hFigure1;
 
-	% 创建一个 figure 对象
-	hFigure1 = figure('Position',[200,130,900,500]);
-
-	% (在当前 figure 对象上)创建一个 axes 子对象
-	hAxes = axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+	if isempty(hFigure1)
+		% 创建一个 figure 对象
+		hFigure1 = figure('Position',[200,130,900,500]);
+		% (在当前 figure 对象上)创建一个 axes 子对象
+		axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+	else
+		figure(hFigure1);
+		% cla(gca(),'reset');
+	end
 
 	% 设定x轴位置为顶部，y轴方向朝下
-	set(hAxes,'XAxisLocation','top','YDir','reverse');
+	set(gca(),'XAxisLocation','top','YDir','reverse');
 
 	hold on;
 

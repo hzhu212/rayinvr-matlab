@@ -9,6 +9,14 @@ function fun_segmnt(iflag)
 	global fID_19;
 	% common /cplot/ iplot,isep,iseg,nseg,xwndow,ywndow,ibcol,ifcol,sf
 	global iplot isep iseg nseg xwndow ywndow ibcol ifcol sf;
+	global hFigure1 hFigure2;
+
+	if iflag == 1
+		hAxes1 = findall(hFigure1,'type','axes');
+		hAxes2 = findall(hFigure1,'type','axes');
+		cla(hAxes1,'reset');
+		cla(hAxes2,'reset');
+	end
 
 	if iplot >= 0
 		if iseg == 0, return; end

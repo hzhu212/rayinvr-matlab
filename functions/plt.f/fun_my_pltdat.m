@@ -50,25 +50,28 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 			% rayCode = ip(1);
 
 			if iszero == 0
-				xplot = xp - xmint;
+				% xplot = xp - xmint;
+				xplot = xp;
 			else
-				xplot = (xp - xThisShot) .* dThisShot - xmint;
+				% xplot = (xp - xThisShot) .* dThisShot - xmint;
+				xplot = (xp - xThisShot) .* dThisShot;
 			end
 			if itx ~= 4
-				tplot = tp - tadj;
+				% tplot = tp - tadj;
+				tplot = tp;
 			else
-				tplot = abs(ip) - tadj;
+				% tplot = abs(ip) - tadj;
+				tplot = abs(ip);
 			end
 
-			if itcol == 1
-				ipcol = colour(mod(ip(1)-1,ncol)+1);
-			elseif itcol == 2
-				ipcol = colour(mod(ii-1,ncol)+1);
-			else
-				;
+			if itcol == 1 || itcol == 2
+				if itcol == 1
+					ipcol = colour(mod(ip(1)-1,ncol)+1);
+				else
+					ipcol = colour(mod(ii-1,ncol)+1);
+				end
+				currentColor = matlabColors(ipcol);
 			end
-
-			currentColor = matlabColors(ipcol);
 
 			if itxbox ~= 0
 				filtIndex = find(xplot >= xbmin & xplot <= xbmax & tplot >= tbmin & tplot <= tbmax);

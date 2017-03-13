@@ -30,11 +30,15 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 	% 	rvred = 0.0;
 	% end
 
-	% 创建一个新的 figure 对象
-	hFigure2 = figure('Position',[220,100,900,500]);
-
-	% 创建 axes 对象
-	hAxes = axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+	if isempty(hFigure2)
+		% 创建一个新的 figure 对象
+		hFigure2 = figure('Position',[220,100,900,500]);
+		% 创建 axes 对象
+		axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+    else
+    	figure(hFigure2);
+    	% cla(gca(),'reset');
+	end
 
 	hold on;
 
@@ -51,7 +55,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 		tadj = tmin;
 	else
 		tadj = tmax;
-		set(hAxes,'YDir','reverse');
+		set(gca(),'YDir','reverse');
 	end
 
 	% xshoth = -99999.0;
@@ -91,8 +95,12 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 
 			if iflaga == 1
 				if ipflag ~= 0
+					if (isep < 2 || isep == 3) && iflag1 ~= 0
+						fun_empty();
+						fun_aldone();
+					end
 					if (isep < 2 || isep == 3) && (iflag1 ~= 0 || isep == 1 || isep == 3)
-						% fun_erase();
+						fun_erase();
 						ititle = 0;
 					end
 
@@ -106,7 +114,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 					box on;
 
 					% 绘制图像标题
-					if ititle == 0 & title_ ~= ' '
+					if ititle == 0 && ~isempty(strtrim(title_))
 						title(title_);
 						ititle = 1;
 					end
@@ -141,20 +149,29 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 					end
 
 					if itx >= 3
-						xplot = xcalc(index) - xmint;
+						% xplot = xcalc(index) - xmint;
+						xplot = xcalc(index);
 						if itx == 3
-							tplot = tcalc(index) - tadj;
+							% tplot = tcalc(index) - tadj;
+							tplot = tcalc(index);
 						else
-							tplot = tcalc(index) - tobs(index) + abs(icalc(index)) - tadj;
+							% tplot = tcalc(index) - tobs(index) + abs(icalc(index)) - tadj;
+							tplot = tcalc(index) - tobs(index) + abs(icalc(index));
 						end
+						rayCode = ircalc(index);
+
 						% 如果 itxbox~=0, 则投到绘图区域之外的点不画
 						if itxbox ~= 0
 							filtIndex = find(xplot >= xbmin & xplot <= xbmax & tplot >= tbmin & tplot <= tbmax);
 							xplot = xplot(filtIndex);
 							tplot = tplot(filtIndex);
+							rayCode = rayCode(filtIndex);
 						end
 
-						% 绘制一条走时曲线
+						codeChange = find(rayCode(1:end-1) ~= rayCode(2:end));
+						codeChange = [0, codeChange, length(rayCode)];
+
+						% 设置绘图样式
 						lineStyle = '-';
 						lineSymbol = '';
 						if iline == 0
@@ -162,7 +179,20 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 							lineSymbol = 's';
 						end
 						markerSize = symht .* 5;
-						plot(xplot,tplot,[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+
+						% itcol = 3;
+						for k = 1:length(codeChange)-1
+							% aaa = input('input: ');
+							codeBegin = codeChange(k) + 1;
+							codeEnd = codeChange(k+1);
+						    codeIndex = codeBegin:codeEnd;
+						    thisCode = rayCode(codeBegin);
+						    if itcol == 3
+						        ipcol = colour(mod(thisCode-1,ncol)+1);
+						        currentColor = matlabColors(ipcol);
+						    end
+							plot(xplot(codeIndex),tplot(codeIndex),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+						end
 					end
 
 					% 输出到 tx.out 跳过
@@ -188,8 +218,10 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 				while cycle100
 					k = k + 1;
 					if (k+nh2) <= npts(ii)
-						x(k) = xh(k+nh2) - xmint;
-						t(k) = th(k+nh2) - tadj;
+						% x(k) = xh(k+nh2) - xmint;
+						% t(k) = th(k+nh2) - tadj;
+						x(k) = xh(k+nh2);
+						t(k) = th(k+nh2);
 						xs(k) = xsh(k+nh2);
 						f(k) = fh(k+nh2);
 						if k == 1
@@ -224,7 +256,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 						if itxbox ~= 0
 							index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
 						end
-						plot(x(1:npt),t(1:npt),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+						plot(x(index),t(index),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
 					end
 
 				% end

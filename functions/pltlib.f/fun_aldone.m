@@ -1,6 +1,6 @@
 % pltlib.f
 % []
-% call: fun_aldone; fun_plotnd; fun_segmnt;
+% call: fun_plotnd; fun_segmnt;
 % called by: main; fun_plttx;
 
 function fun_aldone()
@@ -11,18 +11,20 @@ function fun_aldone()
 	global iplot isep iseg nseg xwndow ywndow ibcol ifcol sf;
 	reply = ' ';
 
-	if iplot >= 0
+	% if iplot >= 0
 		% 15 % 25
 		reply = input('\nEnter <CR> to continue\n','s');
-		if reply(1) == 's'
-		    fun_plotnd();
-		    error('e:stop','stop in fun_aldone.'); % stop
-		end
-		if any(reply(1) == '0123')
-		    iseg = str2num(reply(1));
+		if ~isempty(reply)
+			if reply(1) == 's'
+				fun_plotnd();
+				error('e:stop','\n\n|---------- plot is stoped by user ----------|\n\n'); % stop
+			end
+			if any(reply(1) == '0123')
+				iseg = str2num(reply(1));
+			end
 		end
 		fun_segmnt(1);
-	end
+	% end
 
 	if iplot <= 0
 		% 5

@@ -97,6 +97,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 						if ~isGoto1010
 							tintr = tfinv(1);
 							if tintr < tvmin
+								if ~exist('ii','var'), ii = 0; end
 								ifpos = ii;
 								tvmin = tintr;
 							end

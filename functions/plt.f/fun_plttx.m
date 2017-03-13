@@ -147,7 +147,7 @@ function fun_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka,iv
 					fun_box(orig,orig,orig+xmmt,orig+tmm);
 
 					% 绘制图像标题
-					if ititle == 0 & title_ ~= ' '
+					if ititle == 0 && ~isempty(strtrim(title_))
 						if xtitle < -999999.0, xtitle = 0.0; end
 						if ytitle < -999999.0, ytitle = 0.0; end
 						fun_symbol(xtitle,ytitle,albht,title_,0.0,80);

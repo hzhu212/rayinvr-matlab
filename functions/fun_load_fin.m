@@ -3,7 +3,9 @@
 function [nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel]=fun_load_fin(file_fin)
     % read in floating reflectors
 
-    fid = fopen(filein,'r');
+    global ppfref;
+
+    fid = fopen(file_fin,'r');
     count=0;
     imdata={};
     line = fgetl(fid);
