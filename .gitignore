@@ -1,7 +1,6 @@
 /e3/
-/old/
-/input/
-/output/
+/data/
+/dev_tools/
 *.py
 *.o
 *.exe
