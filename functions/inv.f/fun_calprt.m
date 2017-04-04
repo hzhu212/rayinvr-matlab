@@ -54,6 +54,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 				tpick = tftf;
 				upick = uf;
 				tvmin = 99999.0;
+				if ~exist('ii','var'), ii = []; end
 				if ninv > 1
 					for ii = 1:ninv-1 % 10
 						x1 = xfinv(ii) - x2pt;
@@ -97,7 +98,6 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
 						if ~isGoto1010
 							tintr = tfinv(1);
 							if tintr < tvmin
-								if ~exist('ii','var'), ii = 0; end
 								ifpos = ii;
 								tvmin = tintr;
 							end

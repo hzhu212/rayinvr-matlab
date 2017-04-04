@@ -392,7 +392,7 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 end % 120
             else
                 z1 = zm(ii,1);
-                if ivarz(ii,1) > 0
+                if ivarz(ii,1) >= 0
                     iv = ivarz(ii,1);
                 else
                     iv = ivarz(ii-1,1);

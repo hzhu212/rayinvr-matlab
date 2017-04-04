@@ -8,21 +8,30 @@
 
 % fun_aldone; fun_pltmod; fun_plttx; fun_pltray; fun_empty; fun_plotnd;
 
-function main(filePathIn, filePathOut)
+function main(pathIn, pathOut)
 	% main function for rayinvr, all variables are global
 	%
-	% <strong>main(filePathIn, filePathOut)</strong>
+	% <strong>main(pathIn, pathOut)</strong>
 	%
-	% filePathIn: file path for all input files. That means you'd better put all of your ".in" files in the same path. Default: 'input'.
+	% pathIn: path of input files. You should put all of your ".in" files in this path. Default: 'data\examples\e1'.
+	% pathOut: path of output files. Default: pathIn/'output'.
 
 	if nargin < 2
-		filePathOut = 'output\examples\e1';
 		if nargin < 1
-			filePathIn = 'input\examples\e1';
+			pathIn = fullfile('data','examples','e1');
+		end
+
+		if ~exist(pathIn, 'dir')
+		    error('e:IOError','Input path: "%s" not exist',pathIn);
+		end
+
+		pathOut = fullfile(pathIn,'output');
+		if ~exist(pathOut,'dir')
+		    mkdir(pathOut);
 		end
 	end
 
-	addpath(genpath('functions'));
+	addpath(genpath('./functions'));
 	% addpath(genpath(fullfile(pwd(),'functions')));
 
 	% global onDev;
@@ -44,22 +53,22 @@ function main(filePathIn, filePathOut)
 	file_main_par = 'main_par.m';
 	file_block_data = 'blkdat.m';
 
-	file_rin = fullfile(filePathIn,'r.in');
-	file_vin = fullfile(filePathIn,'v.in');
-	file_txin = fullfile(filePathIn,'tx.in');
-	file_fin = fullfile(filePathIn,'f.in');
+	file_rin = fullfile(pathIn,'r.in');
+	file_vin = fullfile(pathIn,'v.in');
+	file_txin = fullfile(pathIn,'tx.in');
+	file_fin = fullfile(pathIn,'f.in');
 
-	file_r1out = fullfile(filePathOut,'r1.out');
-	file_r2out = fullfile(filePathOut,'r2.out');
-	file_ra1out = fullfile(filePathOut,'ra1.out');
-	file_ra2out = fullfile(filePathOut,'ra2.out');
-	file_txout = fullfile(filePathOut,'tx.out');
-	file_fdout = fullfile(filePathOut,'fd.out');
-	file_iout = fullfile(filePathOut,'i.out');
-	file_nout = fullfile(filePathOut,'n.out');
-	file_tout = fullfile(filePathOut,'t.out');
-	file_pout = fullfile(filePathOut,'p.out');
-	file_vout = fullfile(filePathOut,'v.out');
+	file_r1out = fullfile(pathOut,'r1.out');
+	file_r2out = fullfile(pathOut,'r2.out');
+	file_ra1out = fullfile(pathOut,'ra1.out');
+	file_ra2out = fullfile(pathOut,'ra2.out');
+	file_txout = fullfile(pathOut,'tx.out');
+	file_fdout = fullfile(pathOut,'fd.out');
+	file_iout = fullfile(pathOut,'i.out');
+	file_nout = fullfile(pathOut,'n.out');
+	file_tout = fullfile(pathOut,'t.out');
+	file_pout = fullfile(pathOut,'p.out');
+	file_vout = fullfile(pathOut,'v.out');
 
 
 	% 1 variables
@@ -80,7 +89,7 @@ function main(filePathIn, filePathOut)
 	run(file_rin_m); % 载入脚本，为r.in中所有变量赋值
 
     % matlab colors，设定当前颜色为默认色（前景色）
-    matlabColors = 'krgbcmyw';
+    matlabColors = 'krgbcmyy';
     currentColor = matlabColors(ifcol);
 
 	if onDev, disp('========================= tick 1 ========================='); end
