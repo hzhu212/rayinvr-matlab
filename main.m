@@ -18,7 +18,7 @@ function main(pathIn, pathOut)
 
 	if nargin < 2
 		if nargin < 1
-			pathIn = fullfile('data','examples','e1');
+			pathIn = fullfile('data','examples','e3');
 		end
 
 		if ~exist(pathIn, 'dir')
@@ -173,31 +173,9 @@ function main(pathIn, pathOut)
 
 	% read in observed data
 
-	% 2.3 读入tx.in文件
-	% [xpf,tpf,upf,ipf,len] = fun_load_txin(file_txin);
 	% 930
-	txData = load(file_txin,'-ascii');
-	[xpf,tpf,upf,ipf] = deal(txData(:,1),txData(:,2),txData(:,3),txData(:,4));
-
-	isf = 1; nsf = 0; xshotc = 0.0;
-	% 910 % -------------------- cycle910 begin
-	cycle910 = true;
-	while cycle910
-	    if ipf(isf) <= 0
-			nsf = nsf + 1;
-			ilshot(nsf) = isf;
-			xshotc = xpf(isf);
-		else
-			if vred ~= 0
-			    tpf(isf) = tpf(isf) - abs(xshotc-xpf(isf)) ./ vred;
-			end
-	    end
-	    isf = isf + 1;
-	    if ipf(isf-1)~=-1, continue; end % go to 910
-	    break; % go to nothing
-	end % -------------------- cycle910 end
-	% t_txLength = isf - 2;
-	% [xpf,tpf,upf,ipf] = deal(xpf(1:t_txLength),tpf(1:t_txLength),upf(1:t_txLength),ipf(1:t_txLength));
+	% 2.3 读入tx.in文件
+	[xpf,tpf,upf,ipf] = fun_load_txin(file_txin);
 
 	if onDev, disp('========================= tick 3 ========================='); end
 
@@ -1063,20 +1041,6 @@ function main(pathIn, pathOut)
 
 	fclose('all');
 end % main function end
-
-% --------------------------------------------------------------------------------
-
-function [col1,col2,col3,col4,len] = fun_load_txin(file_txin)
-% 载入tx.in文件，tx.in文件可以看作n行×4列的矩阵
-
-	% 910 % 930
-	txData = load(file_txin,'-ascii');
-	% tx.in的结束行为 0 0 0 -1
-	endLine = find(txData(:,2)==0 && txData(:,4)==-1,1);
-	len = endLine - 1;
-	txData = txData(1:len,:);
-	[col1,col2,col3,col4] = deal(txData(:,1),txData(:,2),txData(:,3),txData(:,4));
-end
 
 % --------------------------------------------------------------------------------
 
