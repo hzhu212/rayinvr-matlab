@@ -29,18 +29,22 @@ function hh = my_errorbar(varargin)
 %   Copyright 1984-2010 The MathWorks, Inc.
 
 % First we check which HG plotting API should be used.
-if ishg2parent( varargin{:} )
-    [~, cax, args] = parseplotapi(varargin{:},'-mfilename',mfilename);
-    try
-        h = errorbarHGUsingMATLABClasses(cax, args{:});
-    catch me
-        throw(me)
-    end
-else
-    [v6, args] = usev6plotapi(varargin{:},'-mfilename',mfilename);
-    [cax, args] = axescheck(args{:});
-    h = Lerrorbarv6(cax, args{:});
-end
+% if ishg2parent( varargin{:} )
+%     [~, cax, args] = parseplotapi(varargin{:},'-mfilename',mfilename);
+%     try
+%         h = errorbarHGUsingMATLABClasses(cax, args{:});
+%     catch me
+%         throw(me)
+%     end
+% else
+%     [v6, args] = usev6plotapi(varargin{:},'-mfilename',mfilename);
+%     [cax, args] = axescheck(args{:});
+%     h = Lerrorbarv6(cax, args{:});
+% end
+
+[v6, args] = usev6plotapi(varargin{:},'-mfilename',mfilename);
+[cax, args] = axescheck(args{:});
+h = Lerrorbarv6(cax, args{:});
 
 if nargout>0, hh = h; end
 
@@ -164,8 +168,8 @@ esymbol = ['-' col]; % Make sure bars are solid
 oldWarn(1) = warning('off','MATLAB:plot:DeprecatedV6Argument');
 oldWarn(2) = warning('off','MATLAB:plot:IgnoringV6Argument');
 try
-    h = plot('v6',xb,yb,esymbol,'parent',cax); hold(cax,'on')
-    h = [h;plot('v6',x,y,symbol,'parent',cax)];
+    h = plot(xb,yb,esymbol,'parent',cax); hold(cax,'on')
+    h = [h;plot(x,y,symbol,'parent',cax)];
 catch err
     warning(oldWarn); %#ok<WNTAG>
     rethrow(err);

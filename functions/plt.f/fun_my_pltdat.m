@@ -85,7 +85,11 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 			markerSize = symht .* 5;
 
 			if idata > 0
-				hErrorbar = my_errorbar(xplot,tplot,2.*up,[lineStyle,currentColor,lineSymbol]);
+				try
+					hErrorbar = my_errorbar(xplot,tplot,2.*up,[lineStyle,currentColor,lineSymbol]);
+				catch e
+					hErrorbar = errorbar(xplot,tplot,2.*up,[lineStyle,currentColor,lineSymbol]);
+				end
 				set(hErrorbar,'MarkerSize',markerSize);
 			else
 				plot(xplot,tplot,[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);

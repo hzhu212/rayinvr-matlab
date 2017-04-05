@@ -18,7 +18,7 @@ function main(pathIn, pathOut)
 
 	if nargin < 2
 		if nargin < 1
-			pathIn = fullfile('data','examples','e3');
+			pathIn = fullfile('data','examples','e1');
 		end
 
 		if ~exist(pathIn, 'dir')
