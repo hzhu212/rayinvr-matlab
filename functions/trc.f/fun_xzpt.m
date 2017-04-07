@@ -4,6 +4,11 @@
 % call: none.
 
 function [xpt,zpt,layers,iblks,iflag] = fun_xzpt(xpt,zpt,layers,iblks,iflag)
+% 给定一个炮点 (xpt,zpt)，找到该炮点所在的 block，返回值：
+% layers: block 所在层号
+% iblks: 在层内的序号
+% iflag: 是否成功找到，0-成功，1-失败，即找不到满足条件的 block
+
     % global file_rayinvr_par file_rayinvr_com;
     % run(file_rayinvr_par);
     % run(file_rayinvr_com);

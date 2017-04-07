@@ -12,8 +12,9 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 	% run(file_rayinvr_par);
 	% run(file_rayinvr_com);
 
-	global fID_31 fID_32 fID_35 fID_63;
-	global iblk layer npfref nlayer nfrefl pxgrid player s sample xbnd xfrefl ...
+	% global fID_31 fID_32 fID_35 fID_63;
+	global fID_31 fID_32 fID_35;
+	global b iblk layer npfref nlayer nfrefl pxgrid player s sample xbnd xfrefl ...
 		zmin zmax zfrefl;
 
 	% real vzgrid(pxgrid),xgrid(player+1),xgmt(pxgrid),zgmt(pxgrid)
@@ -48,6 +49,7 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 		for jj = 1:nx+1 % 20
 			xmod = xmmin + (jj-1).*dx; % float
 
+			if ~exist('iflag','var'), iflag = []; end
 			[~,~,layer,iblk,iflag] = fun_xzpt(xmod,zmod,layer,iblk,iflag);
 
 			if iflag == 0
@@ -131,10 +133,10 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 		for jj = 1:nx+1 % 130
 			if vzgrid(jj) ~= 9.999
 				% 35
-				fprintf(fID_35, '%10.3f%10.3f%10.3f\n', xgmt(jj),zgmt(jj),vzgrid(jj));
+				% fprintf(fID_35, '%10.3f%10.3f%10.3f\n', xgmt(jj),zgmt(jj),vzgrid(jj));
 			end
 			% 26
-			fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
+			% fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
 		end % 130
 	end % 10
 
@@ -183,7 +185,7 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 			end % 70
 
 			% 25
-			fprintf(fID_31, '%10.3f', vzgrid(i:nx+1));
+			fprintf(fID_31, '%10.3f', vzgrid(ii:nx+1));
 			fprintf(fID_31, '\n');
 		end % 60
 	end
