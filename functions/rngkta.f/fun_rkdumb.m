@@ -8,6 +8,7 @@ function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
 % routine to solve a 2x2 system of first order o.d.e.'s
 % using a 4th-order runge-kutta method without error control
 % derivs 是一个函数参数
+% 使用 4 阶不带错误控制的 龙格-库塔方法解决 2×2 的一阶常微分方程组
 
 	% dimension y(2),dydx(2),yt(2),dyt(2),dym(2)
 	% [y,yt] = deal(zeros(1,2));

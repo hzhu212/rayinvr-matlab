@@ -6,14 +6,20 @@
 function [x,y,f] = fun_odex(x,y,f)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with x as independent variable
+% 使用 龙格-库塔 方法解一阶常微分方程，把 x 当做自变量
 
-    % global file_rayinvr_par file_rayinvr_com;
-    % global fID_12;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
-    % real y(2),f(2)
-    % logical ok
-    % common /rkcs/ ok
+% y(1): z
+% y(2): theta
+% f(1): dz/dx
+% f(2): d theta/ dx
+% term1: vz 的分子
+% term2: v(x,z) 的分子
+% vxv, vzv: vx/v, vz/v
+% vx, vz: partial v/ partial x, partial v/ partial z
+
+% 该函数的效果是：给定初值 x0,z0,theta0, 求出 dz/dx, dtheta/dx,
+% 外层函数得到 dz/dx dtheta/dx, 并引入射线步长，求出下一个射线节点的 x1,z1,theta1,
+% 再调用该函数处理下一个射线节点，如此循环往复
 
     global fID_12;
     global c iblk idump irkc isrkc layer;
