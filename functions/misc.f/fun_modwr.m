@@ -49,8 +49,8 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 		for jj = 1:nx+1 % 20
 			xmod = xmmin + (jj-1).*dx; % float
 
-			if ~exist('iflag','var'), iflag = []; end
-			[~,~,layer,iblk,iflag] = fun_xzpt(xmod,zmod,layer,iblk,iflag);
+			% if ~exist('iflag','var'), iflag = []; end
+			[layer,iblk,iflag] = fun_xzpt(xmod,zmod);
 
 			if iflag == 0
 				vzgrid(jj) = fun_vel(xmod,zmod);
