@@ -22,7 +22,6 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	% integer icasec(5)
 
 	[xn,zn,an,xb,zb,ab,xt,zt,at,xl,zl,al,xri,zri,ari] = deal([]); % for fun_adhoc
-	ib = []; % for fun_block
 	icase = []; % for fun_corner
 
 	icasec = [3,4,1,2,5];
@@ -274,7 +273,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	    	    isGoto1330 = false;
 
 	    	    i1 = layer - 1;
-	    	    [~,~,ib] = fun_block(xn,i1,ib);
+	    	    [ib] = fun_block(xn,i1);
 
 	    	    if ivg(i1,ib) ~= -1, break; end % go to 1310
 
@@ -471,7 +470,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
     	cycle3020 = true;
     	while cycle3020
 	    	i1 = layer + 1;
-	    	[~,~,ib] = fun_block(xn,i1,ib);
+	    	[ib] = fun_block(xn,i1);
 	    	if ivg(i1,ib) ~= -1
 	    	    break; % go to 3010
 	    	end

@@ -1,19 +1,16 @@
 % trc.f
-% [~,~,iblk1]
+% [iblk1]
 % called by: fun_adjpt; fun_auto; fun_hdwave;
 % call: none;
 
-function [x,layer1,iblk1] = fun_block(x,layer1,iblk1)
+function [iblk1] = fun_block(x,layer1)
 % determine block of point x in layer
-
-    % global file_rayinvr_par file_rayinvr_com;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
+% 给定层号和 x 坐标，返回 block 编号
 
     global nblk xbnd;
 
     for ii = 1:nblk(layer1) % 10
-        if x>=xbnd(layer1,ii,1) & x<= xbnd(layer1,ii,2)
+        if x >= xbnd(layer1,ii,1) && x <= xbnd(layer1,ii,2)
             iblk1 = ii;
             return;
         end

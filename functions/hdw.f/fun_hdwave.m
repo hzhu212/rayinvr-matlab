@@ -21,13 +21,12 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		vm xr xsinc xbnd xmin zr;
 
 	dhw = 0.0;
-	ib = []; % for fun_block
 
 	% 10 % -------------------- cycle10 begin
 	cycle10 = true;
 	while cycle10
 		l1 = layer + 1;
-		[~,~,ib] = fun_block(xr(n),l1,ib);
+		[ib] = fun_block(xr(n),l1);
 		if ivg(l1,ib)~=-1, break; end % go to 20
 		layer = layer + 1;
 		if layer == nlayer
@@ -66,7 +65,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        cycle30 = true;
 	        while cycle30
 		        l1 = layer - 1;
-		        [~,~,ib] = fun_block(xr(n),l1,ib);
+		        [ib] = fun_block(xr(n),l1);
 		        if ivg(l1,ib)~=-1, break; end % go to 40
 	            layer = layer - 1;
 	            if layer == 1
@@ -192,7 +191,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 						[vr,~,iflag,ihdwf] = fun_goto999(vr,n,iflag,ihdwf);
 		    	    	return; % go to 999
 	    	    	end
-		    	    [~,~,ib] = fun_block(xr(n)+fid.*0.001,l1,ib);
+		    	    [ib] = fun_block(xr(n)+fid.*0.001,l1);
 		    	    layer = l1;
 		    	    iblk = ib;
 		    	    continue; % go to 50

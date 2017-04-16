@@ -1,15 +1,38 @@
 % atrc.f
-% [~,~,~,~,~,~,amin,amax,~,~,~,~,~,~,~,iflag,~,~,~,ia0,~,~,~,~,~,~,~,~]
+% [amin,amax,iflag,ia0]
 % called by: main;
 % call: fun_autotr; fun_calvel; fun_block; done.
 
-function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin] = fun_auto(xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,iflag,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin)
+function [amin,amax,iflag,ia0] = fun_auto(xshot,zshot,if_,ifam,l,idr,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax,it,amina,amaxa,ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin)
 % determine min. and max. take-off angles for a specific ray code
 
-    % global file_rayinvr_par file_rayinvr_com;
-    % global fID_11;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
+% 返回值
+% amin,amax: 求得的射线组最小和最大发射角
+% iflag: 是否抛出异常，0-成功结束，1-抛出异常
+
+% 参数
+% xshot,zshot: 当前炮点的 x 坐标和 z 坐标
+% if_: index-flock, 当前炮点下的射线组的索引
+% ifam
+% l: 当前射线组的层号
+% idr: 当前射线组的类型。设当前 ray code 为 layer.type，则 l=layer, idr=type
+% aamin,aamax: 浮点数，预定义的所有射线组的最小和最大发射角
+% layer1: 当前炮点所在的层号
+% iblk1: 当前炮点所在的 block 号
+% aainc
+% aaimin
+% nsmax: 当前射线组在搜索模式下的最大搜索次数
+% it: iturn,? 1-该射线组的类型为反射；0-该射线组的类型不是反射，但包含反射界面
+% amina,amaxa: 用户自定义的最小发射角和最大发射角
+% ia0: 整数，索引当前进行到第几个自定义发射角，初值为 1
+% stol: 搜索模式下停止搜索的最小允差
+% irays: 开关，是否绘制搜索模式下生成的射线
+% nskip: the first nskip points (step lengths) of all ray paths are not plotted (default: 0)
+%   跳过每条射线开头的控制点数目，这可以使得震源附近的射线不那么密集（估计设为1就足够了）
+% idot: plot a symbol at each point (step length) defining each ray path (default: 0)
+% irayps: plot the P-wave segments of ray paths as solid lines and the S-wave segments as dashed lines (default: 0)
+% xsmax: 射线组到达的最远距离，或射线组反射点的最大 offset
+% istep: 开关，追踪完每个射线组暂停一次
 
     global fID_11;
     global fid idray isrch id idiff layer nlayer nblk pi18 ray tang vm vr xr zr;
@@ -18,8 +41,10 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     [npt,iflag2] = deal([]); % for fun_autotr
 
     iflag = 0;
+
+    % ray take-off angles input by user
+    % 用户自定义了最小和最大发射角，无需再计算
     if idr == 0
-        % ray take-off angles input by user
         if abs(amina) > 180.0 || abs(amaxa) > 180.0
             fprintf(fID_11, '\n***  error in specification of amin or amax  ***\n\n');
             iflag = 1;
@@ -32,19 +57,19 @@ function [xshot,zshot,ifif,ifam,l,idr,amin,amax,aamin,aamax,layer1,iblk1,aainc,a
     end
 
     % check to see if layer of ray code is above shot or below model
+    % 检查当前射线组的层号是否出界
     if l < layer1 || l > nlayer || (l >= nlayer && idr > 1)
         iflag = 1;
         return;
     end
 
+    % search for refracted rays
+    % 如果射线组类型为反射波
     if idr == 1
-
-        % search for refracted rays
-
         [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
 
         if l > layer1 && abs(vtop-vbotom) <= 0.000001
-            [~,~,ib] = fun_block(xshot+fid.*0.0005,l,ib);
+            [ib] = fun_block(xshot+fid.*0.0005,l);
             if id == 1
                 i1 = ib; i2 = nblk(l);
             else
