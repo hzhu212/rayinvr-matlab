@@ -10,9 +10,7 @@ function [y] = fun_rkdumb(y,x1,x2,derivs, btan,c,factan,iblk,layer,mtan)
 % 使用 4 阶不带错误控制的 龙格-库塔方法解决 2×2 的一阶常微分方程组
 
 	% dimension y(2),dydx(2),yt(2),dyt(2),dym(2)
-	% [y,yt] = deal(zeros(1,2));
 
-	% [dydx,dyt,dym] = deal([]); % for function derivs
 	x = x1;
 	h = x2 - x1;
 	if x+h == x, return; end

@@ -1,5 +1,6 @@
 % \bvar\b(\(.*\))*\s*=[^=]
 % (\[.*)?\bvar\b(.*\])?(\(.*\))*\s*=[^=]
+% profile on; main; profile off; profile viewer; profsave(profile('info'),'profile_test');
 % rayinvr_par.m, rayinvr_com.m, main_par.m, blkdat.m, input/r.in, -old/*.*
 
 % call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
@@ -559,7 +560,7 @@ function main(pathIn, pathOut)
 		% 若果需要定位当前炮点
 		if ics == 1
 			% 定位当前炮点：即指找到当前炮点属于第几层的第几个小 block
-			[layer1,iblk1,iflags] = fun_xzpt(xshotr,zshotr);
+			[layer1,iblk1,iflags] = fun_xzpt(xshotr,zshotr, b,nblk,nlayer,s,xbnd);
 
 			% 定位炮点失败
 			if iflags == 1
@@ -970,14 +971,15 @@ function main(pathIn, pathOut)
 						[npt,iflag,i1ray] = fun_trace(npt,ifam,irs,iturnt,invr,xsmax,idl,idt,iray,ii2pt,i1ray,modout);
 						if ~exist('uf','var'), uf = []; end
 						if ~exist('irayf','var'), irayf = []; end
-						[~,~,~,~,~,~,itt,~,~,~,~] = fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
+						[itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf, ...
+							ar_,fid,fid1,fidarr,iblk,id,idray,idump,iwave,layer,ntt,pi18,range_,rayid,time,timer_,tr,tt,vr,vred,xr,xshtar,zr);
 
 						if irs == 0
 							ic2pt = ic2pt + 1;
 							if ihdwf ~= 1, ta2pt(ic2pt) = angled;
 							else ta2pt(ic2pt) = tdhw-hws; end
 							ra2pt(ic2pt) = xr(npt);
-							tt2pt(ic2pt) = timertimer;
+							tt2pt(ic2pt) = timer_;
 							if vr(npt,2)<=0.0, tt2pt(ic2pt)=1.0e20; end
 						end
 

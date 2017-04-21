@@ -16,7 +16,7 @@ global xm zm vf nzed nvel xvel;  %  blk5
 global xr zr ar_ vr tr vp vs;  %  blk6
 global refll ircbnd;  %  blk7
 global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
-global itx vred time timertimer;  %  blk9
+global itx vred time timer_;  %  blk9
 global step_ smin smax;  %  blk10
 global range_ tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...

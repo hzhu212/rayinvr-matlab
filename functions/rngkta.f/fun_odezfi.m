@@ -15,6 +15,7 @@ function [f] = fun_odezfi(x,y, btan,c,factan,iblk,layer,mtan)
 	% global btan c factan iblk layer mtan;
 
 	% real y(2),f(2)
+	f = zeros(1,2);
 
 	sa = 1.0 .* sign(y(2));
 	n1 = fix(sa.*y(2).*factan) + 1; % int -> fix
@@ -24,5 +25,5 @@ function [f] = fun_odezfi(x,y, btan,c,factan,iblk,layer,mtan)
 	vxv = (y(1).*(c(layer,iblk,8)+c(layer,iblk,9).*y(1))+c(layer,iblk,10).*x+c(layer,iblk,11)) ./ (term2.*(c(layer,iblk,6).*y(1)+c(layer,iblk,7)));
 	vzv = term1 ./ term2;
 	f(2) = vzv .* f(1) - vxv;
-	return;
+
 end

@@ -72,7 +72,7 @@ function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray
 			y(2) = ar_(npt,2);
 
 			if ivg(layer,iblk) == 0
-				[x,y,~,~] = fun_strait(x,y,npt,0);
+				[x,y] = fun_strait(x,y,npt,0, ar_,dstepf,fid,pi2,smax,xr,zr);
 			else
 				z = x + fid .* fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
 				[~,z,zr(npt)] = fun_check(0,z,zr(npt), b,iblk,id,layer,s,xbnd);
@@ -102,7 +102,7 @@ function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray
 			y(2) = ar_(npt,2);
 
 			if ivg(layer,iblk) == 0
-				[x,y,~,~] = fun_strait(x,y,npt,1);
+				[x,y] = fun_strait(x,y,npt,1, ar_,dstepf,fid,pi2,smax,xr,zr);
 			else
 				if (fid.*ar_(npt,2)) <= pi2
 					z = x + fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;

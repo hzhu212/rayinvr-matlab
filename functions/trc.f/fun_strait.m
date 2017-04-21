@@ -1,9 +1,9 @@
 % trc.f
-% [x,y,~,~]
+% [x,y]
 % called by: fun_trace;
 % call: none.
 
-function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
+function [x,y] = fun_strait(x,y,npt,iflag, ar_,dstepf,fid,pi2,smax,xr,zr)
 % if the upper and lower velocities in a layer are nearly the same
 % (or equal) the ray path is essentially a straight line segment.
 % therefore, no need to use runge kutta routine. this routine
@@ -13,11 +13,7 @@ function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
 %              iflag=0 --  x is present x coordinate
 %              iflag=1 --  x is present z coordinate
 
-    % global file_rayinvr_par file_rayinvr_com;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
-
-    global ar_ dstepf fid pi2 smax xr zr;
+    % global ar_ dstepf fid pi2 smax xr zr;
 
     if iflag == 0
         x = xr(npt) + fid.*smax./dstepf;
@@ -32,5 +28,5 @@ function [x,y,npt,iflag] = fun_strait(x,y,npt,iflag)
         y(1) = xr(npt) + tan(ar_(npt,2)) .* (x - zr(npt));
         y(2) = ar_(npt,2);
     end
-    return;
+
 end % function end

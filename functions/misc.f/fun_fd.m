@@ -15,6 +15,8 @@ function [dxz,xmmin,xmmax,ifd] = fun_fd(dxz,xmmin,xmmax,ifd)
 	global fID_35;
 	global iblk layer pxgrid zmin;
 
+	global b nblk nlayer s xbnd; % for fun_xzpt
+
 	% real vzgrid(pxgrid),xgmt(pxgrid),zgmt(pxgrid)
 
 	nx = fix((xmmax-xmmin) ./ dxz); % int -> int
@@ -33,7 +35,7 @@ function [dxz,xmmin,xmmax,ifd] = fun_fd(dxz,xmmin,xmmax,ifd)
 		for jj = 1:nx+1 % 20
 			xmod = xmmin + (jj-i).*dxz;
 
-			[layer,iblk,iflag] = fun_xzpt(xmod,zmod);
+			[layer,iblk,iflag] = fun_xzpt(xmod,zmod, b,nblk,nlayer,s,xbnd);
 
 			if iflag == 0
 				vzgrid(jj) = fun_vel(xmod,zmod, c,iblk,layer);

@@ -13,6 +13,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 		zmin zmax zfrefl;
 
 	global c iblk layer; % for fun_vel
+	global b nblk nlayer s xbnd; % for fun_xzpt
 
 	% real vzgrid(pxgrid),xgrid(player+1),xgmt(pxgrid),zgmt(pxgrid)
 	% integer igrid(player+1),modi(player),zsmax(pxgrid)
@@ -46,8 +47,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 		for jj = 1:nx+1 % 20
 			xmod = xmmin + (jj-1).*dx; % float
 
-			% if ~exist('iflag','var'), iflag = []; end
-			[layer,iblk,iflag] = fun_xzpt(xmod,zmod);
+			[layer,iblk,iflag] = fun_xzpt(xmod,zmod, b,nblk,nlayer,s,xbnd);
 
 			if iflag == 0
 				vzgrid(jj) = fun_vel(xmod,zmod, c,iblk,layer);

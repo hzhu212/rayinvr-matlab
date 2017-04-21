@@ -1,6 +1,7 @@
 /e3/
 /data/
 /dev_tools/
+/*profile*/
 *.py
 *.o
 *.exe

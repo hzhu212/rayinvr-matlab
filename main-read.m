@@ -1005,7 +1005,7 @@ function main(pathIn, pathOut)
 								if ihdwf ~= 1, ta2pt(ic2pt) = angled;
 								else ta2pt(ic2pt) = tdhw-hws; end
 								ra2pt(ic2pt) = xr(npt);
-								tt2pt(ic2pt) = timertimer;
+								tt2pt(ic2pt) = timer_;
 								if vr(npt,2)<=0.0, tt2pt(ic2pt)=1.0e20; end
 							end
 
