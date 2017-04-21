@@ -224,11 +224,10 @@ function main(pathIn, pathOut)
 		fun_goto900(); return;
 	end
 
-	% 查看是否有浮动界面信息，如果有，ifrbnd 置为 1
+	%% 查看是否有浮动界面信息，如果有，ifrbnd 置为 1
 	% frbnd 与 ray 数组是一一对应的，举例：e7 的 r.in 中：
 	% ray   = 1.1, 1.3, 2.1, 2.3, 3.1, 4.2, 5.2, 5.3, 5.0, 5.0, 5.0, 5.0, 5.0,
 	% frbnd =   0,   0,   0,   0,   0,   0,   0,   0,   5,   2,   3,   1,   4,
-	% 这表明正常的射线类型(1-折射，2-反射，3-首波)均不对应浮动界面，浮动界面对应着特殊的 ray code: 0-浮动界面
 	ifrbnd = 0;
 	for ii = 1:ngroup % 540
 		if frbnd(ii) < 0 || frbnd(ii) > pfrefl
@@ -312,11 +311,12 @@ function main(pathIn, pathOut)
 	% assign values to the arrays xshota, zshota and idr
 	% and determine nshot
 
-	% 获取炮点信息
-	% 炮点的原始数据来自数组 xhsot, zshot，由 r.in 文件读入
+	% 获取模型炮点信息
+	% 模型炮点数据来自数组 xshot, zshot，由 r.in 文件读入
 	% xshota, zshota, idr: 所有有效炮点的 x 坐标，z 坐标，和方向(-1-左，1-右)
 	% nshot: 所有有效炮点总数
 	for ii = 1:pshot % 290
+		% 炮点方向为左或左右
 		if ishot(ii)==-1 || ishot(ii)==2
 			nshot = nshot + 1;
 			xshota(nshot) = xshot(ii);
@@ -325,6 +325,7 @@ function main(pathIn, pathOut)
 			ishotw(nshot) = -ii;
 			ishotr(nshot) = 2 .* ii - 1;
 		end
+		% 炮点方向为右或左右
 		if ishot(ii)==1 || ishot(ii)==2
 			nshot = nshot + 1;
 			xshota(nshot) = xshot(ii);
@@ -507,7 +508,8 @@ function main(pathIn, pathOut)
 	end
 
 	% 对每个"模型炮点"进行循环
-	% 区别于观测炮点，模型炮点是用户构建模型时设定的，一般从 r.in 文件中读入，而观测炮点则是 tx.in 文件中实际观测时的炮点信息
+	% 区别于观测炮点，模型炮点是用户构建模型时设定的，一般从 r.in 文件中读入，
+	% 而观测炮点则是 tx.in 文件中实际观测时的炮点信息
 	for is = 1:nshot % 60
 		isGoto1000 = false;
 		% is: 当前炮点序号
@@ -534,7 +536,8 @@ function main(pathIn, pathOut)
 		else
 			% 如果当前炮点与上一个炮点是同一个(同一个炮点但 direction 不同当做 2 个炮点)
 			if abs(xshotr-xsec) < 0.001 && abs(zshotr-zsec) < 0.001
-				% 如果上一个炮点定位失败，则该炮点也不必再尝试，直接跳到下一个炮点（“定位”是指找到炮点属于哪一层的哪个小 block）
+				% 如果上一个炮点定位失败，则该炮点也不必再尝试，直接跳到下一个炮点
+				% “定位”是指找到炮点属于哪一层的哪个 block
 				if iflags == 1, continue; end % go to 60
 				% ics=0: 如果上一个炮点定位成功，则该炮点不必重新定位
 				ics = 0;
@@ -556,7 +559,6 @@ function main(pathIn, pathOut)
 		% 若果需要定位当前炮点
 		if ics == 1
 			% 定位当前炮点：即指找到当前炮点属于第几层的第几个小 block
-			% [layer1,iblk1,iflags] = deal([]);
 			[layer1,iblk1,iflags] = fun_xzpt(xshotr,zshotr);
 
 			% 定位炮点失败
@@ -565,7 +567,8 @@ function main(pathIn, pathOut)
 				continue; % go to 60
 			end
 
-			% 如果(绘制模型边界 或 绘制追踪的射线 或 绘制搜索模式下追踪的射线) 且 每个炮点需要单独绘制一张图(如果 isep<1 则所有炮点绘制在同一张图)
+			% 如果(绘制模型边界 或 绘制追踪的射线 或 绘制搜索模式下追踪的射线) 且
+			% 每个炮点需要单独绘制一张图(如果 isep<1 则所有炮点绘制在同一张图)
 			if (imod==1 || iray > 0 || irays==1) && isep > 1
 				% 每绘制一条射线暂停一次，等待用户输入
 				if iflagp == 1
@@ -574,7 +577,6 @@ function main(pathIn, pathOut)
 				iflagp = 1;
 				% 刷新绘制模型
 				fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
-				% fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 			end
 		end
 
@@ -731,14 +733,15 @@ function main(pathIn, pathOut)
 					end
 				end
 
-
-				% 计算当前射线组的最小和最大发射角 aminr, amaxr
-				if ~exist('aminr','var'), [aminr,amaxr,iflag] = deal([]); end % for fun_auto
-				[~,~,~,~,~,~,aminr,amaxr,~,~,~,~,~,~,~,iflag,~,~,~,ia0,~,~,~,~,~,~,~,~] ...
-				= fun_auto(xshotr,zshotr,ii,ifam,idl,idt,aminr,amaxr,aamin,aamax,...
-					layer1,iblk1,aainc,aaimin,nsmax(ii),iflag,iturn(ii),amin(ia0),...
-					amax(ia0),ia0,stol,irays,nskip,idot,irayps,xsmax,istep,nsmin(ii));
-
+				%% 计算当前射线组的最小和最大发射角 aminr, amaxr
+				% aamin,aamax: 浮点数，预定义的所有射线组的最小和最大发射角
+				% ray code 为 L.0 的射线组可以由用户自定义最小发射角和最大发射角
+				% amin,amax: 数组，用户自定义的最小发射角和最大发射角
+				% ia0: 整数，索引当前进行到第几个自定义发射角，初值为 1
+				[aminr,amaxr,iflag,ia0] = fun_auto(xshotr,zshotr,ii,ifam,idl,...
+					idt,aamin,aamax,layer1,iblk1,aainc,aaimin,nsmax(ii),...
+					iturn(ii),amin(ia0),amax(ia0),ia0,stol,irays,nskip,idot,...
+					irayps,xsmax,istep,nsmin(ii));
 
 				% 计算发射角失败，继续下一个射线组
 				if iflag ~= 0

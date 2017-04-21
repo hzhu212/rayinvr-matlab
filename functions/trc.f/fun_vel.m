@@ -4,14 +4,9 @@
 % fun_adjpt; fun_frefl; fun_calmod; fun_hdwave; fun_odex; fun_odez;
 % call: none.
 
-% fortran function
-
 function [vel] = fun_vel(x,z)
 % calculate p-wave velocity at point (x,z) in model
-
-	% global file_rayinvr_par file_rayinvr_com;
-	% run(file_rayinvr_par);
-	% run(file_rayinvr_com);
+% 给出一点坐标 (x,z)，返回改点处的 P 波速度
 
 	global c iblk layer;
 

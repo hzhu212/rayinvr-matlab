@@ -4,8 +4,7 @@
 % call: fun_trace; fun_vel; done.
 
 function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,idr,irayps,istep] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,idr,irayps,istep)
-% trace a single ray through model to its turning point
-% (iturn=1) or to completion (iturn=0)
+% trace a single ray through model to its turning point (iturn=1) or to completion (iturn=0)
 
     % global file_rayinvr_par file_rayinvr_com;
     % global fID_12;
@@ -31,14 +30,14 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     fid = fid1;
     ir = 0;
     invr = 0;
-    angle_angle = fid .* (90.0 - ang) ./ pi18;
+    angle_ = fid .* (90.0 - ang) ./ pi18;
     layer = layer1;
     iblk = iblk1;
     npt = 1;
     xr(1) = xshot;
     zr(1) = zshot;
     ar_(1,1) = 0.0;
-    ar_(1,2) = angle_angle;
+    ar_(1,2) = angle_;
     vr(1,1) = 0.0;
     vp(1,1) = 0.0;
     vs(1,1) = 0.0;

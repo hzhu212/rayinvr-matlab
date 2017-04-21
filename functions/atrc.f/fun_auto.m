@@ -13,7 +13,7 @@ function [amin,amax,iflag,ia0] = fun_auto(xshot,zshot,if_,ifam,l,idr,aamin,aamax
 % 参数
 % xshot,zshot: 当前炮点的 x 坐标和 z 坐标
 % if_: index-flock, 当前炮点下的射线组的索引
-% ifam
+% ifam: 当前射线组总编号(所有炮点的射线组累计到一起)
 % l: 当前射线组的层号
 % idr: 当前射线组的类型。设当前 ray code 为 layer.type，则 l=layer, idr=type
 % aamin,aamax: 浮点数，预定义的所有射线组的最小和最大发射角
@@ -64,7 +64,7 @@ function [amin,amax,iflag,ia0] = fun_auto(xshot,zshot,if_,ifam,l,idr,aamin,aamax
     end
 
     % search for refracted rays
-    % 如果射线组类型为反射波
+    % 如果射线组类型为折射波
     if idr == 1
         [~,~,~,~,~,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,layer1,iblk1,l,vshot,vtop,vbotom);
 
@@ -77,7 +77,7 @@ function [amin,amax,iflag,ia0] = fun_auto(xshot,zshot,if_,ifam,l,idr,aamin,aamax
             end
             isGoto105 = false;
             for ii = i1:i2 % 103
-                if (vm(l,ii,1)<=vm(l,ii,3) | vm(l,ii,2)<=vm(l,ii,4)) & vm(l,ii,1)~=0
+                if (vm(l,ii,1)<=vm(l,ii,3) || vm(l,ii,2)<=vm(l,ii,4)) && vm(l,ii,1)~=0
                     isGoto105 = true; break; % go to 105
                 end
             end % 103
