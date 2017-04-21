@@ -36,7 +36,7 @@ function [dxz,xmmin,xmmax,ifd] = fun_fd(dxz,xmmin,xmmax,ifd)
 			[layer,iblk,iflag] = fun_xzpt(xmod,zmod);
 
 			if iflag == 0
-				vzgrid(jj) = fun_vel(xmod,zmod);
+				vzgrid(jj) = fun_vel(xmod,zmod, c,iblk,layer);
 			else
 				vzgrid(jj) = 9.999;
 			end

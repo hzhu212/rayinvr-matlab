@@ -49,7 +49,7 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 	end
 
 	% 将 figure1(模型图像) 设为当前图像
-	figure(hFigure1);
+	% figure(hFigure1);
 	% set(hFigure1,'CurrentAxes',gca());
 
 	hold on;

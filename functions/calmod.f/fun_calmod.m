@@ -1274,10 +1274,10 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
                 z2sum = z2sum + xblk*(z21+z22)/2.0;
                 if vm(ii,jj,1) > 0.001
                     layer = ii; iblk = jj;
-                    v11 = fun_vel(xb1,z11);
-                    v12 = fun_vel(xb2,z12);
-                    v21 = fun_vel(xb1,z21);
-                    v22 = fun_vel(xb2,z22);
+                    v11 = fun_vel(xb1,z11, c,iblk,layer);
+                    v12 = fun_vel(xb2,z12, c,iblk,layer);
+                    v21 = fun_vel(xb1,z21, c,iblk,layer);
+                    v22 = fun_vel(xb2,z22, c,iblk,layer);
                     vp1sum = vp1sum + xblk*(v11+v12)/2.0;
                     vs1sum = vs1sum + xblk*(v11+v12)*vsvp(ii,jj)/2.0;
                     vp2sum = vp2sum + xblk*(v21+v22)/2.0;

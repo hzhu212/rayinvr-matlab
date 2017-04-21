@@ -950,7 +950,7 @@ function main(pathIn, pathOut)
 						vr(1,1) = 0.0;
 						vp(1,1) = 0.0;
 						vs(1,1) = 0.0;
-						vp(1,2) = fun_vel(xshotr,zshotr);
+						vp(1,2) = fun_vel(xshotr,zshotr, c,iblk,layer);
 						vs(1,2) = vp(1,2) .* vsvp(layer1,iblk1);
 						if iwave == 1, vr(1,2) = vp(1,2);
 						else vr(1,2) = vs(1,2); end

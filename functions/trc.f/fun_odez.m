@@ -29,7 +29,7 @@ function [x,y,f] = fun_odez(x,y,f)
     if ~ok
         if isrkc==1 & idump==1
             % 5
-            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. z  ***\n|del(v)| = %12.5f\n',fun_vel(y(1),x).*(vxv.^2+vzv.^2).^0.5);
+            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. z  ***\n|del(v)| = %12.5f\n',fun_vel(y(1),x, c,iblk,layer).*(vxv.^2+vzv.^2).^0.5);
         end
         irkc = 1;
         isrkc = 0;

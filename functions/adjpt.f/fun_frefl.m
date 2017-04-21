@@ -32,7 +32,7 @@ function [ir,n,xfr,zfr,ifrpt,modout,invr] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,
     a1 = fid .* (ar_(n,1)+alpha_);
     a2 = a1;
     ar_(n,2) = fid .* (pi-a2) - alpha_;
-    vp(n,1) = fun_vel(xr(n),zr(n));
+    vp(n,1) = fun_vel(xr(n),zr(n), c,iblk,layer);
     vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
     vr(n,1) = vp(n,1);
     if iwave==-1, vr(n,1)=vs(n,1); end

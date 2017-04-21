@@ -1,10 +1,10 @@
 % rngkta.f
-% [y,~,~,~]
+% [y, btan,c,factan,iblk,layer,mtan]
 % called by: fun_trace;
 % call: derivs:
 	% from fun_trace: fun_odezfi
 
-function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
+function [y, btan,c,factan,iblk,layer,mtan] = fun_rkdumb(y,x1,x2,derivs, btan,c,factan,iblk,layer,mtan)
 % routine to solve a 2x2 system of first order o.d.e.'s
 % using a 4th-order runge-kutta method without error control
 % derivs 是一个函数参数
@@ -18,7 +18,7 @@ function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
 	h = x2 - x1;
 	if x+h == x, return; end
 
-	[x,y,dydx] = derivs(x,y,dydx);
+	[dydx, btan,c,factan,iblk,layer,mtan] = derivs(x,y, btan,c,factan,iblk,layer,mtan);
 
 	hh = h .* 0.5;
 	h6 = h ./ 6.0;
@@ -28,20 +28,20 @@ function [y,x1,x2,derivs] = fun_rkdumb(y,x1,x2,derivs)
 		yt(ii) = y(ii) + hh .* dydx(ii);
 	end % 11
 
-	[xh,yt,dyt] = derivs(xh,yt,dyt);
+	[dyt, btan,c,factan,iblk,layer,mtan] = derivs(xh,yt, btan,c,factan,iblk,layer,mtan);
 
 	for ii = 1:2 % 12
 		yt(ii) = y(ii) + hh .* dyt(ii);
 	end % 12
 
-	[xh,yt,dym] = derivs(xh,yt,dym);
+	[dym, btan,c,factan,iblk,layer,mtan] = derivs(xh,yt, btan,c,factan,iblk,layer,mtan);
 
 	for ii = 1:2 % 13
 		yt(ii) = y(ii) + h .* dym(ii);
 		dym(ii) = dyt(ii) + dym(ii);
 	end % 13
 
-	[~,yt,dyt] = derivs(x+h,yt,dyt);
+	[dyt, btan,c,factan,iblk,layer,mtan] = derivs(x+h,yt, btan,c,factan,iblk,layer,mtan);
 
 	for ii = 1:2 % 14
 		y(ii) = y(ii) + h6 .* (dydx(ii)+dyt(ii)+2.0.*dym(ii));

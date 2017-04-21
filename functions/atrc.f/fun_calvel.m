@@ -7,11 +7,13 @@ function [xshot,zshot,lsls,ibs,l,vshot,vtop,vbotom] = fun_calvel(xshot,zshot,lsl
 
     global iblk iwave iccbnd icbnd layer nblk vm vsvp xbnd;
 
+    global c iblk layer; % for fun_vel
+
     layer = lsls;
     iblk = ibs;
     iwave = 1;
     iccbnd = 1;
-    vshot = fun_vel(xshot,zshot);
+    vshot = fun_vel(xshot,zshot, c,iblk,layer);
     % 如果射线以 S 波从炮点发出
     if icbnd(1) == 0
         % 由 S 波波速求 P 波波速

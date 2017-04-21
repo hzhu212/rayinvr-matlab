@@ -3,7 +3,16 @@
 % called by: fun_trace;
 % call: fun_adhoc; fun_corner; fun_block; fun_bndprt; fun_frefl; fun_vel; done.
 
-function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout] = fun_adjpt(n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout)
+function [ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,iccbnd,...
+		idray,istop,ibsmth,icbnd,iheadf,idifff,ihdw,layer,nbnd,nptbnd,npskp,...
+		n2,n3,nblk,nstepr,nccbnd,nbnda,nlayer,piray,pi2,pit2,ray,refll,s,vm,...
+		vr,vp,vs,vsvp,xmin,xr,xsinc,zr,...
+		n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout] = fun_adjpt(...
+		ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,iccbnd,...
+		idray,istop,ibsmth,icbnd,iheadf,idifff,ihdw,layer,nbnd,nptbnd,npskp,...
+		n2,n3,nblk,nstepr,nccbnd,nbnda,nlayer,piray,pi2,pit2,ray,refll,s,vm,...
+		vr,vp,vs,vsvp,xmin,xr,xsinc,zr, ...
+		n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout)
 % ray has intersected a model boundary so must determine correct
 % (x,z) coordinates and angle at boundary
 
@@ -13,10 +22,10 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	% run(file_rayinvr_com);
 
 	global fID_11 fID_32;
-	global ar_ b c crit cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
-		idray istop ibsmth icbnd iheadf idifff ihdw layer nbnd nptbnd npskp ...
-		n2 n3 nblk nstepr nccbnd nbnda nlayer piray pi2 pit2 ray refll s vm ...
-		vr vp vs vsvp xmin xr xsinc zr;
+	% global ar_ b c crit cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
+	% 	idray istop ibsmth icbnd iheadf idifff ihdw layer nbnd nptbnd npskp ...
+	% 	n2 n3 nblk nstepr nccbnd nbnda nlayer piray pi2 pit2 ray refll s vm ...
+	% 	vr vp vs vsvp xmin xr xsinc zr;
 
 	% real lef
 	% integer icasec(5)
@@ -203,7 +212,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	end
 	xr(n) = xn;
 	zr(n) = zn;
-	vp(n,1) = fun_vel(xn,zn);
+	vp(n,1) = fun_vel(xn,zn, c,iblk,layer);
 	vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
 	if iwave == 1
 	    vr(n,1) = vp(n,1);
@@ -261,7 +270,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
             iwave = -iwave;
             iccbnd = iccbnd + 1;
     	end
-    	vi = fun_vel(xr(n),zr(n));
+    	vi = fun_vel(xr(n),zr(n), c,iblk,layer);
     	if iwave == -1
     	    vi = vi .* vsvp(layer,iblk);
     	end
@@ -461,7 +470,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
 	        iwave = -iwave;
 	        iccbnd = iccbnd + 1;
     	end
-    	vi = fun_vel(xr(n),zr(n));
+    	vi = fun_vel(xr(n),zr(n), c,iblk,layer);
     	if iwave == -1
     	    vi = vi .* vsvp(layer,iblk);
     	end
@@ -719,7 +728,7 @@ function [n,top,bot,lef,rig,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,z
         return;
     end
 	iblk = iblk + ja;
-	vp(n,2) = fun_vel(xn,zn);
+	vp(n,2) = fun_vel(xn,zn, c,iblk,layer);
 	vs(n,2) = vp(n,2) .* vsvp(layer,iblk);
 	if iwave == 1
 	    vr(n,2) = vp(n,2);

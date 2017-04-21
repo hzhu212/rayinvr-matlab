@@ -53,7 +53,7 @@ function [modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax] = fun_modwr(modout,dx,dz,mod
 			[layer,iblk,iflag] = fun_xzpt(xmod,zmod);
 
 			if iflag == 0
-				vzgrid(jj) = fun_vel(xmod,zmod);
+				vzgrid(jj) = fun_vel(xmod,zmod, c,iblk,layer);
 			else
 				vzgrid(jj) = 9.999;
 			end

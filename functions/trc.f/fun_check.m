@@ -3,7 +3,7 @@
 % called by: fun_trace;
 % call: none.
 
-function [iflag,x,z] = fun_check(iflag,x,z)
+function [iflag,x,z] = fun_check(iflag,x,z, b,iblk,id,layer,s,xbnd)
 % check that the new ray point will still be inside the current
 % trapezoid; if not, adjust the step length so it falls 1 meter
 % outside the trapezoid
@@ -12,7 +12,7 @@ function [iflag,x,z] = fun_check(iflag,x,z)
     % run(file_rayinvr_par);
     % run(file_rayinvr_com);
 
-    global b iblk id layer s xbnd;
+    % global b iblk id layer s xbnd;
 
     if iflag == 0
         if x < xbnd(layer,iblk,1), x = xbnd(layer,iblk,1) - 0.001; end

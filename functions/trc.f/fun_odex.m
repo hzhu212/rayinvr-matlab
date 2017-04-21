@@ -35,7 +35,7 @@ function [x,y,f] = fun_odex(x,y,f)
     if ~ok
         if isrkc==1 & idump==1
             % 5
-            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. x  ***\n|del(v)| = %12.5f\n',fun_vel(x,y(1)).*(vxv.^2+vzv.^2).^0.5);
+            fprintf(fID_12,'***  possible inaccuracies in rngkta w.r.t. x  ***\n|del(v)| = %12.5f\n',fun_vel(x,y(1), c,iblk,layer).*(vxv.^2+vzv.^2).^0.5);
         end
         irkc = 1;
         isrkc = 0;

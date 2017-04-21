@@ -20,6 +20,8 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		nhskip nbnda nblk pi2 pi18 ppray piray ray s tdhw vr vp vs vsvp ...
 		vm xr xsinc xbnd xmin zr;
 
+	global c iblk layer; % for fun_vel
+
 	dhw = 0.0;
 
 	% 10 % -------------------- cycle10 begin
@@ -57,7 +59,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        ihdw = 0;
 	        tdhw = tdhw + hws;
 	        if dhw == 0.0
-	            vh = fun_vel(xr(n),zr(n));
+	            vh = fun_vel(xr(n),zr(n), c,iblk,layer);
 	            if iwave==-1, vh=vh.*vsvp(layer,iblk); end
 	        end
 
@@ -79,7 +81,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        % 40
 	        layer = l1;
 	        iblk = ib;
-	        vp(n,2) = fun_vel(xr(n),zr(n));
+	        vp(n,2) = fun_vel(xr(n),zr(n), c,iblk,layer);
 	        vs(n,2) = vp(n,2) .* vsvp(layer,iblk);
 	        nccbnd = nccbnd + 1;
 	        if icbnd(iccbnd) == nccbnd
@@ -235,7 +237,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 					ihdwf = 0;
 					return;
 		        end
-		        vp(n,1) = fun_vel(xr(n),zr(n));
+		        vp(n,1) = fun_vel(xr(n),zr(n), c,iblk,layer);
 		        vs(n,1) = vp(n,1) .* vsvp(layer,iblk);
 		        if iwave == 1
 		            vr(n,1) = vp(n,1);

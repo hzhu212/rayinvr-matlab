@@ -1,9 +1,10 @@
 % rngkta.f
-% [~,~,f]
+% old: [~,~,f] + fun_odexfi(x,y,f)
+% [f, bcotan,c,factan,iblk,layer,mcotan]
 % called by: fun_trace;
 % call: none.
 
-function [x,y,f] = fun_odexfi(x,y,f)
+function [f, bcotan,c,factan,iblk,layer,mcotan] = fun_odexfi(x,y, bcotan,c,factan,iblk,layer,mcotan)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with x as independent variable
 
@@ -12,7 +13,7 @@ function [x,y,f] = fun_odexfi(x,y,f)
     % real y(2),f(2)
     % run(file_rayinvr_com);
 
-    global bcotan c factan iblk layer mcotan;
+    % global bcotan c factan iblk layer mcotan;
 
     sa = 1.0 .* sign(y(2));
     n1 = fix(sa.*y(2).*factan) + 1;

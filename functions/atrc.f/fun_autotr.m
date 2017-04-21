@@ -15,6 +15,8 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     global ar_ fid fid1 ircbnd iwave iccbnd icbnd id iblk idray ifcbnd ...
         idump layer nptbnd nbnd npskp npskip nccbnd pi18 ray vp vr vs vsvp xr zr;
 
+    global c iblk layer; % for fun_vel
+
     ircbnd = 1;
     iccbnd = 1;
     iwave = 1;
@@ -41,7 +43,7 @@ function [ang,layer1,iblk1,xshot,zshot,ifam,iturn,npt,iflag2,irays,nskip,idot,id
     vr(1,1) = 0.0;
     vp(1,1) = 0.0;
     vs(1,1) = 0.0;
-    vp(1,2) = fun_vel(xshot,zshot);
+    vp(1,2) = fun_vel(xshot,zshot, c,iblk,layer);
     vs(1,2) = vp(1,2) .* vsvp(layer1,iblk1);
     if iwave == 1
         vr(1,2) = vp(1,2);

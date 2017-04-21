@@ -18,6 +18,14 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
         id ifast isrkc icasel ihdw layer ntray ntpts n2 n3 nptbnd pi2 pi4 pi18 ...
         ppray pi34 ray s smax tol vr vp vs vsvp xr xbnd zr;
 
+    global bcotan c factan iblk layer mcotan; % for fun_rkdumb -> fun_odexfi
+    global btan c factan iblk layer mtan; % for fun_rkdumb -> fun_odezfi
+    global ar_ b c crit cosmth dstepf fid fid1 iblk id ivg iwave icasel ircbnd iccbnd ...
+      idray istop ibsmth icbnd iheadf idifff ihdw layer nbnd nptbnd npskp ...
+      n2 n3 nblk nstepr nccbnd nbnda nlayer piray pi2 pit2 ray refll s vm ...
+      vr vp vs vsvp xmin xr xsinc zr; % for fun_adjpt
+    global c iblk layer smax smin step_; % for fun_dstep
+
     % external odex,odez,odexfi,odezfi
     % real y(2),f(2),w1(2),w2(2),w3(2),left
 
@@ -29,7 +37,7 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
     n2 = 0; n3 = 0;
     iflag = 0;
     if ivg(layer,iblk) > 0
-        hn = fun_dstep(xr(npt),zr(npt)) ./ hdenom;
+        hn = fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ hdenom;
     else
         hn = smax ./ hdenom;
     end
@@ -73,15 +81,15 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
             if ivg(layer,iblk) == 0
                 [x,y,~,~] = fun_strait(x,y,npt,0);
             else
-                z = x + fid .* fun_dstep(xr(npt),zr(npt)) ./ dstepf;
-                [~,z,zr(npt)] = fun_check(0,z,zr(npt));
+                z = x + fid .* fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
+                [~,z,zr(npt)] = fun_check(0,z,zr(npt), b,iblk,id,layer,s,xbnd);
 
                 if ifast == 0
                     odex = @ fun_odex;
                     [x,~,y,f,hn,~,~,~,w1,w2,w3] = fun_rngkta(x,z,y,f,hn,hminn,tol,odex,w1,w2,w3);
                 else
                     odexfi = @ fun_odexfi;
-                    [y,~,~,~] = fun_rkdumb(y,x,z,odexfi);
+                    [y, bcotan,c,factan,iblk,layer,mcotan] = fun_rkdumb(y,x,z,odexfi, bcotan,c,factan,iblk,layer,mcotan);
                     x = z;
                 end
             end
@@ -104,19 +112,19 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
                 [x,y,~,~] = fun_strait(x,y,npt,1);
             else
                 if (fid.*ar_(npt,2)) <= pi2
-                    z = x + fun_dstep(xr(npt),zr(npt)) ./ dstepf;
+                    z = x + fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
                 else
-                    z = x - fun_dstep(xr(npt),zr(npt)) ./ dstepf;
+                    z = x - fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
                 end
 
-                [~,xr(npt),z] = fun_check(1,xr(npt),z);
+                [~,xr(npt),z] = fun_check(1,xr(npt),z, b,iblk,id,layer,s,xbnd);
 
                 if ifast == 0
                     odez = @ fun_odez;
                     [x,~,y,f,hn,~,~,~,w1,w2,w3] = fun_rngkta(x,z,y,f,hn,hminn,tol,odez,w1,w2,w3);
                 else
                     odezfi = @ fun_odezfi;
-                    [y,~,~,~] = fun_rkdumb(y,x,z,odezfi);
+                    [y, btan,c,factan,iblk,layer,mtan] = fun_rkdumb(y,x,z,odezfi, btan,c,factan,iblk,layer,mtan);
                     x = z;
                 end
             end
@@ -131,7 +139,7 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
 
         ar_(npt,1) = y(2);
         ar_(npt,2) = y(2);
-        vp(npt,1) = fun_vel(xr(npt),zr(npt));
+        vp(npt,1) = fun_vel(xr(npt),zr(npt), c,iblk,layer);
         vs(npt,1) = vp(npt,1) .* vsvp(layer,iblk);
         if iwave == 1
             vr(npt,1) = vp(npt,1);
@@ -165,8 +173,18 @@ function [npt,ifam,ir,iturn,invr,xsmax,iflag,idl,idr,iray,ii2pt,i1ray,modout] = 
             continue; % go to 1000
         else
             nptin = npt;
-            [npt,top,bottom,~,~,~,~,~,lstart,istart,~,iflag,~,~,~,~,~,~,~] ...
-            = fun_adjpt(npt,top,bottom,left,right,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout);
+            [ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,iccbnd,...
+                idray,istop,ibsmth,icbnd,iheadf,idifff,ihdw,layer,nbnd,nptbnd,npskp,...
+                n2,n3,nblk,nstepr,nccbnd,nbnda,nlayer,piray,pi2,pit2,ray,refll,s,vm,...
+                vr,vp,vs,vsvp,xmin,xr,xsinc,zr, ...
+            npt,top,bottom,~,~,~,~,~,lstart,istart,~,iflag,~,~,~,~,~,~,~] ...
+            = fun_adjpt(ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,iccbnd,...
+                idray,istop,ibsmth,icbnd,iheadf,idifff,ihdw,layer,nbnd,nptbnd,npskp,...
+                n2,n3,nblk,nstepr,nccbnd,nbnda,nlayer,piray,pi2,pit2,ray,refll,s,vm,...
+                vr,vp,vs,vsvp,xmin,xr,xsinc,zr, ...
+            npt,top,bottom,left,right,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout);
+            % [npt,top,bottom,~,~,~,~,~,lstart,istart,~,iflag,~,~,~,~,~,~,~] ...
+            % = fun_adjpt(npt,top,bottom,left,right,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout);
 
             if ir~=0 && invr==1 && nptin==npt
                 [~,~,~] = fun_velprt(lstart,istart,npt);
