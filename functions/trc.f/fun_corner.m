@@ -1,9 +1,9 @@
 % trc.f
-% [~,~,~,~,~,~,~,~,~,~,xn,zn,an,icase]
+% [xn,zn,an,icase]
 % called by: fun_adjpt;
 % call: none.
 
-function [x,z,x1,z1,a1,i1,x2,z2,a2,i2,xn,zn,an,icase] = fun_corner(x,z,x1,z1,a1,i1,x2,z2,a2,i2,xn,zn,an,icase)
+function [xn,zn,an,icase] = fun_corner(x,z,x1,z1,a1,i1,x2,z2,a2,i2)
 % determine which point (x1,z1) or (x2,z2) is nearest to (x,z)
 % and assign new point (xn,zn) accordingly as well as an and icase
 

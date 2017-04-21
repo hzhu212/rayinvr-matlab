@@ -9,12 +9,12 @@
 % fun_aldone; fun_pltmod; fun_plttx; fun_pltray; fun_empty; fun_plotnd;
 
 function main(pathIn, pathOut)
-	% main function for rayinvr
-	%
-	% <strong>main(pathIn, pathOut)</strong>
-	%
-	% pathIn: path of input files. You should put all of your ".in" files in this path. Default: 'data\examples\e1'.
-	% pathOut: path of output files. Default: pathIn/'output'.
+% main function for rayinvr
+%
+% <strong>main(pathIn, pathOut)</strong>
+%
+% pathIn: path of input files. You should put all of your ".in" files in this path. Default: 'data\examples\e1'.
+% pathOut: path of output files. Default: pathIn/'output'.
 
 	if nargin < 2
 		if nargin < 1
@@ -22,12 +22,12 @@ function main(pathIn, pathOut)
 		end
 
 		if ~exist(pathIn, 'dir')
-		    error('e:IOError','Input path: "%s" not exist',pathIn);
+			error('e:IOError','Input path: "%s" not exist',pathIn);
 		end
 
 		pathOut = fullfile(pathIn,'output');
 		if ~exist(pathOut,'dir')
-		    mkdir(pathOut);
+			mkdir(pathOut);
 		end
 	end
 
@@ -86,9 +86,9 @@ function main(pathIn, pathOut)
 	file_rin_m = fun_trans_rin2m(file_rin);
 	run(file_rin_m);
 
-    % matlab colors，设定当前颜色为默认色（前景色）
-    matlabColors = 'krgbcmyy';
-    currentColor = matlabColors(ifcol);
+	% matlab colors，设定当前颜色为默认色（前景色）
+	matlabColors = 'krgbcmyy';
+	currentColor = matlabColors(ifcol);
 
 	% 2 main
 	% 如果未指定 xmax，则程序结束
@@ -116,16 +116,16 @@ function main(pathIn, pathOut)
 
 		% 调整数组形式，与fortran代码中对应的数组一致
 		if t_xlen == 2
-		    t_thisLayer.bd = t_thisLayer.bd(:,2);
-		    t_xlen = 1;
+			t_thisLayer.bd = t_thisLayer.bd(:,2);
+			t_xlen = 1;
 		end
 		if t_tvlen == 2
-		    t_thisLayer.tv = t_thisLayer.tv(:,2);
-		    t_tvlen = 1;
+			t_thisLayer.tv = t_thisLayer.tv(:,2);
+			t_tvlen = 1;
 		end
 		if t_bvlen == 2
-		    t_thisLayer.bv = t_thisLayer.bv(:,2);
-		    t_bvlen = 1;
+			t_thisLayer.bv = t_thisLayer.bv(:,2);
+			t_bvlen = 1;
 		end
 
 		xm(ii,1:t_xlen) = t_thisLayer.bd(1,:);
@@ -967,7 +967,7 @@ function main(pathIn, pathOut)
 						nrg = nrg + 1;
 						nhskip = 0;
 
-						[npt,~,~,~,~,~,iflag,~,~,~,~,i1ray,~] = fun_trace(npt,ifam,irs,iturnt,invr,xsmax,iflag,idl,idt,iray,ii2pt,i1ray,modout);
+						[npt,iflag,i1ray] = fun_trace(npt,ifam,irs,iturnt,invr,xsmax,idl,idt,iray,ii2pt,i1ray,modout);
 						if ~exist('uf','var'), uf = []; end
 						if ~exist('irayf','var'), irayf = []; end
 						[~,~,~,~,~,~,itt,~,~,~,~] = fun_ttime(ishotw(is),xshotr,npt,irs,angled,ifam,itt,iszero,iflag,uf,irayf);
@@ -1104,7 +1104,7 @@ function main(pathIn, pathOut)
 	end
 
 	if abs(modout) ~= 0
-		[~,~,~,~,~,frz,~,~]= fun_modwr(modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax);
+		[frz]= fun_modwr(modout,dxmod,dzmod,modi,ifrbnd,frz,xmmin,xmmax);
 	end
 
 	if ifd > 0

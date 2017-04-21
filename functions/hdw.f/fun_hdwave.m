@@ -1,18 +1,14 @@
 % hdw.f
-% [~,~,n,~,~,iflag,i1ray,~]
+% old: [~,~,n,~,~,iflag,i1ray,~] = fun_hdwave(ifam,ir,n,invr,xsmax,iflag,i1ray,modout)
+% [n,iflag,i1ray]
 % called by: fun_trace;
 % call: fun_block; fun_velprt; fun_bndprt; fun_vel; done.
 
-function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,xsmax,iflag,i1ray,modout)
+function [n,iflag,i1ray] = fun_hdwave(ifam,ir,n,invr,xsmax,iflag,i1ray,modout)
 % ray now travels along a layer boundary as a head wave.
 % do not need to use runge kutta routine. after ray has
 % traveled a distance hws further than previous ray, it
 % is directed upward into the model.
-
-	% global file_rayinvr_par file_rayinvr_com;
-	% global fID_11 fID_12;
-	% run(file_rayinvr_par);
-	% run(file_rayinvr_com);
 
 	global fID_11 fID_12;
 	global ar_ b cosmth dhw fid hws iblk ihdwf ivg iwave id idray iccbnd ...
@@ -28,7 +24,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	cycle10 = true;
 	while cycle10
 		l1 = layer + 1;
-		[ib] = fun_block(xr(n),l1);
+		[ib] = fun_block(xr(n),l1 ,nblk,xbnd);
 		if ivg(l1,ib)~=-1, break; end % go to 20
 		layer = layer + 1;
 		if layer == nlayer
@@ -67,7 +63,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 	        cycle30 = true;
 	        while cycle30
 		        l1 = layer - 1;
-		        [ib] = fun_block(xr(n),l1);
+		        [ib] = fun_block(xr(n),l1 ,nblk,xbnd);
 		        if ivg(l1,ib)~=-1, break; end % go to 40
 	            layer = layer - 1;
 	            if layer == 1
@@ -193,7 +189,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 						[vr,~,iflag,ihdwf] = fun_goto999(vr,n,iflag,ihdwf);
 		    	    	return; % go to 999
 	    	    	end
-		    	    [ib] = fun_block(xr(n)+fid.*0.001,l1);
+		    	    [ib] = fun_block(xr(n)+fid.*0.001,l1 ,nblk,xbnd);
 		    	    layer = l1;
 		    	    iblk = ib;
 		    	    continue; % go to 50
@@ -210,7 +206,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        alpha_ = atan(s(layer,iblk,1));
 		        ar_(n,2) = fid .* pi2 - alpha_;
 		        if invr == 1 & ir > 0
-		            [~,~,~] = fun_velprt(layer,iblk,n);
+		            fun_velprt(layer,iblk,n);
 		        end
 
 		        if idump == 1
@@ -250,7 +246,7 @@ function [ifam,ir,n,invr,xsmax,iflag,i1ray,modout] = fun_hdwave(ifam,ir,n,invr,x
 		        vr(n,2) = vr(n,1);
 		        ar_(n,2) = ar_(n,1);
 		        if invr == 1 & ir > 0
-		            [~,~,~] = fun_velprt(layer,iblk,n);
+		            fun_velprt(layer,iblk,n);
 		        end
 		        dhw = dhw + hws;
 		        isGoto1000 = true; break; % go to 1000 step1

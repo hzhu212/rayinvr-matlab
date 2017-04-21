@@ -3,11 +3,11 @@
 % called by: fun_adjpt; fun_auto; fun_hdwave;
 % call: none;
 
-function [iblk1] = fun_block(x,layer1)
+function [iblk1] = fun_block(x,layer1 ,nblk,xbnd)
 % determine block of point x in layer
 % 给定层号和 x 坐标，返回 block 编号
 
-    global nblk xbnd;
+    % global nblk xbnd;
 
     for ii = 1:nblk(layer1) % 10
         if x >= xbnd(layer1,ii,1) && x <= xbnd(layer1,ii,2)
