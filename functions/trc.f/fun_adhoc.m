@@ -58,5 +58,5 @@ function [x,z,a] = fun_adhoc(x1,z1,a1,x2,z2,a2,mb,bb,it)
 			a = (d1.*a2 + d2.*a1) ./ (d1+d2);
 		end
 	end
-	return;
+
 end % fun_adhoc end

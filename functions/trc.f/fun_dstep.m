@@ -25,5 +25,5 @@ function [dstep] = fun_dstep(x,z, c,iblk,layer,smax,smin,step_)
 	if dstep > smax
 	    dstep = smax;
 	end
-    return;
+
 end % fun_dstep end

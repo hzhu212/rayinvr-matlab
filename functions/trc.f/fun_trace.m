@@ -75,7 +75,7 @@ function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray
 				[x,y] = fun_strait(x,y,npt,0, ar_,dstepf,fid,pi2,smax,xr,zr);
 			else
 				z = x + fid .* fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
-				[~,z,zr(npt)] = fun_check(0,z,zr(npt), b,iblk,id,layer,s,xbnd);
+				[z,zr(npt)] = fun_check(0,z,zr(npt), b,iblk,id,layer,s,xbnd);
 
 				if ifast == 0
 					odex = @ fun_odex;
@@ -110,7 +110,7 @@ function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray
 					z = x - fun_dstep(xr(npt),zr(npt), c,iblk,layer,smax,smin,step_) ./ dstepf;
 				end
 
-				[~,xr(npt),z] = fun_check(1,xr(npt),z, b,iblk,id,layer,s,xbnd);
+				[xr(npt),z] = fun_check(1,xr(npt),z, b,iblk,id,layer,s,xbnd);
 
 				if ifast == 0
 					odez = @ fun_odez;
@@ -175,6 +175,7 @@ function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray
 				idray,istop,ibsmth,icbnd,iheadf,idifff,ihdw,layer,nbnd,nptbnd,npskp,...
 				n2,n3,nblk,nstepr,nccbnd,nbnda,nlayer,piray,pi2,pit2,ray,refll,s,vm,...
 				vr,vp,vs,vsvp,xmin,xr,xsinc,zr, ...
+				xbnd, ...
 			npt,top,bottom,left,right,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout);
 			% [npt,top,bottom,~,~,~,~,~,lstart,istart,~,iflag,~,~,~,~,~,~,~] ...
 			% = fun_adjpt(npt,top,bottom,left,right,ifam,ir,iturn,lstart,istart,invr,iflag,idl,idr,xfr,zfr,ifrpt,iflagf,modout);

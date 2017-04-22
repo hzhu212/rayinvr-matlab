@@ -24,7 +24,7 @@ function [layers,iblks,iflag] = fun_xzpt(xpt,zpt, b,nblk,nlayer,s,xbnd)
             if xpt + 0.001 < left, break; end
 
             % 如果 x 坐标大于当前 block 右边界，则进入下一个 block
-            if xpt > right + 0.001, continue; end
+            if xpt - 0.001 > right, continue; end
 
             top = s(ii,jj,1) .* xpt + b(ii,jj,1);
             bottom = s(ii,jj,2) .* xpt + b(ii,jj,2);
@@ -40,5 +40,5 @@ function [layers,iblks,iflag] = fun_xzpt(xpt,zpt, b,nblk,nlayer,s,xbnd)
         end
     end
     iflag = 1;
-    return;
+
 end

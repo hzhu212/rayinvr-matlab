@@ -8,14 +8,10 @@ function [f] = fun_odezfi(x,y, btan,c,factan,iblk,layer,mtan)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with z as independent variable
 
-	% global file_rayinvr_par file_rayinvr_com;
-	% run(file_rayinvr_par);
-	% run(file_rayinvr_com);
-
 	% global btan c factan iblk layer mtan;
 
 	% real y(2),f(2)
-	f = zeros(1,2);
+	% f = zeros(1,2);
 
 	sa = 1.0 .* sign(y(2));
 	n1 = fix(sa.*y(2).*factan) + 1; % int -> fix

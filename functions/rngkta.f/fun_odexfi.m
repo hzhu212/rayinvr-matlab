@@ -8,11 +8,6 @@ function [f] = fun_odexfi(x,y, bcotan,c,factan,iblk,layer,mcotan)
 % pair of first order o.d.e.'s solved by runge kutta method
 % with x as independent variable
 
-	% global file_rayinvr_par file_rayinvr_com;
-	% run(file_rayinvr_par);
-	% real y(2),f(2)
-	% run(file_rayinvr_com);
-
 	% global bcotan c factan iblk layer mcotan;
 
 	sa = 1.0 .* sign(y(2));
@@ -23,5 +18,5 @@ function [f] = fun_odexfi(x,y, bcotan,c,factan,iblk,layer,mcotan)
 	vxv = (x.*(c(layer,iblk,8)+c(layer,iblk,9).*x)+c(layer,iblk,10).*y(1)+c(layer,iblk,11)) ./ (term2.*(c(layer,iblk,6).*x+c(layer,iblk,7)));
 	vzv = term1 ./ term2;
 	f(2) = vzv - vxv .* f(1);
-	return;
+
 end
