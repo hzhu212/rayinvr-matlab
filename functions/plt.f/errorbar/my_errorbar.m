@@ -52,7 +52,11 @@ function h = Lerrorbarv6(cax, varargin)
 % Parse possible Axes input
 args = varargin;
 nargs = length(args);
-error(nargchk(2,6,nargs,'struct'));
+try
+	narginchk(2,6);
+catch e
+	error(nargchk(2,6,nargs,'struct'));
+end
 
 x = args{1};
 y = args{2};
