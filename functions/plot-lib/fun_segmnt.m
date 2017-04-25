@@ -13,7 +13,7 @@ function fun_segmnt(iflag)
 
 	if iflag == 1
 		hAxes1 = findall(hFigure1,'type','axes');
-		hAxes2 = findall(hFigure1,'type','axes');
+		hAxes2 = findall(hFigure2,'type','axes');
 		cla(hAxes1,'reset');
 		cla(hAxes2,'reset');
 	end

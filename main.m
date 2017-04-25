@@ -4,10 +4,10 @@
 % rayinvr_par.m, rayinvr_com.m, main_par.m, blkdat.m, input/r.in, -old/*.*
 
 % call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
-% fun_ttime; fun_cells; fun_fxtinv; fun_sort3; fun_calprt; fun_fd;
+% fun_ttime; fun_cells; fun_fxtinv; fun_calprt; fun_fd;
 % fun_load_vin; fun_trans_rin2m; fun_load_txin; fun_load_fin;
 
-% fun_aldone; fun_pltmod; fun_plttx; fun_pltray; fun_empty; fun_plotnd;
+% fun_aldone; fun_empty; fun_plotnd;
 
 function main(pathIn, pathOut)
 % main function for rayinvr
@@ -399,7 +399,6 @@ function main(pathIn, pathOut)
 	% 绘制模型
 	if (imod == 1 || iray > 0 || irays == 1) && isep < 2
 		fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
-		% fun_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
 	end
 
 	% calculation of smooth layer boundaries
@@ -844,6 +843,9 @@ function main(pathIn, pathOut)
 					ni2pt = 0; ii2pt = 0;
 				end
 
+				if iflagp == 1
+				    figure(hFigure1);
+				end
 
 				% 91 % -------------------- cycle91 begin
 				cycle91 = true;
@@ -985,7 +987,6 @@ function main(pathIn, pathOut)
 
 						if ((iray==1 || (iray==2 && vr(npt,2)>0.0)) && mod(ir-1,nrskip)==0 && irs>0) || (irays==1 && irs==0)
 							fun_my_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
-							% [~,~,~,~,istep,~] = fun_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
 							if i33 == 1
 								if iszero == 1, xwr=abs(xshtar(ntt-1)-xobs);
 								else xwr = xobs; end
@@ -1016,8 +1017,6 @@ function main(pathIn, pathOut)
 					if ii2pt > 0
 						nc2pt = ic2pt;
 						if ni2pt > 1
-							% replace fun_sort3 with matlab built-in function 'sort'
-							% [ta2pt,ipos,~] = fun_sort3(ta2pt,ipos,nc2pt);
 							[ta2pt,ipos] = sort(ta2pt(1:nc2pt));
 							% 893 cycle
 							ho2pt(1:nc2pt) = ra2pt(1:nc2pt);
@@ -1061,7 +1060,6 @@ function main(pathIn, pathOut)
 		if isGoto1000, break; end % go to 1000 step2
 		if isep==2 && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
 			fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
-			% fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
 		end
 	end % 60
 	% end % -------------------- ~ go to 1000 block end
@@ -1072,7 +1070,6 @@ function main(pathIn, pathOut)
 			fun_aldone();
 		end
 		fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
-		% fun_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
 	end
 
 	if itxout > 0

@@ -51,11 +51,6 @@ function [npt,iflag2] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,iturn,irays
 	ifcbnd = 0;
 	[npt,iflag2,~] = fun_trace(npt,ifam,ir,iturn,invr,0.0,0,idr,0,0,0,0);
 
-	if irays == 1
-		% call pltray(npt,nskip,idot,irayps,istep,ang)
-		% fun_pltray();
-	end
-
 	if idump == 1
 		fprintf(fID_12,'%2d%3d%4d%8.3f%8.3f%8.2f%8.2f%7.2f%7.2f%3d%3d%3d%3d\n',...
 			ifam,ir,npt,xr(npt),zr(npt),ar_(npt,1).*pi18,ar_(npt,2).*pi18,...
