@@ -126,7 +126,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 						for jj = 1:ntlmax % 310
 							tp = jj - tadj;
 							t = [tp, tp];
-							plot(x,t,['--',currentColor]);
+							plot(x,t,'--','Color',currentColor);
 						end % 310
 					end
 
@@ -188,16 +188,16 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 						    thisCode = rayCode(codeBegin);
 						    if itcol == 3
 						        ipcol = colour(mod(thisCode-1,ncol)+1);
-						        currentColor = matlabColors(ipcol);
+						        currentColor = matlabColors{ipcol};
 						    end
-							plot(xplot(codeIndex),tplot(codeIndex),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+							plot(xplot(codeIndex),tplot(codeIndex),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
 						end
 					end
 
 					% 输出到 tx.out 跳过
 
 					if itx >= 3 && itcol == 3
-						currentColor = matlabColors(ifcol);
+						currentColor = matlabColors{ifcol};
 					end
 				end
 			end
@@ -255,7 +255,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 						if itxbox ~= 0
 							index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
 						end
-						plot(x(index),t(index),[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+						plot(x(index),t(index),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
 					end
 
 				% end

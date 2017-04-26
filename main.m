@@ -88,8 +88,9 @@ function main(pathIn, pathOut)
 	run(file_rin_m);
 
 	% matlab colors，设定当前颜色为默认色（前景色）
-	matlabColors = 'krgbcmyy';
-	currentColor = matlabColors(ifcol);
+	% matlabColors = 'krgbcmyy';
+	matlabColors = {'k','r','g','b','c','m',[1,0.65,0],[0.5,0.2,0.9],[0.6,0.8,0.2],[0.4,0.2,0.2],[0.4,0.4,1]};
+	currentColor = matlabColors{ifcol};
 
 	% 2 main
 	% 如果未指定 xmax，则程序结束

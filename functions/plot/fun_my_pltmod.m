@@ -38,13 +38,13 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 	if idash == 1, lineStyle = '--';
 	else lineStyle = '-'; end
 	% 设定颜色，默认为前景色
-	% currentColor = matlabColors(ifcol);
+	% currentColor = matlabColors{ifcol};
 
 	% 绘制模型轮廓
 	if imod == 1
 
 		% 绘制模型层界面（水平方向）
-		currentColor = matlabColors(mcol(1));
+		currentColor = matlabColors{mcol(1)};
 		for ii = 1:ncont
 			nptsc = nzed(ii);
 			if nptsc == 1
@@ -54,10 +54,10 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 				xcp = xm(ii,1:nptsc);
 				zcp = zm(ii,1:nptsc);
 			end
-			plot(xcp,zcp,[lineStyle,currentColor]);
+			plot(xcp,zcp,lineStyle,'Color',currentColor);
 		end
 
-		currentColor = matlabColors(mcol(3));
+		currentColor = matlabColors{mcol(3)};
 
 		% 绘制 floating-reflectors
 		% ifrbnd = 1;
@@ -65,21 +65,21 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 			for ii = 1:nfrefl
 				xcp = xfrefl(ii,1:npfref(ii));
 				zcp = zfrefl(ii,1:npfref(ii));
-				plot(xcp,zcp,[lineStyle,currentColor]);
+				plot(xcp,zcp,lineStyle,'Color',currentColor);
 			end
 		end
 
 		% 绘制模型中每个 block 的竖直边界
 		% ibnd = 1;
 		if ibnd == 1
-			currentColor = matlabColors(mcol(2));
+			currentColor = matlabColors{mcol(2)};
 			for ii = 1:nlayer
 				if nblk(ii) > 1
 					for jj = 1:nblk(ii)
 						coorx = xbnd(ii,jj,2);
 						xcp = [coorx, coorx];
 						zcp = squeeze(s(ii,jj,1:2) .* coorx + b(ii,jj,1:2));
-						plot(xcp,zcp,[lineStyle,currentColor]);
+						plot(xcp,zcp,lineStyle,'Color',currentColor);
 					end
 				end
 			end
@@ -88,19 +88,19 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 		% 绘制 smoothed bounderies
 		% ibsmth = 2;
 		if ibsmth == 2
-			currentColor = matlabColors(mcol(4));
+			currentColor = matlabColors{mcol(4)};
 			xcp = ((1:npbnd) - 1) .* xsinc;
 			for ii = 1:nlayer+1
 				% zcp = cosmth(ii,1:npbnd) - zmax;
 				zcp = cosmth(ii,1:npbnd) - zmin;
-				plot(xcp,zcp,[lineStyle,currentColor]);
+				plot(xcp,zcp,lineStyle,'Color',currentColor);
 			end
 		end
 
 		% 在模型中每个小梯形中写上 P 波和 S 波的速度值
 		% ivel = 1;
 		if ivel ~= 0
-			currentColor = matlabColors(mcol(5));
+			currentColor = matlabColors{mcol(5)};
 			% currentColor = 'r';
 			for ii = 1:nlayer
 				for jj = 1:nblk(ii)
@@ -131,7 +131,7 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 
 	hold off;
 
-	currentColor = matlabColors(ifcol);
+	currentColor = matlabColors{ifcol};
 
 	return;
 end % fun_my_pltmod end

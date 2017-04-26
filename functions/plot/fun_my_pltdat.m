@@ -70,7 +70,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 				else
 					ipcol = colour(mod(ii-1,ncol)+1);
 				end
-				currentColor = matlabColors(ipcol);
+				currentColor = matlabColors{ipcol};
 			end
 
 			if itxbox ~= 0
@@ -86,20 +86,20 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 
 			if idata > 0
 				try
-					hErrorbar = my_errorbar(xplot,tplot,2.*up,[lineStyle,currentColor,lineSymbol]);
+					hErrorbar = my_errorbar(xplot,tplot,2.*up,[lineStyle,lineSymbol],'Color',currentColor);
 				catch e
-					hErrorbar = errorbar(xplot,tplot,2.*up,[lineStyle,currentColor,lineSymbol]);
+					hErrorbar = errorbar(xplot,tplot,2.*up,[lineStyle,lineSymbol],'Color',currentColor);
 				end
 				set(hErrorbar,'MarkerSize',markerSize);
 			else
-				plot(xplot,tplot,[lineStyle,currentColor,lineSymbol],'MarkerSize',markerSize);
+				plot(xplot,tplot,[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
 			end
 		end
 	end
 
 	% 999
 	if itcol ~= 0
-		currentColor = matlabColors(ifcol);
+		currentColor = matlabColors{ifcol};
 	end
 	return;
 
