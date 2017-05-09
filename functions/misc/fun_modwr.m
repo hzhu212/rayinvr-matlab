@@ -132,7 +132,9 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 				fprintf(fID_35, '%10.3f%10.3f%10.3f\n', xgmt(jj),zgmt(jj),vzgrid(jj));
 			end
 			% 26
-			fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
+			if ii <= nz && jj <= nx
+				fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
+			end
 		end % 130
 	end % 10
 
