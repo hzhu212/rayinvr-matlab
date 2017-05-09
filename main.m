@@ -37,7 +37,7 @@ function main(pathIn, pathOut)
 
 	clear('global');
 	global file_rayinvr_par file_rayinvr_com file_main_par;
-	global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35;
+	global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35 fID_63;
 	global file_iout file_nout;
 
 	% 控制绘图颜色
@@ -67,6 +67,8 @@ function main(pathIn, pathOut)
 	file_tout = fullfile(pathOut,'t.out');
 	file_pout = fullfile(pathOut,'p.out');
 	file_vout = fullfile(pathOut,'v.out');
+	file_fort35 = fullfile(pathOut,'fort.35');
+	file_fort63 = fullfile(pathOut,'fort.63');
 
 
 	% 1 variables
@@ -164,7 +166,12 @@ function main(pathIn, pathOut)
 		fID_34 = fopen(file_ra2out,'w');
 		i33 = 1;
 	end
-	if ifd > 0, fID_35 = fopen(file_fdout,'w'); end
+	if ifd > 0
+		fID_35 = fopen(file_fdout,'w');
+	else
+		fID_35 = fopen(file_fort35,'w');
+	end
+	fID_63 = fopen(file_fort63,'w');
 
 	% read in observed data
 

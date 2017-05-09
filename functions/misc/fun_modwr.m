@@ -7,8 +7,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 % output the velocity model on a uniform grid for input to the
 % plotting program MODPLT
 
-	% global fID_31 fID_32 fID_35 fID_63;
-	global fID_31 fID_32 fID_35;
+	global fID_31 fID_32 fID_35 fID_63;
 	global b iblk layer npfref nlayer nfrefl pxgrid player s sample xbnd xfrefl ...
 		zmin zmax zfrefl;
 
@@ -130,10 +129,10 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 		for jj = 1:nx+1 % 130
 			if vzgrid(jj) ~= 9.999
 				% 35
-				% fprintf(fID_35, '%10.3f%10.3f%10.3f\n', xgmt(jj),zgmt(jj),vzgrid(jj));
+				fprintf(fID_35, '%10.3f%10.3f%10.3f\n', xgmt(jj),zgmt(jj),vzgrid(jj));
 			end
 			% 26
-			% fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
+			fprintf(fID_63, '%10.3f%10.3f%10d\n', xgmt(jj),-zgmt(jj),sample(ii,jj));
 		end % 130
 	end % 10
 
