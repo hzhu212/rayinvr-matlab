@@ -26,7 +26,7 @@ if isempty(has_rayinvr_par_init)
     pi4 = pi / 4;
     pi2 = pi / 2;
     pi34 = pi * 3 / 4;
-    pi18 = 57.29577951;
+    pi18 = 180 / pi;
     pit2 = - pi * 2;
 
     player = 42;      % model layers

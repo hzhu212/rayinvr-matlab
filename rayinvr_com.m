@@ -16,7 +16,7 @@ global xm zm vf nzed nvel xvel;  %  blk5
 global xr zr ar_ vr tr vp vs;  %  blk6
 global refll ircbnd;  %  blk7
 global irkc tol hdenom hmin idump isrkc ifast;  %  blk8
-global itx vred time timertimer;  %  blk9
+global itx vred time timer_;  %  blk9
 global step_ smin smax;  %  blk10
 global range_ tt rayid xshtar fidarr idray ntt ray;  %  blk11
 global xmin xmax xtmin xtmax xmm ndecix xscale ntickx xmint xmaxt xtmint ...
@@ -30,7 +30,7 @@ global isrch tang;  %  blk15
 global ntray ntpts;  %  blk16
 global ibsmth nbsmth npbnd cosmth xsinc;  %  blk17
 global nptbnd;  %  blk18
-global ivarz ivarv ivarf ivv izv cz cv partyp nvar parorg;  %  blk19
+global ivarz ivarv ivarf ivv izv cz cv_ partyp nvar parorg;  %  blk19
 global apart fpart tobs uobs tcalc xcalc xscalc ipinv ivray narinv icalc ...
        ircalc;  %  blk20
 global ninv xfinv tfinv;  %  blk21
@@ -64,8 +64,8 @@ global ok;
 %     [xtmin,xtmax,xtmint,xtmaxt,ztmin,ztmax,ttmin,ttmax] = deal(-999999.0);
 %     [symht,albht] = deal(0.5,2.5);
 %     [ibsmth,nbsmth,npbnd] = deal(0,10,100);
-%     % cv = zeros(1,picv);
-%     cv = zeros(player,ptrap,4,5);
+%     % cv_ = zeros(1,picv);
+%     cv_ = zeros(player,ptrap,4,5);
 %     [crit,hws] = deal(1.0,-1.0);
 %     [iplot,iplots,orig,sep,iseg,nseg] = deal(1,0,12.5,7.5,0,0);
 %     [xwndow,ywndow] = deal(0.0);
@@ -129,7 +129,7 @@ if isempty(has_rayinvr_com_init)
     xfinv = zeros(1,pnrayf);
     ray = zeros(1,prayf);
     vsvp = zeros(player,ptrap);
-    cv = zeros(player,ptrap,4,5);
+    cv_ = zeros(player,ptrap,4,5);
     tt = zeros(1,pray);
     cz = zeros(player,ptrap,4,2);
     tang = zeros(player,4);
