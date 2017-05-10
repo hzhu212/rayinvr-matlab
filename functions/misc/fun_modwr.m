@@ -24,7 +24,8 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 	nz = round((zmax-zmin)./dz);
 
 	% 15
-	fprintf(fID_31, '%7d%7d%7d%7d%7d%7d%7d%7d%7d%7d\n', nx,nz);
+	% fprintf(fID_31, '%7d%7d%7d%7d%7d%7d%7d%7d%7d%7d\n', nx,nz);
+	fprintf(fID_31, '%7d%7d\n', nx,nz);
 
 	if abs(modout) == 3
 		for jj = 1:nx % 310
