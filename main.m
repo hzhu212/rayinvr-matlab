@@ -110,7 +110,7 @@ function main(pathIn, pathOut)
 
 	% 2.1 读入 v.in
 	% [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
-	[model,LN,xmin,xmax,zmin,zmax,~,~,~,mError] = fun_load_vin(file_vin);
+	[model,LN,xmin,xmax,~,~,~,~,~,mError] = fun_load_vin(file_vin);
 	error(mError);
 	for ii = 1:length(model)
 		t_thisLayer = model(ii);
