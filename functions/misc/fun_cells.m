@@ -22,6 +22,9 @@ function [npt,xmmin,dx,dz] = fun_cells(npt,xmmin,dx,dz)
 			zrp = zr(ii) + (jj-1) .* zinc; % float
 			nx = round((xrp-xmmin)./dx) + 1; % nint -> round
 			nz = round((zrp-zmin)./dz) + 1; % nint -> round
+			if nx <= 0 || nz <= 0
+			    break;
+			end
 			sample(nz,nx) = sample(nz,nx) + 1;
 		end % 20
 	end % 10

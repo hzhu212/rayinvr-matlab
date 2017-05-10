@@ -7,11 +7,6 @@ function [dxz,xmmin,xmmax,ifd] = fun_fd(dxz,xmmin,xmmax,ifd)
 % output the velocity model on a uniform grid for input to the
 % finite difference program FD
 
-	% global file_rayinvr_par file_rayinvr_com;
-	% global fID_35;
-	% run(file_rayinvr_par);
-	% run(file_rayinvr_com);
-
 	global fID_35;
 	global iblk layer pxgrid zmin;
 
