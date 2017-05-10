@@ -125,7 +125,8 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 		end
 
 		% 112 % 25
-		fprintf(fID_31, '%10.3f\n', vzgrid(1:nx+1));
+		fprintf(fID_31, '%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f\n', vzgrid(1:nx+1));
+		fprintf(fID_31, '\n');
 
 		for jj = 1:nx+1 % 130
 			if vzgrid(jj) ~= 9.999
@@ -151,7 +152,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 	end
 
 	% 40 % 15
-	fprintf(fID_31, '%7d%7d%7d%7d%7d%7d%7d%7d%7d%7d\n', nmodi);
+	fprintf(fID_31, '%7d\n', nmodi);
 
 	if nmodi > 0
 		for ii = 1:nmodi % 50
@@ -160,10 +161,10 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 		end % 50
 
 		% 15
-		fprintf(fID_31, '%7d', igrid(1:nmodi));
+		fprintf(fID_31, '%7d%7d%7d%7d%7d%7d%7d%7d%7d%7d\n', igrid(1:nmodi));
 		fprintf(fID_31, '\n');
 		% 25
-		fprintf(fID_31, '%10.3f', xgrid(1:nmodi));
+		fprintf(fID_31, '%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f\n', xgrid(1:nmodi));
 		fprintf(fID_31, '\n');
 
 		for ii = 1:nmodi % 60
@@ -184,7 +185,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 			end % 70
 
 			% 25
-			fprintf(fID_31, '%10.3f', vzgrid(ii:nx+1));
+			fprintf(fID_31, '%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f%10.3f\n', vzgrid(ii:nx+1));
 			fprintf(fID_31, '\n');
 		end % 60
 	end
@@ -199,5 +200,4 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 			% fprintf(fID_32, '\n');
 		end % 90
 	end
-	return;
 end % fun_modwr end
