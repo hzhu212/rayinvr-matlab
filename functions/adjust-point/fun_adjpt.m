@@ -66,66 +66,66 @@ function [ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,ic
 
 	% 为方便快速跳转到1001处，构造一个只执行一次的循环，通过break语句实现与goto类似的效果
 	for cycle1001 = 1:1 % -------------------- cycle1001 begin
-		if zr(n)<=top & xr(n)>lef & xr(n)<=rig
+		if zr(n)<=top && xr(n)>lef && xr(n)<=rig
 		    % ray intersects upper boundary
 		    icase = 1;
 		    [xn,zn,an] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,1),b(layer,iblk,1),0);
 		    break; % go to 1001
 		end
-		if zr(n)<=top & xr(n)>rig
+		if zr(n)<=top && xr(n)>rig
 		    % ray intersects upper right corner
 		    [xt,zt,at] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,1),b(layer,iblk,1),0);
 		    [xri,zri,ari] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,rig,1);
 		    [xn,zn,an,icase] = fun_corner(xr(n-1),zr(n-1),xt,zt,at,1,xri,zri,ari,2);
-		    if icase==2 & iblk<nblk(layer)
+		    if icase==2 && iblk<nblk(layer)
 		        if ivg(layer,iblk+1)==-1, icase=1; end
 		    end
 		    break; % go to 1001
 		end
-		if zr(n)>bot & xr(n)>lef & xr(n)<=rig
+		if zr(n)>bot && xr(n)>lef && xr(n)<=rig
 		    % ray intersects lower boundary
 		    icase = 3;
 		    [xn,zn,an] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,2),b(layer,iblk,2),0);
 		    break; % go to 1001
 		end
-		if zr(n)>bot & xr(n)>rig
+		if zr(n)>bot && xr(n)>rig
 		    % ray intersects lower right corner
 		    [xb,zb,ab] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,2),b(layer,iblk,2),0);
 		    [xri,zri,ari] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,rig,1);
 		    [xn,zn,an,icase] = fun_corner(xr(n-1),zr(n-1),xb,zb,ab,3,xri,zri,ari,2);
-		    if icase==2 & iblk<nblk(layer)
+		    if icase==2 && iblk<nblk(layer)
 		        if ivg(layer,iblk+1)==-1, icase=3; end
 		    end
 		    break; % go to 1001
 		end
-		if xr(n)>rig & zr(n)>top & zr(n)<=bot
+		if xr(n)>rig && zr(n)>top && zr(n)<=bot
 		    % ray intersects right boundary
 		    icase = 2;
 		    [xn,zn,an] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,rig,1);
 		    break; % go to 1001
 		end
-		if zr(n)<=top & xr(n)<=lef
+		if zr(n)<=top && xr(n)<=lef
 		    % ray intersects upper left corner
 		    [xt,zt,at] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,1),b(layer,iblk,1),0);
 		    [xl,zl,al] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,lef,1);
 		    [xn,zn,an,icase] = fun_corner(xr(n-1),zr(n-1),xt,zt,at,1,xl,zl,al,4);
-		    if icase == 4 & iblk > 1
+		    if icase == 4 && iblk > 1
 		        if ivg(layer,iblk-1)==-1, icase=1; end
 		    end
 		    break; % go to 1001
 		end
-		if xr(n)<=lef & zr(n)>top & zr(n)<=bot
+		if xr(n)<=lef && zr(n)>top && zr(n)<=bot
 		    % ray intersects left boundary
 		    icase = 4;
 		    [xn,zn,an] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,lef,1);
 		    break; % go to 1001
 		end
-		if zr(n)>bot & xr(n)<=lef
+		if zr(n)>bot && xr(n)<=lef
 		    % ray intersects lower left corner
 		    [xb,zb,ab] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),s(layer,iblk,2),b(layer,iblk,2),0);
 		    [xl,zl,al] = fun_adhoc(xr(n-1),zr(n-1),ar_(n-1,2),xr(n),zr(n),ar_(n,1),0.0,lef,1);
 		    [xn,zn,an,icase] = fun_corner(xr(n-1),zr(n-1),xb,zb,ab,3,xl,zl,al,4);
-		    if icase == 4 & iblk > 1
+		    if icase == 4 && iblk > 1
 		        if ivg(layer,iblk-1)==-1, icase=3; end
 		    end
 		    break; % go to 1001
@@ -142,7 +142,7 @@ function [ar_,b,c,crit,cosmth,dstepf,fid,fid1,iblk,id,ivg,iwave,icasel,ircbnd,ic
         if dfrefl <= dtrap
             lstart = layer;
             istart = iblk;
-            [~,~,~,~,~,~,~] = fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr);
+            fun_frefl(ir,n,xfr,zfr,ifrpt,modout,invr);
             return;
         end
 	end

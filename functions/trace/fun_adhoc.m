@@ -14,7 +14,7 @@ function [x,z,a] = fun_adhoc(x1,z1,a1,x2,z2,a2,mb,bb,it)
 % incidence (a) at boundary
 
 	% real mb, mr
-	if (x1-x2)==0.0 & (z1-z2)==0.0
+	if (x1-x2)==0.0 && (z1-z2)==0.0
 		x = x1;
 		z = z1;
 		a = (a1+a2) ./ 2.0;

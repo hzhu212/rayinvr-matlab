@@ -156,6 +156,9 @@ if isempty(has_rayinvr_com_init)
     % character
     title_ = '';
 
+    % 其他变量初值
+    ihdw = 0;
+
 end
 
 if isempty(has_rayinvr_com_init)
