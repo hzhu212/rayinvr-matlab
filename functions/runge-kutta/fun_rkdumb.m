@@ -9,6 +9,12 @@ function [y] = fun_rkdumb(y,x1,x2,derivs, btan,c,factan,iblk,layer,mtan)
 % derivs 是一个函数参数
 % 使用 4 阶不带错误控制的 龙格-库塔方法解决 2×2 的一阶常微分方程组
 
+% x1: 当前节点的 x 坐标
+% x2: 下一个节点的 x 坐标(通过当前 x 坐标与步长求得)
+% y(1): 当前节点的 z 坐标
+% y(2): 当前节点的入射角
+% 返回值: y(1),y(2) 分别为下一个节点的 z 坐标和入射角
+
 	% dimension y(2),dydx(2),yt(2),dyt(2),dym(2)
 
 	x = x1;

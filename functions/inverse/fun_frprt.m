@@ -1,14 +1,10 @@
 % inv.f
-% [~,~,~,~,~]
+% []
 % called by: fun_frefl;
 % call: none.
 
-function [vfr,afr,alpha_,npt,ifrpt] = fun_frprt(vfr,afr,alpha_,npt,ifrpt)
+function fun_frprt(vfr,afr,alpha_,npt,ifrpt)
 % calculate partial derivatives for floating reflectors
-
-    % global file_rayinvr_par file_rayinvr_com;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
 
     global fpart ifcbnd ivarf ninv xfrefl xr;
 

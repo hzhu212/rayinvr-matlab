@@ -264,6 +264,11 @@ function main(pathIn, pathOut)
 	[~,~,poisb,poisl,~,invr,iflagm,~,xmin1d,xmax1d,~,~,~] ...
 	= fun_calmod(ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,xminns,xmaxns);
 
+	% 设置模型输出参数 (modout~=0 表示要把模型以及统计信息输出到文件中，如 fort.35, fort.63)
+	% xmmin, xmmax: 要输出的那部分模型的 x 范围
+	% dxmod, dzmod: 把模型均匀地剖分为矩形网格，dxmod, dzmod 分别为网格的宽和高
+	% nx, nz: 横向和纵向上的网格数量
+	% sample(nz,nx): 记录每个小网格中穿过的射线条数
 	if abs(modout) ~= 0 || ifd > 1
 		if xmmin < -999998, xmmin = xmin; end
 		if xmmax < -999998, xmmax = xmax; end
@@ -348,7 +353,7 @@ function main(pathIn, pathOut)
 	% calculate the z coordinate of shot points if not specified by the
 	% user - assumed to be at the top of the first layer
 
-	% 计算炮点的 z 坐标，如果用户事先只设置了 x 坐标但未设置 z 坐标。
+	% 计算炮点的 z 坐标（有时用户只设置了 x 坐标但未设置 z 坐标）
 	% 计算的前提是：假设所有炮点都位于模型的第一层的上表面附近。通过 z = s*x + b 计算。
 	% 计算出的 z 坐标都要加上一个 zshift ，以避免炮点 z 坐标刚好落在层界面上，导致意想不到的错误
 	zshift = abs(zmax-zmin) ./ 10000.0;
@@ -482,6 +487,7 @@ function main(pathIn, pathOut)
 
 	if ximax < 0.0, ximax = (xmax-xmin)./20.0; end
 	ist = 0;
+	% iflagp: i-flag-plot. 1-绘制每个射线组前等待用户输入
 	iflagp = 0;
 
 	% ifast=1: 使用快速计算的 Runge-Kutta 方法。
@@ -516,7 +522,7 @@ function main(pathIn, pathOut)
 	end
 
 	% 对每个"模型炮点"进行循环
-	% 区别于观测炮点，模型炮点是用户构建模型时设定的，一般从 r.in 文件中读入，
+	% 区别于观测炮点，模型炮点是用户构建模型时设定的，一般从 v.in 文件中读入，
 	% 而观测炮点则是 tx.in 文件中实际观测时的炮点信息
 	for is = 1:nshot % 60
 		isGoto1000 = false;
@@ -613,6 +619,7 @@ function main(pathIn, pathOut)
 			% 250 cycle
 			refll(1:prefl+1) = 0;
 			% 251 cycle
+			% icbnd: 记录每个转换界面的状态 (i-射线在第i个界面处发生转换；0-射线以S波形式发射)
 			icbnd(1:pconv+1) = -1;
 			ifam = ifam + 1;
 			% nrayr: 该射线组中待追踪的射线条数
@@ -668,6 +675,7 @@ function main(pathIn, pathOut)
 					% ihdwf: 指示当前 ray group 的类型是否为首波，i-head-wave-flag
 					ihdwf = 1;
 					ihdwm = 1;
+					% hws: head-wave-spacing. 首波沿界面滑行时的发散间隔
 					hws = hwsm;
 					tdhw = 0.0;
 					% nhray: maximum number of rays traced for a head wave ray group (default: pnrayf)
@@ -688,8 +696,11 @@ function main(pathIn, pathOut)
 				end
 				idifff = 0;
 
+				% 每个射线到达类型分配一种颜色
 				if ircol==1, irrcol=colour(mod(ivray(ii)-1,ncol)+1); end
+				% 每个炮点分配一种颜色
 				if ircol==2, irrcol=colour(mod(is-1,ncol)+1); end
+				% 每个射线组分配一种颜色
 				if ircol==3, irrcol=colour(mod(ii-1,ncol)+1); end
 				if ircol< 0, irrcol=-ircol; end
 
@@ -697,7 +708,7 @@ function main(pathIn, pathOut)
 				if nrayr <= 0, break; end % go to 69
 
 				% 进入搜索模式，搜索射线组的发射角
-				% 在 tx.in 中找到当前炮点当前射线组对应的观测炮点观测射线组
+				% 在 tx.in 中找到 当前炮点&当前射线组 所对应的 观测炮点&观测射线组
 				% 找到上述射线组的第一条射线所在的行数 isf，将用于计算发射角
 				if i2pt > 0
 					iflag2 = 0;
@@ -711,11 +722,13 @@ function main(pathIn, pathOut)
 						tf = tpf(isf);
 						uf = upf(isf);
 						irayf = ipf(isf);
-						% ipf 为负，表示 tx.in 结束
+						% irayf 为负，tx.in 结束
 						if irayf < 0, break; end % go to 1200
+						% irayf=0，该行描述一个炮点
 						if irayf == 0
 							xshotf = xf;
 							idf = sign(tf);
+							% 如果该行描述的炮点正是当前炮点
 							if abs(xshotr-xshotf) < 0.001 && idr(is) == idf
 								i2flag = 1;
 								isf = isf + 1;
@@ -724,6 +737,7 @@ function main(pathIn, pathOut)
 								nsfc = nsfc + 1;
 								isf = ilshot(nsfc);
 							end
+						% irayf>0，该行描述一个接收点
 						else
 							if i2flag==1 && ivray(ii)==irayf
 								iflag2 = 1;
@@ -756,7 +770,9 @@ function main(pathIn, pathOut)
 					% 65
 					fprintf(fID_11,'***  shot#%4d ray code%5.1f no rays traced  ***\n',ishotw(is),ray(ii));
 					nrayr = 0;
+					% nrayl: 统计未达到预设计算目标的射线组的个数（例如：预设当前射线组需要计算 nray 条射线，但此处计算了 0 条）
 					nrayl = nrayl + 1;
+					% iflagl=1 表示当前射线组在处理中遇到异常
 					iflagl = 1;
 					break; % go to 69
 				end
@@ -800,9 +816,9 @@ function main(pathIn, pathOut)
 				nc2pt = 0;
 
 				% 如果 搜索模式 且 待追踪射线数大于 1
-				% 找到与当前炮点当前射线组 对应的 所有观测炮点观测射线组的射线
+				% 找到与 当前炮点&射线组 对应的 所有 观测炮点&射线组 的射线
 				% no2pt: 找到的满足上述条件的射线的数目
-				% xo2pt(no2pt): 所有满足条件的射线的 x 坐标
+				% xo2pt(no2pt): 所有满足条件的射线的接收点的 x 坐标
 				% ni2pt: 是否找到了满足条件的射线，0-没找到，1-找到了
 				% ii2pt: 是否进行了上述搜索过程，0-没进行，1-进行了
 				if i2pt > 0 && nrayr > 1
@@ -851,6 +867,7 @@ function main(pathIn, pathOut)
 					ni2pt = 0; ii2pt = 0;
 				end
 
+				% iflagp=1，每绘制一个射线组都要暂停等待用户输入，此时绘图的焦点在 hFigure2 上，需要切换回来
 				if iflagp == 1
 				    figure(hFigure1);
 				end
@@ -872,7 +889,10 @@ function main(pathIn, pathOut)
 						if ir>nrayr && ni2pt<=1, break; end % go to 890
 						if i2pt==0 && iend==1, break; end % go to 890
 						ircbnd = 1; iccbnd = 1;
-						iwave = 1; ihdw = 0;
+						% iwave: 1-当前射线为 P 波，-1-当前射线为 S 波
+						iwave = 1;
+						ihdw = 0;
+						% 如果射线在第一层发出时为 S 波
 						if icbnd(1) == 0
 							iwave = -iwave;
 							iccbnd = 2;
@@ -880,6 +900,7 @@ function main(pathIn, pathOut)
 						nptbnd = 0; nbnd = 0;
 						npskp = npskip;
 						nccbnd = 0;
+						% id 当前炮点的发射方向 1-向右侧，-1-向左侧
 						id = idr(is);
 						fid = id; % float
 						fid1 = fid;
@@ -943,12 +964,12 @@ function main(pathIn, pathOut)
 							end % -------------------- cycle891 end
 							if isGoto890, break; end % go to 890 step2
 						end
-						angle_angle = fid .* (90.0-angled) ./ pi18;
+						angle_ = fid .* (90.0-angled) ./ pi18;
 						if ir > 1 && ihdwf ~= 1
-							if angle_angle == am, continue; end % go to 90
+							if angle_ == am, continue; end % go to 90
 						end
-						am = angle_angle;
-						if fid1 .* angle_angle < 0.0
+						am = angle_;
+						if fid1 .* angle_ < 0.0
 							id = -id; fid = id; % float
 						end
 						layer = layer1;
@@ -957,7 +978,7 @@ function main(pathIn, pathOut)
 						xr(1) = xshotr;
 						zr(1) = zshotr;
 						ar_(1,1) = 0.0;
-						ar_(1,2) = angle_angle;
+						ar_(1,2) = angle_;
 						vr(1,1) = 0.0;
 						vp(1,1) = 0.0;
 						vs(1,1) = 0.0;

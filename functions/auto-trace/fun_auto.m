@@ -43,6 +43,8 @@ function [amin,amax,iflag,ia0] = fun_auto(xshot,zshot,if_,ifam,l,idr,aamin,aamax
 	% [npt,iflag2] = deal([]); % for fun_autotr
 
 	iflag = 0;
+	amin = aamin;
+	amax = aamax;
 
 	% ray take-off angles input by user
 	% 用户自定义了最小和最大发射角，无需再计算
