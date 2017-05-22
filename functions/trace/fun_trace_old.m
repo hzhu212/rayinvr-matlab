@@ -6,7 +6,7 @@
 % fun_velprt; fun_odez; fun_odezfi; fun_frefpt; fun_frefl; fun_adjpt; fun_hdwave;
 % fun_dstep; fun_vel; done.
 
-function [npt,iflag,i1ray] = fun_trace(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray,ii2pt,i1ray,modout)
+function [npt,iflag,i1ray] = fun_trace_old(npt,ifam,ir,iturn,invr,xsmax,idl,idr,iray,ii2pt,i1ray,modout)
 % trace a single ray through the model
 % npt: 当前射线的节点数
 % ifam: 累计射线组编号
