@@ -13,6 +13,8 @@ function [npt,iflag2] = fun_autotr(ang,layer1,iblk1,xshot,zshot,ifam,iturn,irays
 
 	global c iblk layer; % for fun_vel
 
+	global fun_trace;
+
 	ircbnd = 1;
 	iccbnd = 1;
 	iwave = 1;

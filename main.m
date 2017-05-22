@@ -9,7 +9,7 @@
 
 % fun_aldone; fun_empty; fun_plotnd;
 
-function main(pathIn, pathOut)
+function main(params)
 % main function for rayinvr
 %
 % <strong>main(pathIn, pathOut)</strong>
@@ -17,19 +17,38 @@ function main(pathIn, pathOut)
 % pathIn: path of input files. You should put all of your ".in" files in this path. Default: 'data\examples\e1'.
 % pathOut: path of output files. Default: pathIn/'output'.
 
-	if nargin < 2
-		if nargin < 1
-			pathIn = fullfile('data','examples','e1');
-		end
+	% if nargin < 2
+	% 	if nargin < 1
+	% 		pathIn = fullfile('data','examples','e1');
+	% 	end
 
-		if ~exist(pathIn, 'dir')
-			error('e:IOError','Input path: "%s" not exist',pathIn);
-		end
+	% 	if ~exist(pathIn, 'dir')
+	% 		error('e:IOError','Input path: "%s" not exist',pathIn);
+	% 	end
 
-		pathOut = fullfile(pathIn,'output');
-		if ~exist(pathOut,'dir')
-			mkdir(pathOut);
+	% 	pathOut = fullfile(pathIn,'output');
+	% 	if ~exist(pathOut,'dir')
+	% 		mkdir(pathOut);
+	% 	end
+	% end
+
+	if nargin < 1
+	    pathIn = fullfile('data','examples','e1');
+	    isUseOde = false;
+	else
+		pathIn = params.pathIn;
+		if isempty(pathIn)
+		    pathIn = fullfile('data','examples','e1');
 		end
+		isUseOde = params.isUseOde;
+	end
+
+	if ~exist(pathIn, 'dir')
+		error('main:IOError','Input path: "%s" not exist',pathIn);
+	end
+	pathOut = fullfile(pathIn,'output');
+	if ~exist(pathOut,'dir')
+		mkdir(pathOut);
 	end
 
 	addpath(genpath('./functions'));
@@ -39,6 +58,13 @@ function main(pathIn, pathOut)
 	global file_rayinvr_par file_rayinvr_com file_main_par;
 	global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35 fID_63;
 	global file_iout file_nout;
+	global fun_trace;
+
+	if isUseOde
+	    fun_trace = @fun_trace_new;
+	else
+		fun_trace = @fun_trace_old;
+	end
 
 	% 控制绘图颜色
 	global matlabColors currentColor;
