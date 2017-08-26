@@ -173,23 +173,41 @@ function gui
 		'Position',[gap,panelHeightRightUp-itemHeight*2-gapLarge-gapSmall*4-itemHeightLarge*3,itemWidth,itemHeightLarge] ...
 	);
 
-	textWidth = 70;
+	textWidth = 100;
 	textIter = uicontrol(...
 		'Parent',panelRightDown, ...
 		'Style','text', ...
 		'HorizontalAlignment','left', ...
-		'String','迭代次数：', ...
+		'String','当前已迭代次数：', ...
 		'Unit','pixels', ...
 		'Position',[gap,panelHeightRightDown-itemHeight-gapLarge-6,textWidth,itemHeight] ...
 	);
 
-	popupIter = uicontrol(...
+	textCurrentIter = uicontrol(...
 		'Parent',panelRightDown, ...
-		'Style','popupmenu', ...
-		'String',sprintf('1\n2\n3\n4\n5\n6\n7\n8\n9\n10'), ...
-		'Value', 4, ...
+		'Style','text', ...
+		'HorizontalAlignment','left', ...
+		'String','', ...
 		'Unit','pixels', ...
-		'Position',[gap+textWidth,panelHeightRightDown-itemHeight-gapLarge,50,itemHeight] ...
+		'Position',[gap+textWidth,panelHeightRightDown-itemHeight-gapLarge-6,30,itemHeight] ...
+	);
+
+	% popupIter = uicontrol(...
+	% 	'Parent',panelRightDown, ...
+	% 	'Style','popupmenu', ...
+	% 	'String',sprintf('1\n2\n3\n4\n5\n6\n7\n8\n9\n10'), ...
+	% 	'Value', 4, ...
+	% 	'Unit','pixels', ...
+	% 	'Position',[gap+textWidth,panelHeightRightDown-itemHeight-gapLarge,50,itemHeight] ...
+	% );
+
+	btnRefresh = uicontrol(...
+		'Parent',panelRightDown, ...
+		'Style','pushbutton', ...
+		'String','重新检测', ...
+		'Callback',@btnRefreshCallback, ...
+		'Unit','pixels', ...
+		'Position',[gap,panelHeightRightDown-itemHeight-itemHeightLarge-gapLarge-gapSmall,itemWidth,itemHeightLarge] ...
 	);
 
 	btnInverse = uicontrol(...
@@ -198,12 +216,14 @@ function gui
 		'String','反演', ...
 		'Callback',@btnInverseCallback, ...
 		'Unit','pixels', ...
-		'Position',[gap,panelHeightRightDown-itemHeight-itemHeightLarge-gapLarge-gapSmall,itemWidth,itemHeightLarge] ...
+		'Position',[gap,panelHeightRightDown-itemHeight-itemHeightLarge*2-gapLarge-gapSmall*2,itemWidth,itemHeightLarge] ...
 	);
 
 
-	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,panelSelectVin,editSelectVin,btnSelectVin,checkboxOde,checkboxTimer,textIter,popupIter},9);
-	setFontSize({panelLeftUp,panelLeftDown,panelRightUp,panelRightDown,btnAssistant,btnCalc,btnPlot,btnRun,btnInverse},10);
+	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,panelSelectVin,...
+		editSelectVin,btnSelectVin,checkboxOde,checkboxTimer,textIter,textCurrentIter},9);
+	setFontSize({panelLeftUp,panelLeftDown,panelRightUp,panelRightDown,btnAssistant,...
+		btnCalc,btnPlot,btnRun,btnRefresh,btnInverse},10);
 
 	function setFontSize(handles, fontSize)
 		for ii = 1:length(handles)
@@ -214,12 +234,17 @@ function gui
 
 	pathIn = '';
 	pathVin = '';
+	currentIteration = 0;
 	if exist('history_gui.mat','file')
 	    load('history_gui.mat','pathIn');
 	    load('history_gui.mat','pathVin');
 	end
 	set(editSelectFolder,'String',pathIn);
 	set(editSelectVin,'String',pathVin);
+
+	% 依据当前目录检测反演迭代次数
+	currentIteration = fun_getCurrentIteration();
+	set(textCurrentIter,'String',currentIteration);
 
 	%% callbacks
 	% 选择输入文件所在目录按钮
@@ -246,14 +271,15 @@ function gui
 				save('history_gui.mat','pathIn');
 			end
 		end
+
+		% 依据当前目录检测反演迭代次数
+		currentIteration = fun_getCurrentIteration();
+		set(textCurrentIter,'String',currentIteration);
 	end
 
 	% 选择 v.in 文件按钮
 	function btnSelectVinCallback(hObject, eventdata, handles)
-		startPath = './';
-		if pathVin, startPath = pathVin; end
 		[name, dirname] = uigetfile('*.in','选择 v.in 文件');
-
 		% 如果用户未选择目录而直接取消对话框
 		if ~name
 			pathVin = get(editSelectVin,'String');
@@ -273,18 +299,21 @@ function gui
 		assistant_gui();
 	end
 
+	% 获取输入文件目录
+	function valid = fun_checkPath(p)
+		valid = true;
+		if isempty(p)
+			errordlg('请选择输入文件目录','输入错误');
+			valid = false;
+		end
+	end
+
 	% 运行按钮
 	function btnRunCallback(hObject,eventdata,handles)
-		params.pathIn = '';
-		params.isUseOde = false;
-
-		pathIn = get(editSelectFolder,'String');
-		if isempty(pathIn)
-			errordlg('请选择输入文件目录','输入错误');
-			return;
-		end
+		ok = fun_checkPath(pathIn);
+		if ~ok, return; end
 		params.pathIn = pathIn;
-
+		params.isUseOde = false;
 		pathVin = get(editSelectVin,'String');
 		if isempty(pathVin)
 			pathVin = fullfile(pathIn, 'v.in');
@@ -312,10 +341,37 @@ function gui
 		end
 	end
 
+	% 获取当前反演已迭代次数，即检查最新 iteration 目录
+	function iteration = fun_getCurrentIteration()
+		iteration = 0;
+		ok = fun_checkPath(pathIn);
+		if ~ok, return; end
+		subdirs = dir(pathIn);
+		for ii = 1:length(subdirs)
+			subdir = subdirs(ii);
+			% 如果不是目录则跳过
+			if (isequal(subdir.name, '.' ) || isequal(subdir.name, '..') || ~subdir.isdir)
+				continue;
+			end
+			indexs = strfind(subdir.name, 'iteration');
+			if ~isempty(indexs) && indexs(1) == 1
+			    iter = str2num(subdir.name(10:end));
+			    iteration = max(iter, iteration);
+			end
+		end
+	end
+
+	% 刷新当前反演迭代次数
+	function btnRefreshCallback(hObject,eventdata,handles)
+		currentIteration = fun_getCurrentIteration();
+		set(textCurrentIter, 'String', currentIteration);
+	end
+
 	% 反演按钮
 	function btnInverseCallback(hObject,eventdata,handles)
-		iteration = get(popupIter,'Value');
-		fun_inverse(pathIn,iteration);
+		currentIteration = fun_getCurrentIteration();
+		% fun_inverse(pathIn, currentIteration+1);
+		fun_dmplstsqr(pathIn, currentIteration+1);
 	end
 
 end
