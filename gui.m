@@ -81,6 +81,7 @@ function gui
 	editSelectFolder = uicontrol(...
 		'Parent',panelSelectFolder, ...
 		'Style','edit', ...
+		'Callback',@editSelectFolderCallback, ...
 		'HorizontalAlignment', 'left', ...
 		'Unit', 'normalized', ...
 		'Position',[0.01,0.1,0.85,0.8] ...
@@ -97,7 +98,7 @@ function gui
 
 	panelSelectVin = uipanel( ...
 		'Parent',panelLeftUp, ...
-		'Title','可选，指定特定 v.in 文件', ...
+		'Title','选择 v.in 文件', ...
 		'BorderType','none', ...
 		'Unit','pixels', ...
 		'Position',[gapSmall,panelHeightLeftUp-gapLarge-gapSmall-selectorHeight*2,panelLeftWidth-gapSmall*2,selectorHeight] ...
@@ -214,12 +215,13 @@ function gui
 		'Parent',panelRightDown, ...
 		'Style','pushbutton', ...
 		'String','反演', ...
+		'TooltipString','在当前迭代次数的基础上运行反演',...
 		'Callback',@btnInverseCallback, ...
 		'Unit','pixels', ...
 		'Position',[gap,panelHeightRightDown-itemHeight-itemHeightLarge*2-gapLarge-gapSmall*2,itemWidth,itemHeightLarge] ...
 	);
 
-
+	% 设置字体
 	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,panelSelectVin,...
 		editSelectVin,btnSelectVin,checkboxOde,checkboxTimer,textIter,textCurrentIter},9);
 	setFontSize({panelLeftUp,panelLeftDown,panelRightUp,panelRightDown,btnAssistant,...
@@ -231,75 +233,16 @@ function gui
 		end
 	end
 
-
-	pathIn = '';
-	pathVin = '';
-	currentIteration = 0;
-	if exist('history_gui.mat','file')
-	    load('history_gui.mat','pathIn');
-	    load('history_gui.mat','pathVin');
-	end
-	set(editSelectFolder,'String',pathIn);
-	set(editSelectVin,'String',pathVin);
-
-	% 依据当前目录检测反演迭代次数
-	currentIteration = fun_getCurrentIteration();
-	set(textCurrentIter,'String',currentIteration);
-
-	%% callbacks
-	% 选择输入文件所在目录按钮
-	function btnSelectFolderCallback(hObject, eventdata, handles)
-	% hObject    handle to btnSelectFolder (see GCBO)
-	% eventdata  reserved - to be defined in a future version of MATLAB
-	% handles    structure with handles and user data (see GUIDATA)
-		startPath = './';
-		if pathIn, startPath = pathIn; end
-		pathIn = uigetdir(startPath,'选择输入文件所在目录');
-
-		% 如果用户未选择目录而直接取消对话框
-		if ~pathIn
-			pathIn = get(editSelectFolder,'String');
-			if ~pathIn
-				errordlg('请选择输入文件目录','输入错误');
-				return;
-			end
+	% 保存变量到 mat 文件中
+	function fun_saveVar(varName)
+		if exist('history_gui.mat','file')
+			save('history_gui.mat',varName,'-append');
 		else
-			set(editSelectFolder,'String',pathIn);
-			if exist('history_gui.mat','file')
-				save('history_gui.mat','pathIn','-append');
-			else
-				save('history_gui.mat','pathIn');
-			end
-		end
-
-		% 依据当前目录检测反演迭代次数
-		currentIteration = fun_getCurrentIteration();
-		set(textCurrentIter,'String',currentIteration);
-	end
-
-	% 选择 v.in 文件按钮
-	function btnSelectVinCallback(hObject, eventdata, handles)
-		[name, dirname] = uigetfile('*.in','选择 v.in 文件');
-		% 如果用户未选择目录而直接取消对话框
-		if ~name
-			pathVin = get(editSelectVin,'String');
-		else
-			pathVin = fullfile(dirname, name);
-			set(editSelectVin,'String',pathVin);
-			if exist('history_gui.mat','file')
-				save('history_gui.mat','pathVin','-append');
-			else
-				save('history_gui.mat','pathVin');
-			end
+			save('history_gui.mat',varName);
 		end
 	end
 
-	% 启动预处理工具箱
-	function btnAssistantCallback(hObject,eventdata,handles)
-		assistant_gui();
-	end
-
-	% 获取输入文件目录
+	% 检查目录
 	function valid = fun_checkPath(p)
 		valid = true;
 		if isempty(p)
@@ -308,8 +251,105 @@ function gui
 		end
 	end
 
+	% 获取当前反演已迭代次数，即检查最新 iteration 目录
+	function iteration = fun_getCurrentIteration(pathIn_)
+		iteration = 0;
+		subdirs = dir(pathIn_);
+		for ii = 1:length(subdirs)
+			subdir = subdirs(ii);
+			% 如果不是目录则跳过
+			if (isequal(subdir.name, '.' ) || isequal(subdir.name, '..') || ~subdir.isdir)
+				continue;
+			end
+			indexs = strfind(subdir.name, 'iteration');
+			if ~isempty(indexs) && indexs(1) == 1
+			    iter = str2num(subdir.name(10:end));
+			    iteration = max(iter, iteration);
+			end
+		end
+	end
+
+	% 自动设置 v.in 文件的位置
+	% 如果还未反演，设为 pathIn/v.in；如果反演到第 x 轮，设为 pathIn/iterationx/v.in
+	function fun_autoSetVin(pathIn, iteration)
+		if iteration > 0
+			set(editSelectVin,'String',fullfile(pathIn,['iteration',num2str(iteration)],'v.in'));
+		else
+			set(editSelectVin,'String',fullfile(pathIn,'v.in'));
+		end
+	end
+
+	% 界面逻辑
+	pathIn = '';
+	pathVin = '';
+	currentIteration = 0;
+	if exist('history_gui.mat','file')
+	    load('history_gui.mat','pathIn');
+	    load('history_gui.mat','pathVin');
+	end
+	set(editSelectFolder,'String',pathIn);
+	% 依据当前目录检测反演迭代次数
+	currentIteration = fun_getCurrentIteration(pathIn);
+	set(textCurrentIter,'String',currentIteration);
+	% 自动设置 v.in 目录
+	fun_autoSetVin(pathIn, currentIteration);
+
+	%% callbacks
+
+	% 选择输入文件所在目录
+	function btnSelectFolderCallback(hObject, eventdata, handles)
+	% hObject    handle to btnSelectFolder (see GCBO)
+	% eventdata  reserved - to be defined in a future version of MATLAB
+	% handles    structure with handles and user data (see GUIDATA)
+		startPath = get(editSelectFolder,'String');
+		pathIn = uigetdir(startPath,'选择输入文件所在目录');
+		% 如果成功选择目录
+		if pathIn
+			set(editSelectFolder,'String',pathIn);
+			set(editSelectVin,'String',fullfile(pathIn,'v.in'));
+			fun_saveVar('pathIn');
+
+			% 依据当前目录计算反演迭代次数
+			currentIteration = fun_getCurrentIteration(pathIn);
+			set(textCurrentIter,'String',currentIteration);
+
+			% 自动设置 v.in 目录
+			fun_autoSetVin(pathIn, currentIteration);
+		end
+	end
+
+	% 手动修改文字框并回车
+	function editSelectFolderCallback(hObject, eventdata, handles)
+		pathIn = get(hObject,'String');
+		fun_saveVar('pathIn');
+
+		% 依据当前目录计算反演迭代次数
+		currentIteration = fun_getCurrentIteration(pathIn);
+		set(textCurrentIter,'String',currentIteration);
+
+		% 自动设置 v.in 目录
+		fun_autoSetVin(pathIn, currentIteration);
+	end
+
+	% 选择 v.in 文件
+	function btnSelectVinCallback(hObject, eventdata, handles)
+		[name, dirname] = uigetfile('*.in','选择 v.in 文件');
+		% 如果用户未选择目录而直接取消对话框
+		if name
+			pathVin = fullfile(dirname, name);
+			set(editSelectVin,'String',pathVin);
+			fun_saveVar('pathVin');
+		end
+	end
+
+	% 启动预处理工具箱
+	function btnAssistantCallback(hObject,eventdata,handles)
+		assistant_gui();
+	end
+
 	% 运行按钮
 	function btnRunCallback(hObject,eventdata,handles)
+		pathIn = get(editSelectFolder,'String');
 		ok = fun_checkPath(pathIn);
 		if ~ok, return; end
 		params.pathIn = pathIn;
@@ -339,39 +379,38 @@ function gui
 		else
 			main(params);
 		end
-	end
 
-	% 获取当前反演已迭代次数，即检查最新 iteration 目录
-	function iteration = fun_getCurrentIteration()
-		iteration = 0;
-		ok = fun_checkPath(pathIn);
-		if ~ok, return; end
-		subdirs = dir(pathIn);
-		for ii = 1:length(subdirs)
-			subdir = subdirs(ii);
-			% 如果不是目录则跳过
-			if (isequal(subdir.name, '.' ) || isequal(subdir.name, '..') || ~subdir.isdir)
-				continue;
-			end
-			indexs = strfind(subdir.name, 'iteration');
-			if ~isempty(indexs) && indexs(1) == 1
-			    iter = str2num(subdir.name(10:end));
-			    iteration = max(iter, iteration);
-			end
-		end
+		% 正演结束后，释放反演按钮的禁用状态
+		set(btnInverse,'Enable','on','String','反演');
 	end
 
 	% 刷新当前反演迭代次数
 	function btnRefreshCallback(hObject,eventdata,handles)
-		currentIteration = fun_getCurrentIteration();
+		pathIn = get(editSelectFolder,'String');
+		ok = fun_checkPath(pathIn);
+		if ~ok, return; end
+		currentIteration = fun_getCurrentIteration(pathIn);
 		set(textCurrentIter, 'String', currentIteration);
+		% 自动设置 v.in 目录
+		fun_autoSetVin(pathIn, currentIteration);
 	end
 
 	% 反演按钮
 	function btnInverseCallback(hObject,eventdata,handles)
-		currentIteration = fun_getCurrentIteration();
-		% fun_inverse(pathIn, currentIteration+1);
+		pathIn = get(editSelectFolder,'String');
+		ok = fun_checkPath(pathIn);
+		if ~ok, return; end
 		fun_dmplstsqr(pathIn, currentIteration+1);
+
+		% 反演结束后，刷新当前反演迭代次数
+		currentIteration = fun_getCurrentIteration(pathIn);
+		set(textCurrentIter, 'String', currentIteration);
+
+		% 自动设置 v.in 目录
+		fun_autoSetVin(pathIn, currentIteration);
+
+		% 反演结束后需要运行一次正演才能继续反演，所以先禁用反演按钮
+		set(hObject,'Enable','off','String','正演后方可再次反演');
 	end
 
 end

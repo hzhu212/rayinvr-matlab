@@ -65,8 +65,8 @@ function main(params)
 	file_block_data = 'blkdat.m';
 
 	file_rin = fullfile(pathIn,'r.in');
-	if exist(pathVin, 'var') && ~isempty(pathVin)
-		file_vin = pathVin
+	if exist('pathVin', 'var') && ~isempty(pathVin)
+		file_vin = pathVin;
 	else
 		file_vin = fullfile(pathIn,'v.in');
 	end
@@ -128,7 +128,9 @@ function main(params)
 	% 2.1 读入 v.in
 	% [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,mError] = fun_load_vin(file_vin);
 	[model,LN,xmin,xmax,~,~,~,~,~,mError] = fun_load_vin(file_vin);
-	error(mError);
+	for ii = 1:length(mError)
+		error(sprintf('*** 读取 v.in 时发生错误 ***\n%s',mError{ii}));
+	end
 	for ii = 1:length(model)
 		t_thisLayer = model(ii);
 		[~,t_xlen] = size(t_thisLayer.bd);

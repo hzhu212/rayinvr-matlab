@@ -162,29 +162,38 @@ res=zeros(pnvar,pnvar);     % 防止nvarw访问越界
 %ivarf=zeros(pfrefl,ppfref);npfref=zeros(pfrefl,1);
 %hit=zeros(pnvar,1);
 
-% 设定输入输出目录，若输出目录不存在，则创建
-pathIterNow = fullfile(pathIn,['iteration',num2str(iteration)]);
-pathIterPrev = fullfile(pathIn,['iteration',num2str(iteration-1)]);
+% 设定本轮反演的输出目录，以及上一轮反演的目录(作为本轮的输入)
+pathCurr = fullfile(pathIn,['iteration',num2str(iteration)]);
+pathPrev = fullfile(pathIn,['iteration',num2str(iteration-1)]);
 
-if ~exist(pathIterNow,'dir')
-    mkdir(pathIterNow);
+% 如果是第一轮反演，则检测 iteration0 目录，如果存在则删除并新建一个
+% 然后将 v.in, i.out 文件拷贝进去；否则直接新建并拷贝
+if iteration == 1
+	iteration0 = pathPrev;
+	if exist(iteration0, 'dir'), rmdir(iteration0,'s'); end
+	mkdir(iteration0);
+	copyfile(fullfile(pathIn,'v.in'), fullfile(iteration0,'v.in'));
 end
+
+% 每轮反演之后需要进行一轮正演，正演会输出新的 i.out 文件，供下一轮反演使用
+copyfile(fullfile(pathIn,'output','i.out'), fullfile(pathPrev,'i.out'));
+
+% 如果当前轮目录已存在，则将其重命名并新建一个目录，否则直接新建目录
+if exist(pathCurr,'dir')
+	movefile(pathCurr, [pathCurr,'_bak_',datestr(now,'yyyy-mm-dd_HH-MM-SS')]);
+end
+mkdir(pathCurr);
 
 % 确定输入输出文件路径
-if iteration == 1
-    path_vin_load = fullfile(pathIn,'v.in');
-else
-	% path_iout = fullfile(pathIterPrev,'i.out');
-	path_vin_load = fullfile(pathIterPrev,'v.in');
-end
-path_iout = fullfile(pathIn,'output','i.out');
-path_din = fullfile(pathIn,'d.in');
+path_vin_load = fullfile(pathPrev,'v.in');
 path_fin_load = fullfile(pathIn,'f.in');
-path_dout = fullfile(pathIterNow,'d.out');
-path_vbak = fullfile(pathIterNow,'v.bak');
-path_fbak = fullfile(pathIterNow,'f.bak');
-path_fin_save = fullfile(pathIterNow,'f.in');
-path_vin_save = fullfile(pathIterNow,'v.in');
+path_iout = fullfile(pathPrev,'i.out');
+path_din = fullfile(pathIn,'d.in');
+path_dout = fullfile(pathCurr,'d.out');
+path_vbak = fullfile(pathCurr,'v.bak');
+path_fbak = fullfile(pathCurr,'f.bak');
+path_vin_save = fullfile(pathCurr,'v.in');
+path_fin_save = fullfile(pathCurr,'f.in');
 
 %default parameter values
 ifrbnd=0;
@@ -496,22 +505,22 @@ end
 
 %if hnorm{7}>0.0
 	% fileh1='./file out/example1/z1.hit';   %63
-	fileh1=fullfile(pathIterNow,'z1.hit');   %63
-	fileh2=fullfile(pathIterNow,'v.hit');   %64
-	fileh3=fullfile(pathIterNow,'f.hit');   %65
-	fileh4=fullfile(pathIterNow,'z2.hit');   %66
+	fileh1=fullfile(pathCurr,'z1.hit');   %63
+	fileh2=fullfile(pathCurr,'v.hit');   %64
+	fileh3=fullfile(pathCurr,'f.hit');   %65
+	fileh4=fullfile(pathCurr,'z2.hit');   %66
 %end
 %if rnorm{7}>0.0
-	filer1=fullfile(pathIterNow,'z1.res');   %73
-	filer2=fullfile(pathIterNow,'v.res');   %74
-	filer3=fullfile(pathIterNow,'f.res');   %75
-	filer4=fullfile(pathIterNow,'z2.res');   %76
+	filer1=fullfile(pathCurr,'z1.res');   %73
+	filer2=fullfile(pathCurr,'v.res');   %74
+	filer3=fullfile(pathCurr,'f.res');   %75
+	filer4=fullfile(pathCurr,'z2.res');   %76
 %end
 %if nker{7}>0
-	filen1=fullfile(pathIterNow,'z1.ker');   %83
-	filen2=fullfile(pathIterNow,'v.ker');   %84
-	filen3=fullfile(pathIterNow,'f.ker');   %85
-	filen4=fullfile(pathIterNow,'z2.ker');   %86
+	filen1=fullfile(pathCurr,'z1.ker');   %83
+	filen2=fullfile(pathCurr,'v.ker');   %84
+	filen3=fullfile(pathCurr,'f.ker');   %85
+	filen4=fullfile(pathCurr,'z2.ker');   %86
 %end
 
 nvarw=0;
@@ -783,6 +792,8 @@ if ifrbnd==1
 		end
 	end
 end
+
+fclose('all');
 
 %% 3 tool function
 function fun_save_vin(fileout)
