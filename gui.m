@@ -95,6 +95,31 @@ function gui
 		'Position',[0.87,0.1,0.12,0.8] ...
 	);
 
+	panelSelectVin = uipanel( ...
+		'Parent',panelLeftUp, ...
+		'Title','可选，指定特定 v.in 文件', ...
+		'BorderType','none', ...
+		'Unit','pixels', ...
+		'Position',[gapSmall,panelHeightLeftUp-gapLarge-gapSmall-selectorHeight*2,panelLeftWidth-gapSmall*2,selectorHeight] ...
+	);
+
+	editSelectVin = uicontrol(...
+		'Parent',panelSelectVin, ...
+		'Style','edit', ...
+		'HorizontalAlignment', 'left', ...
+		'Unit', 'normalized', ...
+		'Position',[0.01,0.1,0.85,0.8] ...
+	);
+
+	btnSelectVin = uicontrol(...
+		'Parent',panelSelectVin, ...
+		'Style','pushbutton', ...
+		'String','选择', ...
+		'Callback',@btnSelectVinCallback, ...
+		'Unit', 'normalized', ...
+		'Position',[0.87,0.1,0.12,0.8] ...
+	);
+
 	btnAssistant = uicontrol(...
 		'Parent', panelLeftDown, ...
 		'Style', 'pushbutton', ...
@@ -177,7 +202,7 @@ function gui
 	);
 
 
-	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,checkboxOde,checkboxTimer,textIter,popupIter},9);
+	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,panelSelectVin,editSelectVin,btnSelectVin,checkboxOde,checkboxTimer,textIter,popupIter},9);
 	setFontSize({panelLeftUp,panelLeftDown,panelRightUp,panelRightDown,btnAssistant,btnCalc,btnPlot,btnRun,btnInverse},10);
 
 	function setFontSize(handles, fontSize)
@@ -188,10 +213,13 @@ function gui
 
 
 	pathIn = '';
+	pathVin = '';
 	if exist('history_gui.mat','file')
-	    load('history_gui.mat',pathIn);
+	    load('history_gui.mat','pathIn');
+	    load('history_gui.mat','pathVin');
 	end
 	set(editSelectFolder,'String',pathIn);
+	set(editSelectVin,'String',pathVin);
 
 	%% callbacks
 	% 选择输入文件所在目录按钮
@@ -220,6 +248,26 @@ function gui
 		end
 	end
 
+	% 选择 v.in 文件按钮
+	function btnSelectVinCallback(hObject, eventdata, handles)
+		startPath = './';
+		if pathVin, startPath = pathVin; end
+		[name, dirname] = uigetfile('*.in','选择 v.in 文件');
+
+		% 如果用户未选择目录而直接取消对话框
+		if ~name
+			pathVin = get(editSelectVin,'String');
+		else
+			pathVin = fullfile(dirname, name);
+			set(editSelectVin,'String',pathVin);
+			if exist('history_gui.mat','file')
+				save('history_gui.mat','pathVin','-append');
+			else
+				save('history_gui.mat','pathVin');
+			end
+		end
+	end
+
 	% 启动预处理工具箱
 	function btnAssistantCallback(hObject,eventdata,handles)
 		assistant_gui();
@@ -237,6 +285,12 @@ function gui
 		end
 		params.pathIn = pathIn;
 
+		pathVin = get(editSelectVin,'String');
+		if isempty(pathVin)
+			pathVin = fullfile(pathIn, 'v.in');
+		end
+		params.pathVin = pathVin;
+
 		isUseOde = get(checkboxOde,'Value');
 		params.isUseOde = isUseOde;
 
@@ -244,6 +298,7 @@ function gui
 
 		fprintf('开始计算……\n');
 		fprintf('· 输入文件所在目录：%s\n',params.pathIn);
+		fprintf('· v.in 文件路径：%s\n',params.pathVin);
 		fprintf('· 使用 Matlab ODE 工具箱：');
 		if params.isUseOde, fprintf('是\n'); else fprintf('否\n'); end
 		fprintf('· 开启耗时统计：');

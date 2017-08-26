@@ -12,33 +12,20 @@
 function main(params)
 % main function for rayinvr
 %
-% <strong>main(pathIn, pathOut)</strong>
+% <strong>main(params)</strong>
 %
-% pathIn: path of input files. You should put all of your ".in" files in this path. Default: 'data\examples\e1'.
-% pathOut: path of output files. Default: pathIn/'output'.
-
-	% if nargin < 2
-	% 	if nargin < 1
-	% 		pathIn = fullfile('data','examples','e1');
-	% 	end
-
-	% 	if ~exist(pathIn, 'dir')
-	% 		error('e:IOError','Input path: "%s" not exist',pathIn);
-	% 	end
-
-	% 	pathOut = fullfile(pathIn,'output');
-	% 	if ~exist(pathOut,'dir')
-	% 		mkdir(pathOut);
-	% 	end
-	% end
+% params is an Object with keys below:
+% 	pathIn: path of input files. You should put all of your `.in` files in this path. Default: `'./data/examples/e1'`.
+% 	pathVin: optional. path of specified v.in file. Default: `'pathIn/v.in'`
 
 	if nargin < 1
-	    pathIn = fullfile('data','examples','e1');
-	    isUseOde = false;
+		pathIn = fullfile('data','examples','e1');
+		isUseOde = false;
 	else
 		pathIn = params.pathIn;
+		pathVin = params.pathVin;
 		if isempty(pathIn)
-		    pathIn = fullfile('data','examples','e1');
+			pathIn = fullfile('data','examples','e1');
 		end
 		isUseOde = params.isUseOde;
 	end
@@ -61,7 +48,7 @@ function main(params)
 	global fun_trace;
 
 	if isUseOde
-	    fun_trace = @fun_trace_new;
+		fun_trace = @fun_trace_new;
 	else
 		fun_trace = @fun_trace_old;
 	end
@@ -78,7 +65,11 @@ function main(params)
 	file_block_data = 'blkdat.m';
 
 	file_rin = fullfile(pathIn,'r.in');
-	file_vin = fullfile(pathIn,'v.in');
+	if exist(pathVin, 'var') && ~isempty(pathVin)
+		file_vin = pathVin
+	else
+		file_vin = fullfile(pathIn,'v.in');
+	end
 	file_txin = fullfile(pathIn,'tx.in');
 	file_fin = fullfile(pathIn,'f.in');
 
