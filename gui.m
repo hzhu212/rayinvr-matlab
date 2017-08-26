@@ -199,16 +199,24 @@ function gui
 	% hObject    handle to btnSelectFolder (see GCBO)
 	% eventdata  reserved - to be defined in a future version of MATLAB
 	% handles    structure with handles and user data (see GUIDATA)
-		pathIn = uigetdir('./','选择输入文件所在目录');
+		startPath = './';
+		if pathIn, startPath = pathIn; end
+		pathIn = uigetdir(startPath,'选择输入文件所在目录');
+
+		% 如果用户未选择目录而直接取消对话框
 		if ~pathIn
-			errordlg('请选择输入文件目录');
-			return;
-		end
-		set(editSelectFolder,'String',pathIn);
-		if exist('history_gui.mat','file')
-			save('history_gui.mat','pathIn','-append');
+			pathIn = get(editSelectFolder,'String');
+			if ~pathIn
+				errordlg('请选择输入文件目录','输入错误');
+				return;
+			end
 		else
-			save('history_gui.mat','pathIn');
+			set(editSelectFolder,'String',pathIn);
+			if exist('history_gui.mat','file')
+				save('history_gui.mat','pathIn','-append');
+			else
+				save('history_gui.mat','pathIn');
+			end
 		end
 	end
 
@@ -223,6 +231,10 @@ function gui
 		params.isUseOde = false;
 
 		pathIn = get(editSelectFolder,'String');
+		if isempty(pathIn)
+			errordlg('请选择输入文件目录','输入错误');
+			return;
+		end
 		params.pathIn = pathIn;
 
 		isUseOde = get(checkboxOde,'Value');
@@ -231,17 +243,11 @@ function gui
 		isTimeCounting = get(checkboxTimer,'Value');
 
 		fprintf('开始计算……\n');
-		fprintf('输入文件所在目录：%s\n',params.pathIn);
-		if params.isUseOde
-			fprintf('使用 Matlab ODE 工具箱\n');
-		else
-			fprintf('不使用 Matlab ODE 工具箱\n');
-		end
-		if isTimeCounting
-			fprintf('开启耗时统计\n');
-		else
-			fprintf('不开启耗时统计\n');
-		end
+		fprintf('· 输入文件所在目录：%s\n',params.pathIn);
+		fprintf('· 使用 Matlab ODE 工具箱：');
+		if params.isUseOde, fprintf('是\n'); else fprintf('否\n'); end
+		fprintf('· 开启耗时统计：');
+		if isTimeCounting, fprintf('是\n'); else fprintf('否\n'); end
 		fprintf('\n');
 
 		if isTimeCounting

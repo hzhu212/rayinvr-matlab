@@ -610,6 +610,7 @@ function main(params)
 			% 如果(绘制模型边界 或 绘制追踪的射线 或 绘制搜索模式下追踪的射线) 且
 			% 每个炮点需要单独绘制一张图(如果 isep<1 则所有炮点绘制在同一张图)
 			if (imod==1 || iray > 0 || irays==1) && isep > 1
+			% if true
 				% 每绘制一条射线暂停一次，等待用户输入
 				if iflagp == 1
 					fun_aldone();
@@ -1253,7 +1254,7 @@ function fun_goto900()
 		parunc(2) = velunc;
 		parunc(3) = bndunc;
 		% 895 % 835 % 895
-		fprintf(fID_18, ' \n%5d%5d\n\n', narinv,nvar);
+		fprintf(fID_18, ' \n%5d%5d\n \n', narinv,nvar);
 
 		for ii = 1:nvar % 801
 			% 805
@@ -1265,11 +1266,17 @@ function fun_goto900()
 		for ii = 1:narinv % 840
 			% 815
 			fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',apart(ii,1:nvar));
+			% 如果变量数不是 format 字符串中变量数的整数倍，需要补上最后一个换行符
+			if mod(nvar,5) ~= 0, fprintf(fID_18, '\n'); end
 		end % 840
 		% 895 % 915
-		fprintf(fID_18,' \n%12.5e%12.5e%12.5e%12.5e%12.5e\n',tobs(1:narinv)-tcalc(1:narinv));
+		fprintf(fID_18, ' \n');
+		fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',tobs(1:narinv)-tcalc(1:narinv));
+		if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
 		% 895 % 815
-		fprintf(fID_18,' \n%12.5e%12.5e%12.5e%12.5e%12.5e\n',uobs(1:narinv));
+		fprintf(fID_18, ' \n');
+		fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',uobs(1:narinv));
+		if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
 
 		if narinv > 1
 			% 850 cycle begin
