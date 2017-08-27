@@ -1166,6 +1166,26 @@ end % main function end
 
 % --------------------------------------------------------------------------------
 
+% 强制 0. 开头的科学计数法
+function result = fun_leadingZero_5E(floatNum)
+	primary = sprintf('%.4E',floatNum*10);
+	result = regexprep(primary,'(\d)\.','0.$1');
+end
+
+% 打印字符串 cell
+% 其中，每个字符串遵循相同的格式 formatSpec，每打印 segLen 个字符串就输出一个换行符
+function fprintfCell(fid, formatSpec, data, segLen)
+	nSeg = ceil(length(data)/segLen);
+	for ii = 1:nSeg
+		for jj = 1:segLen
+			index = segLen*(ii-1) + jj;
+			if ii == nSeg && index > length(data), break; end
+			fprintf(fid,formatSpec,data{index});
+		end
+		fprintf(fid, '\n');
+	end
+end
+
 function fun_goto9999()
 	global file_nout;
 	global pltpar axepar trapar invpar;
@@ -1258,18 +1278,27 @@ function fun_goto900()
 
 		for ii = 1:narinv % 840
 			% 815
-			fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',apart(ii,1:nvar));
+			% fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',apart(ii,1:nvar));
 			% 如果变量数不是 format 字符串中变量数的整数倍，需要补上最后一个换行符
-			if mod(nvar,5) ~= 0, fprintf(fID_18, '\n'); end
+			% if mod(nvar,5) ~= 0, fprintf(fID_18, '\n'); end
+			toPrint = arrayfun(@fun_leadingZero_5E,apart(ii,1:nvar),'UniformOutput',false);
+			fprintfCell(fID_18,'%12s',toPrint,5);
 		end % 840
 		% 895 % 915
 		fprintf(fID_18, ' \n');
-		fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',tobs(1:narinv)-tcalc(1:narinv));
-		if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
+
+		% fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',tobs(1:narinv)-tcalc(1:narinv));
+		% if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
+		toPrint = arrayfun(@fun_leadingZero_5E,tobs(1:narinv)-tcalc(1:narinv),'UniformOutput',false);
+		fprintfCell(fID_18,'%12s',toPrint,5);
+
 		% 895 % 815
 		fprintf(fID_18, ' \n');
-		fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',uobs(1:narinv));
-		if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
+
+		% fprintf(fID_18,'%12.5e%12.5e%12.5e%12.5e%12.5e\n',uobs(1:narinv));
+		% if mod(narinv,5) ~= 0, fprintf(fID_18, '\n'); end
+		toPrint = arrayfun(@fun_leadingZero_5E,uobs(1:narinv),'UniformOutput',false);
+		fprintfCell(fID_18,'%12s',toPrint,5);
 
 		if narinv > 1
 			% 850 cycle begin
