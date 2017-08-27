@@ -1,7 +1,7 @@
 %% gui: 图形用户界面
 function gui
 	% 窗口尺寸
-	gWidth = 750;
+	gWidth = 900;
 	gHeight = 500;
 
 	% 组件尺寸
@@ -25,7 +25,7 @@ function gui
 	panelHeightRightUp = panelHeight * 0.6;
 	panelHeightRightDown = panelHeight * 0.4 - gap;
 	% 左侧 panel 宽度
-	panelLeftWidth = 450;
+	panelLeftWidth = 600;
 	% 右侧 panel 宽度
 	panelRightWidth = gWidth - panelLeftWidth - gap * 3;
 
@@ -82,8 +82,8 @@ function gui
 		'Parent',panelSelectFolder, ...
 		'Style','edit', ...
 		'Callback',@editSelectFolderCallback, ...
-		'HorizontalAlignment', 'left', ...
-		'Unit', 'normalized', ...
+		'HorizontalAlignment','left', ...
+		'Unit','normalized', ...
 		'Position',[0.01,0.1,0.85,0.8] ...
 	);
 
@@ -98,7 +98,7 @@ function gui
 
 	panelSelectVin = uipanel( ...
 		'Parent',panelLeftUp, ...
-		'Title','选择 v.in 文件', ...
+		'Title','选择 v.in 文件（自动）', ...
 		'BorderType','none', ...
 		'Unit','pixels', ...
 		'Position',[gapSmall,panelHeightLeftUp-gapLarge-gapSmall-selectorHeight*2,panelLeftWidth-gapSmall*2,selectorHeight] ...
@@ -279,20 +279,46 @@ function gui
 		end
 	end
 
+	% 刷新依赖 pathIn 的变量
+	function iteration = fun_pathInChanged(pathIn)
+		% 依据当前目录计算反演迭代次数
+		iteration = fun_getCurrentIteration(pathIn);
+		set(textCurrentIter,'String',iteration);
+
+		% 自动设置 v.in 目录
+		fun_autoSetVin(pathIn, iteration);
+
+		% 判断是否可以进行反演
+		if fun_canInverse(pathIn, iteration)
+			set(btnInverse,'Enable','on','String','反演');
+		else
+			set(btnInverse,'Enable','off','String','需要正演');
+		end
+	end
+
+	% 检测是否可以运行反演(以防连续多次运行反演导致错误结果)
+	% 检测当前 i.out 文件是否与上一轮反演所用的 i.out 相同即可
+	function flag = fun_canInverse(pathIn, iteration)
+		flag = true;
+		if iteration == 0, return; end
+		ioutCurr = fullfile(pathIn,'output','i.out');
+		ioutPrev = fullfile(pathIn,['iteration',num2str(iteration-1)],'i.out');
+		text1 = fileread(ioutCurr);
+		text2 = fileread(ioutPrev);
+		equal = strcmp(text1,text2);
+		flag = ~equal;
+	end
+
 	% 界面逻辑
 	pathIn = '';
 	pathVin = '';
 	currentIteration = 0;
 	if exist('history_gui.mat','file')
 	    load('history_gui.mat','pathIn');
-	    load('history_gui.mat','pathVin');
+	    % load('history_gui.mat','pathVin');
 	end
 	set(editSelectFolder,'String',pathIn);
-	% 依据当前目录检测反演迭代次数
-	currentIteration = fun_getCurrentIteration(pathIn);
-	set(textCurrentIter,'String',currentIteration);
-	% 自动设置 v.in 目录
-	fun_autoSetVin(pathIn, currentIteration);
+	currentIteration = fun_pathInChanged(pathIn);
 
 	%% callbacks
 
@@ -306,15 +332,8 @@ function gui
 		% 如果成功选择目录
 		if pathIn
 			set(editSelectFolder,'String',pathIn);
-			set(editSelectVin,'String',fullfile(pathIn,'v.in'));
 			fun_saveVar('pathIn');
-
-			% 依据当前目录计算反演迭代次数
-			currentIteration = fun_getCurrentIteration(pathIn);
-			set(textCurrentIter,'String',currentIteration);
-
-			% 自动设置 v.in 目录
-			fun_autoSetVin(pathIn, currentIteration);
+			currentIteration = fun_pathInChanged(pathIn);
 		end
 	end
 
@@ -322,13 +341,7 @@ function gui
 	function editSelectFolderCallback(hObject, eventdata, handles)
 		pathIn = get(hObject,'String');
 		fun_saveVar('pathIn');
-
-		% 依据当前目录计算反演迭代次数
-		currentIteration = fun_getCurrentIteration(pathIn);
-		set(textCurrentIter,'String',currentIteration);
-
-		% 自动设置 v.in 目录
-		fun_autoSetVin(pathIn, currentIteration);
+		currentIteration = fun_pathInChanged(pathIn);
 	end
 
 	% 选择 v.in 文件
@@ -338,7 +351,7 @@ function gui
 		if name
 			pathVin = fullfile(dirname, name);
 			set(editSelectVin,'String',pathVin);
-			fun_saveVar('pathVin');
+			% fun_saveVar('pathVin');
 		end
 	end
 
@@ -389,10 +402,7 @@ function gui
 		pathIn = get(editSelectFolder,'String');
 		ok = fun_checkPath(pathIn);
 		if ~ok, return; end
-		currentIteration = fun_getCurrentIteration(pathIn);
-		set(textCurrentIter, 'String', currentIteration);
-		% 自动设置 v.in 目录
-		fun_autoSetVin(pathIn, currentIteration);
+		currentIteration = fun_pathInChanged(pathIn);
 	end
 
 	% 反演按钮
@@ -403,14 +413,10 @@ function gui
 		fun_dmplstsqr(pathIn, currentIteration+1);
 
 		% 反演结束后，刷新当前反演迭代次数
-		currentIteration = fun_getCurrentIteration(pathIn);
-		set(textCurrentIter, 'String', currentIteration);
-
-		% 自动设置 v.in 目录
-		fun_autoSetVin(pathIn, currentIteration);
+		currentIteration = fun_pathInChanged(pathIn);
 
 		% 反演结束后需要运行一次正演才能继续反演，所以先禁用反演按钮
-		set(hObject,'Enable','off','String','正演后方可再次反演');
+		set(hObject,'Enable','off','String','需要正演');
 	end
 
 end
