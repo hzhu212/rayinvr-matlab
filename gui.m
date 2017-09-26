@@ -388,9 +388,13 @@ function gui
 		fprintf('\n');
 
 		if isTimeCounting
-		    profile on; main(params); profile off; profile viewer;
+		    profile on;
+		    [RMS, CHI] = main(params);
+			fprintf('RMS = %f\nCHI = %f\n', RMS, CHI);
+		    profile off; profile viewer;
 		else
-			main(params);
+			[RMS, CHI] = main(params);
+			fprintf('RMS = %f\nCHI = %f\n', RMS, CHI);
 		end
 
 		% 正演结束后，释放反演按钮的禁用状态

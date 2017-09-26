@@ -9,7 +9,7 @@
 
 % fun_aldone; fun_empty; fun_plotnd;
 
-function main(params)
+function [RMS, CHI] = main(params)
 % main function for rayinvr
 %
 % <strong>main(params)</strong>
@@ -27,7 +27,10 @@ function main(params)
 		if isempty(pathIn)
 			pathIn = fullfile('data','examples','e1');
 		end
-		isUseOde = params.isUseOde;
+		isUseOde = false;
+		if isfield(params,'isUseOde')
+			isUseOde = params.isUseOde;
+		end
 	end
 
 	if ~exist(pathIn, 'dir')
@@ -249,7 +252,7 @@ function main(params)
 		% 55
 		fprintf('\n***  no ray codes specified  ***\n\n');
 		% go to 900
-		fun_goto900(); return;
+		[RMS,CHI] = fun_goto900(); return;
 	end
 
 	%% 查看是否有浮动界面信息，如果有，ifrbnd 置为 1
@@ -423,7 +426,7 @@ function main(params)
 	if any(ncbnd(1:prayf)>pconv) % 470
 		% 135
 		fprintf('\n***  max converting boundaries exceeded  ***\n\n');
-		fun_goto900(); return; % go to 900
+		[RMS,CHI] = fun_goto900(); return; % go to 900
 	end % 470
 
 	% plot velocity model
@@ -464,7 +467,7 @@ function main(params)
 	if any(nrbnd(1:prayf)>prefl) % 260
 		% 125
 		fprintf('\n***  max reflecting boundaries exceeded  ***\n\n');
-		fun_goto900(); return; % go to 900
+		[RMS,CHI] = fun_goto900(); return; % go to 900
 	end % 260
 
 	% 检查反射界面 rbnd:(L - Lth layer upward,-L - Lth layer downward)，反射界面不能超出最深 layer 的范围
@@ -1159,7 +1162,7 @@ function main(params)
 		[~,~,~,~] = fun_fd(dxzmod,xmmin,xmmax,ifd);
 	end
 
-	fun_goto900();
+	[RMS,CHI] = fun_goto900();
 
 	fclose('all');
 end % main function end
@@ -1226,13 +1229,15 @@ end
 
 % --------------------------------------------------------------------------------
 
-function fun_goto900()
+function [RMS,CHI] = fun_goto900()
 	global file_rayinvr_par file_rayinvr_com file_main_par;
 	global fID_11;
 	global file_iout;
 	run(file_rayinvr_par);
 	run(file_rayinvr_com);
 	run(file_main_par);
+
+	RMS = 0; CHI = 0;
 
 	% 900 % 920 cycle
 	ntblk = sum(nblk(1:nlayer));
@@ -1260,6 +1265,7 @@ function fun_goto900()
 		'------------------------------|\n\n'], nlayer,ntblk,'');
 	if isum > 0, fprintf(tempstr); end
 	fprintf(fID_11, tempstr);
+
 
 	if invr == 1
 		fID_18 = fopen(file_iout,'w');
@@ -1308,6 +1314,8 @@ function fun_goto900()
 			% 850 cycle end
 			trms = sqrt(ssum ./ narinv); % float
 			chi = sumx ./ (narinv-1); % float
+			RMS = trms;
+			CHI = chi;
 
 			% 895 % 825 % 895
 			tempstr = sprintf([' \nNumber of data points used: %8d\n',...
@@ -1402,5 +1410,5 @@ function fun_goto900()
 		% ? call plotnd(1)
 		fun_plotnd();
 	end
-	fun_goto9999(); return;
+	fun_goto9999();
 end
