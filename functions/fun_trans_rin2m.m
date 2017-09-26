@@ -56,7 +56,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
         for h = 1:length(tokens)
             num = str2num(tokens{h}{1});
             val = str2num(tokens{h}{2});
-            strMat = sprintf('%d,',ones(1,num).*val); strMat = strMat(1:end-1);
+            strMat = sprintf('%.4f,',ones(1,num).*val); strMat = strMat(1:end-1);
             replaced = [replaced, strMat];
         end
         currentLine = strjoin(split,replaced);
