@@ -1,5 +1,10 @@
 %% gui: 图形用户界面
 function gui
+	global appRoot;
+	appRoot = mfilename('fullpath');
+	filesepIndexs = strfind(appRoot, filesep);
+	appRoot = appRoot(1:filesepIndexs(end));
+
 	% 窗口尺寸
 	gWidth = 900;
 	gHeight = 500;
@@ -29,8 +34,10 @@ function gui
 	% 右侧 panel 宽度
 	panelRightWidth = gWidth - panelLeftWidth - gap * 3;
 
+	addpath('./functions');
 	addpath('./assistant');
 	addpath('./inversion');
+	addpath('./optimization');
 
 	gui = figure();
 	screenSize = get(0,'ScreenSize');
@@ -131,6 +138,16 @@ function gui
 		'Position', [gap,panelHeightLeftDown-gapLarge-itemHeightLarge,itemWidth,itemHeightLarge] ...
 	);
 
+	btnOptimize = uicontrol(...
+		'Parent', panelLeftDown, ...
+		'Style', 'pushbutton', ...
+		'String', '基因算法优化', ...
+		'TooltipString', '利用基因算法自动优化泊松比数组', ...
+		'Callback', @btnOptimizeCallback, ...
+		'Unit', 'pixels', ...
+		'Position', [gap,panelHeightLeftDown-2*gapLarge-2*itemHeightLarge,itemWidth,itemHeightLarge] ...
+	);
+
 	checkboxOde = uicontrol(...
 		'Parent', panelRightUp, ...
 		'Style', 'checkbox', ...
@@ -225,7 +242,7 @@ function gui
 	setFontSize({panelSelectFolder,editSelectFolder,btnSelectFolder,panelSelectVin,...
 		editSelectVin,btnSelectVin,checkboxOde,checkboxTimer,textIter,textCurrentIter},9);
 	setFontSize({panelLeftUp,panelLeftDown,panelRightUp,panelRightDown,btnAssistant,...
-		btnCalc,btnPlot,btnRun,btnRefresh,btnInverse},10);
+		btnOptimize,btnCalc,btnPlot,btnRun,btnRefresh,btnInverse},10);
 
 	function setFontSize(handles, fontSize)
 		for ii = 1:length(handles)
@@ -358,6 +375,25 @@ function gui
 	% 启动预处理工具箱
 	function btnAssistantCallback(hObject,eventdata,handles)
 		assistant_gui();
+	end
+
+	% 启动优化工具箱
+	function btnOptimizeCallback(hObject,eventdata,handles)
+		pathIn = get(editSelectFolder,'String');
+		ok = fun_checkPath(pathIn);
+		if ~ok, return; end
+		params.pathIn = pathIn;
+		params.isUseOde = false;
+		pathVin = get(editSelectVin,'String');
+		if isempty(pathVin)
+			pathVin = fullfile(pathIn, 'v.in');
+		end
+		params.pathVin = pathVin;
+
+		[x, fval] = fun_optimize(params);
+		disp('final pois: ');
+		disp(x);
+		fprintf('final chi-squre: %f\n', fval);
 	end
 
 	% 运行按钮

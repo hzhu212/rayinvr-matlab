@@ -9,27 +9,38 @@
 
 % fun_aldone; fun_empty; fun_plotnd;
 
-function [RMS, CHI] = main(params)
+function [RMS, CHI] = main(options)
 % main function for rayinvr
 %
-% <strong>main(params)</strong>
+% <strong>main(options)</strong>
 %
-% params is an Object with keys below:
+% options is an Object with keys below:
 % 	pathIn: path of input files. You should put all of your `.in` files in this path. Default: `'./data/examples/e1'`.
 % 	pathVin: optional. path of specified v.in file. Default: `'pathIn/v.in'`
 
-	if nargin < 1
-		pathIn = fullfile('data','examples','e1');
-		isUseOde = false;
-	else
-		pathIn = params.pathIn;
-		pathVin = params.pathVin;
-		if isempty(pathIn)
-			pathIn = fullfile('data','examples','e1');
+	% default parameters
+	global appRoot;
+	pathIn = fullfile(appRoot, 'data','examples','e1');
+	pathVin = fullfile(pathIn, 'v.in');
+	isUseOde = false;
+	isPlot = true;
+	pois_ = false;
+
+	if nargin == 1
+		if isfield(options,'pathIn') && ~isempty(options.pathIn)
+			pathIn = options.pathIn;
 		end
-		isUseOde = false;
-		if isfield(params,'isUseOde')
-			isUseOde = params.isUseOde;
+		if isfield(options,'pathVin') && ~isempty(options.pathVin)
+			pathVin = options.pathVin;
+		end
+		if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
+			isUseOde = options.isUseOde;
+		end
+		if isfield(options,'isPlot') && ~isempty(options.isPlot)
+			isPlot = options.isPlot;
+		end
+		if isfield(options,'pois') && ~isempty(options.pois)
+			pois_ = options.pois;
 		end
 	end
 
@@ -68,11 +79,7 @@ function [RMS, CHI] = main(params)
 	file_block_data = 'blkdat.m';
 
 	file_rin = fullfile(pathIn,'r.in');
-	if exist('pathVin', 'var') && ~isempty(pathVin)
-		file_vin = pathVin;
-	else
-		file_vin = fullfile(pathIn,'v.in');
-	end
+	file_vin = pathVin;
 	file_txin = fullfile(pathIn,'tx.in');
 	file_fin = fullfile(pathIn,'f.in');
 
@@ -108,6 +115,9 @@ function [RMS, CHI] = main(params)
 	% 将 r.in 文件转化为 r_in.m 脚本。载入脚本，为 r.in 中所有变量赋值
 	file_rin_m = fun_trans_rin2m(file_rin);
 	run(file_rin_m);
+
+	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化
+	if pois_, pois = pois_; end
 
 	% matlab colors，设定当前颜色为默认色（前景色）
 	% matlabColors = 'krgbcmyy';
@@ -433,7 +443,7 @@ function [RMS, CHI] = main(params)
 
 	% 绘制模型
 	if (imod == 1 || iray > 0 || irays == 1) && isep < 2
-		fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+		if isPlot, fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33); end
 	end
 
 	% calculation of smooth layer boundaries
@@ -613,7 +623,7 @@ function [RMS, CHI] = main(params)
 				end
 				iflagp = 1;
 				% 刷新绘制模型
-				fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33);
+				if isPlot, fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,iroute,i33); end
 			end
 		end
 
@@ -1038,7 +1048,7 @@ function [RMS, CHI] = main(params)
 						end
 
 						if ((iray==1 || (iray==2 && vr(npt,2)>0.0)) && mod(ir-1,nrskip)==0 && irs>0) || (irays==1 && irs==0)
-							fun_my_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled);
+							if isPlot, fun_my_pltray(npt,max(nskip,nhskip),idot,irayps,istep,angled); end
 							if i33 == 1
 								if iszero == 1, xwr=abs(xshtar(ntt-1)-xobs);
 								else xwr = xobs; end
@@ -1111,7 +1121,7 @@ function [RMS, CHI] = main(params)
 		end % 70
 		if isGoto1000, break; end % go to 1000 step2
 		if isep==2 && ((itx>0 && ntt>1) || idata~=0 || itxout>0)
-			fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline);
+			if isPlot, fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,idr(is),itxbox,iroute,iline); end
 		end
 	end % 60
 	% end % -------------------- ~ go to 1000 block end
@@ -1121,7 +1131,7 @@ function [RMS, CHI] = main(params)
 		if isep>0 && iplots==1
 			fun_aldone();
 		end
-		fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline);
+		if isPlot, fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline); end
 	end
 
 	if itxout > 0
