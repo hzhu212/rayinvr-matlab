@@ -24,7 +24,7 @@ function [RMS, CHI] = main(options)
 	pathVin = fullfile(pathIn, 'v.in');
 	isUseOde = false;
 	isPlot = true;
-	pois_ = false;
+	pois_ = [];
 
 	if nargin == 1
 		if isfield(options,'pathIn') && ~isempty(options.pathIn)
@@ -41,6 +41,8 @@ function [RMS, CHI] = main(options)
 		end
 		if isfield(options,'pois') && ~isempty(options.pois)
 			pois_ = options.pois;
+			disp('Optimizing pois: ');
+			disp(pois_);
 		end
 	end
 
@@ -117,7 +119,7 @@ function [RMS, CHI] = main(options)
 	run(file_rin_m);
 
 	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化
-	if pois_, pois = pois_; end
+	pois(1:length(pois_)) = pois_;
 
 	% matlab colors，设定当前颜色为默认色（前景色）
 	% matlabColors = 'krgbcmyy';

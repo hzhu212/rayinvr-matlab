@@ -3,7 +3,9 @@
 function [x,fval] = fun_optimize(mainOptions)
 	file_rin = fullfile(mainOptions.pathIn, 'r.in');
 	pois = fun_init_pois(file_rin);
-	nvars = length(pois);
+	% 只对前若干层应用基因算法，提高计算效率
+	nvarsMax = length(pois);
+	nvars = min(nvarsMax, 2);
 
 	mainOptions.isPlot = false;
 	target_fun = fun_partialMain(mainOptions);
@@ -12,7 +14,7 @@ function [x,fval] = fun_optimize(mainOptions)
 	% default options:
 	% Generations: 100 * nvars
 	% PopulationSize: {50} when numberOfVariables <= 5, {200} otherwise | {min(max(10*nvars,40),100)} for mixed-integer problems
-	options = gaoptimset('Generations', 10, 'PopulationSize', 50);
+	options = gaoptimset('Generations', 10, 'PopulationSize', 20);
 	[x, fval] = ga(target_fun, nvars, [],[],[],[],zeros(nvars,1),ones(nvars,1)*0.5,[],options);
 end
 
