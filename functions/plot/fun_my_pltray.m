@@ -62,22 +62,26 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 	lineStyle = '-';
 	lineSymbol = '';
 	markerSize = symht .* 5;
-	if idot == 2
-		lineStyle = '';
-	else
-		if irayps ~= 1
-			;
-		else
-			lineStyle = '--';
-		end
-	end
 
 	% 100
 	if idot > 0
 		lineSymbol = 's';
 	end
+	if idot == 2
+		lineStyle = '';
+	end
 
-	plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+	% p 波画实线，s 波画虚线
+	if idot ~= 2 && irayps == 1
+		maskp = (vra(1:npts) == vpa(1:npts));
+		masks = ~maskp;
+		maskp = maskp | [0, maskp(1:end-1)];
+		masks = masks | [0, masks(1:end-1)];
+		plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+		plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+	else
+		plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+	end
 
 	if ircol ~= 0
 		currentColor = matlabColors{ifcol};
