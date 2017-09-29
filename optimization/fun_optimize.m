@@ -1,20 +1,18 @@
 % 通过优化算法寻找使得 CHI 最小的 pois 数组
 
 function [x,fval] = fun_optimize(mainOptions)
-	% load nvar, nGeneration, nPopulation, lowerLimit, upperLimit
+	% load indexs, nGeneration, nPopulation, lowerLimit, upperLimit
 	run('config.m');
-	if isempty(nvar) || ~nvar, nvar = 2; end
 	if isempty(nGeneration) || ~nGeneration, nGeneration = 10; end
 	if isempty(nPopulation) || ~nPopulation, nPopulation = 20; end
 
+	nvar = length(indexs);
 	file_rin = fullfile(mainOptions.pathIn, 'r.in');
-	pois = fun_init_pois(file_rin);
-	nvarsMax = length(pois);
-	% 可只对前若干层应用基因算法，提高计算效率
-	nvar = min(nvarsMax, nvar);
+	POIS = fun_init_pois(file_rin);
+	INDEXS = int32(indexs);
 
 	mainOptions.isPlot = false;
-	target_fun = fun_partialMain(mainOptions);
+	target_fun = fun_partialMain(mainOptions,POIS,INDEXS);
 
 	% default options:
 	% Generations: 100 * nvar
@@ -26,9 +24,14 @@ function [x,fval] = fun_optimize(mainOptions)
 		lowerLimit*ones(nvar,1),upperLimit*ones(nvar,1),[],options);
 end
 
-function func = fun_partialMain(mainOptions)
-	function y = wrapper(pois)
-		mainOptions.pois = pois;
+function func = fun_partialMain(mainOptions,POIS,INDEXS)
+	function y = wrapper(iterPois)
+		disp('Optimizing pois: ');
+		fprintf('%10.0f', INDEXS); fprintf('\n');
+		fprintf('%10.4f', iterPois); fprintf('\n');
+		curPois = POIS;
+		curPois(INDEXS) = iterPois;
+		mainOptions.pois = curPois;
 		[RMS, CHI] = main(mainOptions);
 		y = CHI;
 	end

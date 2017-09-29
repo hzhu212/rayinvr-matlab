@@ -41,8 +41,6 @@ function [RMS, CHI] = main(options)
 		end
 		if isfield(options,'pois') && ~isempty(options.pois)
 			pois_ = options.pois;
-			disp('Optimizing pois: ');
-			disp(pois_);
 		end
 	end
 
