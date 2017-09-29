@@ -1,7 +1,7 @@
 % 通过优化算法寻找使得 CHI 最小的 pois 数组
 
 function [x,fval] = fun_optimize(mainOptions)
-	% load('config.mat', 'nvar', 'nGeneration', 'nPopulation');
+	% load nvar, nGeneration, nPopulation, lowerLimit, upperLimit
 	run('config.m');
 	if isempty(nvar) || ~nvar, nvar = 2; end
 	if isempty(nGeneration) || ~nGeneration, nGeneration = 10; end
@@ -22,7 +22,8 @@ function [x,fval] = fun_optimize(mainOptions)
 	% options = gaoptimset('Generations', 10, 'PopulationSize', 20);
 	gaoutfun = @gaoutfun_bar3;
 	options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',nGeneration,'PopulationSize',nPopulation);
-	[x, fval] = ga(target_fun, nvar, [],[],[],[],0.4*ones(nvar,1),0.5*ones(nvar,1),[],options);
+	[x, fval] = ga(target_fun, nvar, [],[],[],[],...
+		lowerLimit*ones(nvar,1),upperLimit*ones(nvar,1),[],options);
 end
 
 function func = fun_partialMain(mainOptions)
