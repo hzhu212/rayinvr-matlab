@@ -73,10 +73,10 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
 
 	% p 波画实线，s 波画虚线
 	if idot ~= 2 && irayps == 1
-		maskp = (vra(1:npts) == vpa(1:npts));
+		maskp = (vra(1:npts-1) == vpa(1:npts-1));
 		masks = ~maskp;
-		maskp = maskp | [0, maskp(1:end-1)];
-		masks = masks | [0, masks(1:end-1)];
+		maskp = [maskp, 0] | [0, maskp];
+		masks = [masks, 0] | [0, masks];
 		plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
 		plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
 	else
