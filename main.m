@@ -114,6 +114,7 @@ function [RMS, CHI] = main(options)
 	% 1.4 为 r.in 中的所有变量赋值
 	% 将 r.in 文件转化为 r_in.m 脚本。载入脚本，为 r.in 中所有变量赋值
 	file_rin_m = fun_trans_rin2m(file_rin);
+	clear(file_rin_m);
 	run(file_rin_m);
 
 	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化

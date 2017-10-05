@@ -17,7 +17,8 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 	figure(hFigure2);
 	% set(hFigure2,'CurrentAxes',gca());
 
-	for ii = 1:nshot
+	nRayCodes = sum(ipf == 0);
+	for ii = 1:nRayCodes
 		thisShot = ilshot(ii);
 		nextShot = ilshot(ii+1);
 
@@ -70,7 +71,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 				else
 					ipcol = colour(mod(ii-1,ncol)+1);
 				end
-				currentColor = matlabColors{ipcol};
+				currentColor = matlabColors{mod(ipcol,length(matlabColors))+1};
 			end
 
 			if itxbox ~= 0
