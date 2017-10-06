@@ -18,7 +18,7 @@ function [x,fval] = fun_optimize(mainOptions)
 	% Generations: 100 * nvar
 	% PopulationSize: {50} when numberOfVariables <= 5, {200} otherwise | {min(max(10*nvar,40),100)} for mixed-integer problems
 	% options = gaoptimset('Generations', 10, 'PopulationSize', 20);
-	gaoutfun = @gaoutfun_bar3;
+	gaoutfun = @gaoutfun_stem3;
 	options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',nGeneration,'PopulationSize',nPopulation);
 	[x, fval] = ga(target_fun, nvar, [],[],[],[],...
 		lowerLimit*ones(nvar,1),upperLimit*ones(nvar,1),[],options);

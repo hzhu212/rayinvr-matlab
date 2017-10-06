@@ -1,15 +1,14 @@
 %% 优化算法参数配置
 
-% 指定要迭代哪一层的泊松比
-indexs = [2, 3];
-% nvar = 2;
+% 待优化的泊松比在 pois 数组中的 index
+indexs = 2:10;
 
 % 基因算法代数
 nGeneration = 10;
 
 % 每代的个体数
-nPopulation = 20;
+nPopulation = 70;
 
 % 待优化的自变量的下限和上限（此处指泊松比）
-lowerLimit = 0.41;
-upperLimit = 0.4999;
+lowerLimit = 0.43;
+upperLimit = 0.499;
