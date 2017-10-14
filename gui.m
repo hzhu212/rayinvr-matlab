@@ -390,10 +390,11 @@ function gui
 		end
 		params.pathVin = pathVin;
 
-		[x, fval] = fun_optimize(params);
+		[final_x, final_val] = fun_optimize(params);
 		disp('final pois: ');
-		disp(x);
-		fprintf('final chi-squre: %f\n', fval);
+		disp(final_x);
+		fprintf('final chi-squre: %f\n', final_val);
+		save('history_opetimize.mat', 'final_x', 'final_val', '-append');
 	end
 
 	% 运行按钮

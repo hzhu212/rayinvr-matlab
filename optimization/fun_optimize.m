@@ -1,37 +1,108 @@
 % 通过优化算法寻找使得 CHI 最小的 pois 数组
 
 function [x,fval] = fun_optimize(mainOptions)
-	% load indexs, nGeneration, nPopulation, lowerLimit, upperLimit
-	run('config.m');
-	if isempty(nGeneration) || ~nGeneration, nGeneration = 10; end
-	if isempty(nPopulation) || ~nPopulation, nPopulation = 20; end
-
-	nvar = length(indexs);
 	file_rin = fullfile(mainOptions.pathIn, 'r.in');
-	POIS = fun_init_pois(file_rin);
-	INDEXS = int32(indexs);
+	[initRay, initPois] = fun_load_from_rin(file_rin);
 
-	mainOptions.isPlot = false;
-	target_fun = fun_partialMain(mainOptions,POIS,INDEXS);
+	cfg = fun_get_config();
 
-	% default options:
+	% default ga options:
 	% Generations: 100 * nvar
 	% PopulationSize: {50} when numberOfVariables <= 5, {200} otherwise | {min(max(10*nvar,40),100)} for mixed-integer problems
 	% options = gaoptimset('Generations', 10, 'PopulationSize', 20);
-	gaoutfun = @gaoutfun_stem3;
-	options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',nGeneration,'PopulationSize',nPopulation);
-	[x, fval] = ga(target_fun, nvar, [],[],[],[],...
-		lowerLimit*ones(nvar,1),upperLimit*ones(nvar,1),[],options);
+
+	% ga by layer
+	if cfg.type == 1
+		% config includeing layerIndexs, nGeneration, nPopulation, lowerLimit, upperLimit
+		nvar = length(cfg.layerIndexs);
+		layerIndexs = int32(cfg.layerIndexs);
+
+		mainOptions.isPlot = false;
+		target_fun = fun_partialMain1(mainOptions,initPois,layerIndexs);
+		gaoutfun = @gaoutfun_stem3;
+		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
+		[x, fval] = ga(target_fun, nvar, [],[],[],[],...
+			lowerLimit*ones(nvar,1),upperLimit*ones(nvar,1),[],options);
+
+	% ga by block
+	elseif cfg.type == 2
+		% config includeing layer, nBlock, blockIndexs, nGeneration, nPopulation, refval, offset
+		% 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
+		ray = initRay(fix(initRay) == cfg.layer);
+		nvar = cfg.nBlock;
+		initPoisl = cfg.layer .* ones(nvar,1);
+		initPoisb = 1:nvar;
+		initPoisbl = cfg.refval * ones(nvar,1);
+		upperLimit = min((1+cfg.offset)*cfg.refval, 0.499) * ones(nvar,1);
+		lowerLimit = max((1-cfg.offset)*cfg.refval, 0.42) * ones(nvar,1);
+
+		mainOptions.isPlot = false;
+		target_fun = fun_partialMain2(mainOptions,initPoisl,initPoisb,initPoisbl,cfg.blockIndexs);
+		gaoutfun = @gaoutfun_stem3;
+		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
+		[x, fval] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
+	end
+
+	% 依据层编号 layer，取出在该层内发生的事件对应的 ray
+	% 同时，求出相应的 ncbnd, cbnd, ivray
+	function [ray, ncbnd, cbnd, ivray] = fun_get_related_rays(layer, ray, ncbnd, cbnd, ivray)
+		grouped_cbnd = fun_group_cbnd(ncbnd, cbnd);
+
+		indexs = find(fix(ray) == layer);
+		ray = ray(indexs);
+		ncbnd = ncbnd(indexs);
+		grouped_cbnd = grouped_cbnd(indexs);
+		cbnd = fun_ungroup_cbnd(grouped_cbnd);
+		ivray = ivray(indexs);
+
+		% 将平坦数组 cbnd 转为按照 ncbnd 分组的 cell
+		function grouped_cbnd = fun_group_cbnd(ncbnd, cbnd)
+			total = 1
+			grouped_cbnd = {};
+			for ii = 1:length(ncbnd)
+			    n = ncbnd(ii);
+			    grouped_cbnd{ii} = cbnd(total:(total+n));
+			    total = total + n + 1;
+			end
+		end
+
+		% 将分组后的 cbnd 转为平坦数组
+		function cbnd = fun_ungroup_cbnd(grouped_cbnd)
+			cbnd = [];
+			for ii = 1:length(grouped_cbnd)
+			    cbnd = [cbnd, grouped_cbnd{ii}];
+			end
+		end
+	end
 end
 
-function func = fun_partialMain(mainOptions,POIS,INDEXS)
+% ga by layer
+function func = fun_partialMain1(mainOptions,initPois,layerIndexs)
 	function y = wrapper(iterPois)
-		disp('Optimizing pois: ');
-		fprintf('%10.0f', INDEXS); fprintf('\n');
+		disp('Optimizing pois by layer: ');
+		fprintf('%10.0f', layerIndexs); fprintf('\n');
 		fprintf('%10.4f', iterPois); fprintf('\n');
 		curPois = POIS;
-		curPois(INDEXS) = iterPois;
+		curPois(layerIndexs) = iterPois;
 		mainOptions.pois = curPois;
+		[RMS, CHI] = main(mainOptions);
+		y = CHI;
+	end
+	func = @wrapper;
+end
+
+% ga by block
+function func = fun_partialMain2(mainOptions,initPoisl,initPoisb,initPoisbl,blockIndexs)
+	function y = wrapper(iterPois)
+		disp('Optimizing pois by block: ');
+		fprintf('layer #: %.0f\n', initPoisl(1));
+		fprintf('%10.0f', blockIndexs); fprintf('\n');
+		fprintf('%10.4f', iterPois); fprintf('\n');
+		curPoisbl = initPoisbl;
+		curPoisbl(blockIndexs) = iterPois;
+		mainOptions.poisl = initPoisl;
+		mainOptions.poisb = initPoisb;
+		mainOptions.poisbl = curPoisbl;
 		[RMS, CHI] = main(mainOptions);
 		y = CHI;
 	end
@@ -75,8 +146,9 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	        figure(hf);
 	        pause(0.1);
 	    case 'done'
-	        save('history_optimize.mat', 'populations', 'scores');
+	        % save('history_optimize.mat', 'populations', 'scores');
 	    end
+    save('history_optimize.mat', 'populations', 'scores');
 end
 
 function [state,options,optchanged] = gaoutfun_surf(options,state,flag)

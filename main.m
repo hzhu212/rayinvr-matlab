@@ -25,6 +25,9 @@ function [RMS, CHI] = main(options)
 	isUseOde = false;
 	isPlot = true;
 	pois_ = [];
+	poisl_ = [];
+	poisb_ = [];
+	poisbl_ = [];
 
 	if nargin == 1
 		if isfield(options,'pathIn') && ~isempty(options.pathIn)
@@ -41,6 +44,15 @@ function [RMS, CHI] = main(options)
 		end
 		if isfield(options,'pois') && ~isempty(options.pois)
 			pois_ = options.pois;
+		end
+		if isfield(options,'poisl') && ~isempty(options.poisl)
+			poisl_ = options.poisl;
+		end
+		if isfield(options,'poisb') && ~isempty(options.poisb)
+			poisb_ = options.poisb;
+		end
+		if isfield(options,'poisbl') && ~isempty(options.poisbl)
+			poisbl_ = options.poisbl;
 		end
 	end
 
@@ -117,8 +129,11 @@ function [RMS, CHI] = main(options)
 	clear(file_rin_m);
 	run(file_rin_m);
 
-	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化
+	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化(顺便处理 pois_ 长度为 0 的情况)
 	pois(1:length(pois_)) = pois_;
+	poisl(1:length(poisl_)) = poisl_;
+	poisb(1:length(poisb_)) = poisb_;
+	poisbl(1:length(poisbl_)) = poisbl_;
 
 	% matlab colors，设定当前颜色为默认色（前景色）
 	% matlabColors = 'krgbcmyy';
