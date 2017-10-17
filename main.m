@@ -23,11 +23,7 @@ function [RMS, CHI] = main(options)
 	pathIn = fullfile(appRoot, 'data','examples','e1');
 	pathVin = fullfile(pathIn, 'v.in');
 	isUseOde = false;
-	isPlot = true;
-	pois_ = [];
-	poisl_ = [];
-	poisb_ = [];
-	poisbl_ = [];
+	inOptimize = false;
 
 	if nargin == 1
 		if isfield(options,'pathIn') && ~isempty(options.pathIn)
@@ -39,22 +35,15 @@ function [RMS, CHI] = main(options)
 		if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
 			isUseOde = options.isUseOde;
 		end
-		if isfield(options,'isPlot') && ~isempty(options.isPlot)
-			isPlot = options.isPlot;
+		if isfield(options,'inOptimize') && ~isempty(options.inOptimize)
+			inOptimize = options.inOptimize;
 		end
-		if isfield(options,'pois') && ~isempty(options.pois)
-			pois_ = options.pois;
-		end
-		if isfield(options,'poisl') && ~isempty(options.poisl)
-			poisl_ = options.poisl;
-		end
-		if isfield(options,'poisb') && ~isempty(options.poisb)
-			poisb_ = options.poisb;
-		end
-		if isfield(options,'poisbl') && ~isempty(options.poisbl)
-			poisbl_ = options.poisbl;
+		if inOptimize
+			optimizeOpts = options.optimizeOpts;
 		end
 	end
+
+	isPlot = ~inOptimize;
 
 	if ~exist(pathIn, 'dir')
 		error('main:IOError','Input path: "%s" not exist',pathIn);
@@ -89,6 +78,8 @@ function [RMS, CHI] = main(options)
 	file_rayinvr_com = 'rayinvr_com.m';
 	file_main_par = 'main_par.m';
 	file_block_data = 'blkdat.m';
+
+	file_rin_mat = 'r_in.mat';
 
 	file_rin = fullfile(pathIn,'r.in');
 	file_vin = pathVin;
@@ -129,11 +120,26 @@ function [RMS, CHI] = main(options)
 	clear(file_rin_m);
 	run(file_rin_m);
 
-	% 覆盖性载入 pois 数组，对 pois 数组做基因算法最优化(顺便处理 pois_ 长度为 0 的情况)
-	pois(1:length(pois_)) = pois_;
-	poisl(1:length(poisl_)) = poisl_;
-	poisb(1:length(poisb_)) = poisb_;
-	poisbl(1:length(poisbl_)) = poisbl_;
+	% 在基因算法优化中，需要覆盖某些 r.in 参数
+	if inOptimize
+	    ws = load(optimizeOpts.rin_mat);
+	    f = fieldnames(ws);
+	    for ii = 1:length(f)
+	    	eval([f{ii},'(1:end)=0;']);
+	        eval([f{ii},'(1:length(ws.(f{ii})))=ws.(f{ii});']);
+	    end
+
+	    if optimizeOpts.type == 1
+			pois(1:length(optimizeOpts.pois)) = optimizeOpts.pois;
+		elseif optimizeOpts.type == 2
+			poisl(1:length(optimizeOpts.poisl)) = optimizeOpts.poisl;
+			poisb(1:length(optimizeOpts.poisb)) = optimizeOpts.poisb;
+			poisbl(1:length(optimizeOpts.poisbl)) = optimizeOpts.poisbl;
+		else
+			error('optimize type not exists!');
+	    end
+	end
+
 
 	% matlab colors，设定当前颜色为默认色（前景色）
 	% matlabColors = 'krgbcmyy';

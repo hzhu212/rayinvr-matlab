@@ -8,11 +8,11 @@ function options = fun_get_config()
 	%% by layer
 	if options.type == 1
 		% 待优化的泊松比在 pois 数组中的 index
-		options.layerIndexs = 2:3;
+		options.layerIndexs = [3,6];
 		% 基因算法代数
-		options.nGeneration = 5;
+		options.nGeneration = 3;
 		% 每代的个体数
-		options.nPopulation = 5;
+		options.nPopulation = 3;
 		% 待优化的自变量的下限和上限（此处指泊松比）
 		options.lowerLimit = 0.43;
 		options.upperLimit = 0.499;
@@ -20,18 +20,18 @@ function options = fun_get_config()
 	%% by block
 	elseif options.type == 2
 		% 层号
-		options.layer = 2;
+		options.layer = 3;
 		% 该层的 block 数
-		options.nBlock = 10;
+		options.nBlock = 21;
 		% 待优化的块的 index
-		options.blockIndexs = 'all';
+		options.blockIndexs = 11:14;
 		% 基因算法参数
 		options.nGeneration = 3;
 		options.nPopulation = 3;
 		% 基准值
 		options.refval = 0.494;
 		% 偏差度
-		options.offset = 0.05;
+		options.offset = 0.03;
 
 		% default values
 		% ----------------------------------------

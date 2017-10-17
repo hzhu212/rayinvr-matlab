@@ -394,7 +394,7 @@ function gui
 		disp('final pois: ');
 		disp(final_x);
 		fprintf('final chi-squre: %f\n', final_val);
-		save('history_opetimize.mat', 'final_x', 'final_val', '-append');
+		save('history_optimize.mat', 'final_x', 'final_val', '-append');
 	end
 
 	% 运行按钮
