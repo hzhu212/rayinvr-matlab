@@ -23,6 +23,7 @@ function [RMS, CHI] = main(options)
 	pathIn = fullfile(appRoot, 'data','examples','e1');
 	pathVin = fullfile(pathIn, 'v.in');
 	isUseOde = false;
+	isPlot = true;
 	inOptimize = false;
 
 	if nargin == 1
@@ -40,10 +41,9 @@ function [RMS, CHI] = main(options)
 		end
 		if inOptimize
 			optimizeOpts = options.optimizeOpts;
+			isPlot = optimizeOpts.isPlot;
 		end
 	end
-
-	isPlot = ~inOptimize;
 
 	if ~exist(pathIn, 'dir')
 		error('main:IOError','Input path: "%s" not exist',pathIn);

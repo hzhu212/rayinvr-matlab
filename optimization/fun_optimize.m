@@ -15,6 +15,7 @@ function [x,fval] = fun_optimize(mainOpts)
 
 	optimizeOpts.rin_mat = 'r_in_optimize.mat';
 	optimizeOpts.type = cfg.type;
+	optimizeOpts.isPlot = cfg.isPlot;
 	% ga by layer
 	if cfg.type == 1
 		% config includes layerIndexs, nGeneration, nPopulation, lowerLimit, upperLimit
@@ -55,14 +56,17 @@ end
 % 依据层编号 layer，取出在该层内发生的事件对应的 ray
 % 同时，挑选出相应的 ncbnd, cbnd, ivray
 function [ray, ncbnd, cbnd, ivray] = fun_select_rays(layers, ray, ncbnd, cbnd, ivray)
-	layers = min(layers):max(layers);
+	trace_layers = min(layers):max(layers);
+	if trace_layers(1)-1 > 1
+	    trace_layers = [trace_layers(1)-1, trace_layers];
+	end
 	grouped_cbnd = fun_group_cbnd(ncbnd, cbnd);
 
 	ray_layers = fix(ray);
 	indexs = [];
 	for ii = 1:length(ray_layers)
 	    ly = ray_layers(ii);
-	    if ismember(ly, layers)
+	    if ismember(ly, trace_layers)
 	        indexs = [indexs, ii];
 	    end
 	end
@@ -105,6 +109,10 @@ function func = fun_partialMain1(mainOpts, optimizeOpts, initPois, layerIndexs)
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
+		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
+		if optimizeOpts.isPlot
+		    pause(0.1);
+		end
 	end
 	func = @wrapper;
 end
@@ -125,6 +133,10 @@ function func = fun_partialMain2(mainOpts,optimizeOpts,initPoisl,initPoisb,initP
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
+		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
+		if optimizeOpts.isPlot
+		    pause(0.1);
+		end
 	end
 	func = @wrapper;
 end
