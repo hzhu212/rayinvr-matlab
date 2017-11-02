@@ -22,6 +22,7 @@ function [RMS, CHI] = main(options)
 	global appRoot;
 	pathIn = fullfile(appRoot, 'data','examples','e1');
 	pathVin = fullfile(pathIn, 'v.in');
+	pathRin = fullfile(pathIn, 'r.in');
 	isUseOde = false;
 	isPlot = true;
 	inOptimize = false;
@@ -32,6 +33,9 @@ function [RMS, CHI] = main(options)
 		end
 		if isfield(options,'pathVin') && ~isempty(options.pathVin)
 			pathVin = options.pathVin;
+		end
+		if isfield(options,'pathRin') && ~isempty(options.pathRin)
+			pathRin = options.pathRin;
 		end
 		if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
 			isUseOde = options.isUseOde;
@@ -81,7 +85,7 @@ function [RMS, CHI] = main(options)
 
 	file_rin_mat = 'r_in.mat';
 
-	file_rin = fullfile(pathIn,'r.in');
+	file_rin = pathRin;
 	file_vin = pathVin;
 	file_txin = fullfile(pathIn,'tx.in');
 	file_fin = fullfile(pathIn,'f.in');
