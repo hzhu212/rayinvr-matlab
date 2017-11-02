@@ -64,6 +64,7 @@ function [frz] = fun_modwr(modout,dx,dz,modi,ifrbnd,frz,xmmin,xmmax)
 
 		isGoto112 = false;
 		if abs(modout) == 2
+			jl = nx + 1;
 			for jj = 1:nx+1 % 110
 				iflag = 0;
 				if ii > 1 & jj > 1

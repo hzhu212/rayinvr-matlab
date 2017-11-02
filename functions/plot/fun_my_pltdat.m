@@ -37,6 +37,11 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 			index = inversedRay + ii;
 		end
 
+		% 如果待绘制的射线组为空，则进行下一组
+		if isempty(index)
+		    continue
+		end
+
 		codeChange = find(ipf(index(1:end-1)) ~= ipf(index(2:end)));
 		codeChange = [0; codeChange; length(index)];
 		for jj = 1:length(codeChange)-1
