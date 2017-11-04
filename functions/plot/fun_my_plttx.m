@@ -236,29 +236,29 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 				end % -------------------- cycle100 end
 				npt = k - 1;
 				nh2 = nh2 + npt;
-				% if ibrka(ii) == 0 || itx == 2 || npt < 3
-					% 输出到 tx.out 文件，跳过
 
-					% itx<3 才绘制
-					if itx < 3
-						lineStyle = '-';
-						lineSymbol = '';
-						markerSize = symht .* 5;
-						% 若 itx=2，则不绘制实线，并在节点处绘制小方块
-						if itx == 2
-							lineStyle = '';
-							lineSymbol = 's';
-						end
-						% 默认所有点均绘制
-						index = 1:npt;
-						% 如果限定了 itxbox，则落在坐标框外的不绘制
-						if itxbox ~= 0
-							index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
-						end
-						plot(x(index),t(index),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+				% itx<3 才绘制
+				if itx < 3
+					lineStyle = '-';
+					lineSymbol = '';
+					markerSize = symht .* 5;
+					% 如果线只包括一个点，则线无法显示，只能绘制点标记
+					if itx == 1 && npt == 1
+					    lineSymbol = 's';
 					end
-
-				% end
+					% 若 itx=2，则不绘制实线，并在节点处绘制小方块
+					if itx == 2
+						lineStyle = '';
+						lineSymbol = 's';
+					end
+					% 默认所有点均绘制
+					index = 1:npt;
+					% 如果限定了 itxbox，则落在坐标框外的不绘制
+					if itxbox ~= 0
+						index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
+					end
+					plot(x(index),t(index),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+				end
 			end % -------------------- cycle1000 end
 		end
 	end % 10

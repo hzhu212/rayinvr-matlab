@@ -1160,6 +1160,9 @@ function [RMS, CHI] = main(options)
 		if isPlot, fun_my_plttx(ifam,itt,iszero,idata,iaxlab,xshota,idr,nshot,itxout,ibrka,ivraya,ttunc,itrev,xshotr,1.0,itxbox,iroute,iline); end
 	end
 
+	% 暂停一下，先显示绘图再继续
+	if isPlot, pause(0.1); end
+
 	if itxout > 0
 		% 930
 		fprintf(fID_17,'   %14f   %14f   %14f%12d',0.0,0.0,0.0,-1);
