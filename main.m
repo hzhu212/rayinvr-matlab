@@ -20,6 +20,11 @@ function [RMS, CHI] = main(options)
 
 	% default parameters
 	global appRoot;
+	if isempty(appRoot)
+	    appRoot = mfilename('fullpath');
+    	filesepIndexs = strfind(appRoot, filesep);
+    	appRoot = appRoot(1:filesepIndexs(end));
+	end
 	pathIn = fullfile(appRoot, 'data','examples','e1');
 	pathVin = fullfile(pathIn, 'v.in');
 	pathRin = fullfile(pathIn, 'r.in');
@@ -387,7 +392,8 @@ function [RMS, CHI] = main(options)
 	% 模型炮点数据来自数组 xshot, zshot，由 r.in 文件读入
 	% xshota, zshota, idr: 所有有效炮点的 x 坐标，z 坐标，和方向(-1-左，1-右)
 	% nshot: 所有有效炮点总数
-	for ii = 1:pshot % 290
+	% for ii = 1:pshot % 290
+	for ii = 1:length(ishot) % 290
 		% 炮点方向为左或左右
 		if ishot(ii)==-1 || ishot(ii)==2
 			nshot = nshot + 1;

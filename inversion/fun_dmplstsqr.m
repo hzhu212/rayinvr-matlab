@@ -274,7 +274,7 @@ for i=1:nvar
 				end
 				ifrbnd=1;
 			end
-			atad(i,j)=atad(i,j)+dmpfct{7}/parunc(i)
+			atad(i,j)=atad(i,j)+dmpfct{7}/parunc(i);
 		end
 	end
 end
@@ -463,13 +463,9 @@ for i=1:nlayer
 end
 fid=fopen(path_dout,'a');
 % eval(['fid=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
-fprintf(fid,'%s','velocity model:');
-fprintf(fid,'\n');
-fprintf(fid,'\n');
+fprintf(fid,'velocity model:\n\n');
 if iscrn{7}==1
-	fprintf('%s','velocity model:');
-	fprintf('\n');
-	fprintf('\n');
+	fprintf('velocity model:\n\n');
 end
 
 %% 2.7 check for pinchouts
@@ -1429,6 +1425,7 @@ if temp==2  %save the second part
 		fprintf('\n');
 		fprintf('%2i ',0);
 		fprintf(format_f,zm(ncont,1:nzed(ncont)));
+		fprintf('\n');
 	end
 end
 end
