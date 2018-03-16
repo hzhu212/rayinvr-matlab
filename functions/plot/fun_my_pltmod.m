@@ -12,7 +12,7 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 
 	if isempty(hFigure1)
 		% 创建一个 figure 对象
-		hFigure1 = figure('NumberTitle','off','Name','地层模型与射线追踪','Position',[200,130,900,500]);
+		hFigure1 = figure('NumberTitle','off','Name','Ray Tracing','Position',[200,130,900,500]);
 		% (在当前 figure 对象上)创建一个 axes 子对象
 		axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
 	else

@@ -32,12 +32,12 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 
 	if isempty(hFigure2)
 		% 创建一个新的 figure 对象
-		hFigure2 = figure('NumberTitle','off','Name','走时曲线','Position',[220,100,900,500]);
+		hFigure2 = figure('NumberTitle','off','Name',['Travel Time - ',sprintf('%.2f',xshotr)],'Position',[220,100,900,500]);
 		% 创建 axes 对象
 		axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
     else
+    	% set(hFigure2, 'Name', [get(hFigure2, 'Name'), ' - ', sprintf('%.2f',xshotr)]);
     	figure(hFigure2);
-    	% cla(gca(),'reset');
 	end
 
 	hold on;
