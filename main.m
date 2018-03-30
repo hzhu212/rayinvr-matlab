@@ -141,9 +141,9 @@ function [RMS, CHI] = main(options)
 	    if optimizeOpts.type == 1
 			pois(1:length(optimizeOpts.pois)) = optimizeOpts.pois;
 		elseif optimizeOpts.type == 2
-			poisl(1:length(optimizeOpts.poisl)) = optimizeOpts.poisl;
-			poisb(1:length(optimizeOpts.poisb)) = optimizeOpts.poisb;
-			poisbl(1:length(optimizeOpts.poisbl)) = optimizeOpts.poisbl;
+			poisl = [poisl, optimizeOpts.poisl];
+			poisb = [poisb, optimizeOpts.poisb];
+			poisbl = [poisbl, optimizeOpts.poisbl];
 		else
 			error('optimize type not exists!');
 	    end
@@ -1282,7 +1282,7 @@ function [RMS,CHI] = fun_goto900()
 	run(file_rayinvr_com);
 	run(file_main_par);
 
-	RMS = 0; CHI = 0;
+	RMS = []; CHI = [];
 
 	% 900 % 920 cycle
 	ntblk = sum(nblk(1:nlayer));

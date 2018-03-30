@@ -34,29 +34,41 @@ function [x,fval] = fun_optimize(mainOpts)
 
 	% ga by block
 	elseif cfg.type == 2
-		% config includes layer, nBlock, blockIndexs, nGeneration, nPopulation, refval, offset
-		% 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
-		nvar = length(cfg.blockIndexs);
-		initPoisl = cfg.layer .* ones(cfg.nBlock,1);
-		initPoisb = 1:cfg.nBlock;
-		initPoisbl = cfg.refval .* ones(cfg.nBlock,1);
-		upperLimit = min((1+cfg.offset)*cfg.refval, 0.499) .* ones(nvar,1);
-		lowerLimit = max((1-cfg.offset)*cfg.refval, 0.42) .* ones(nvar,1);
+		% config includes poisl, poisb, nGeneration, nPopulation, poisbl, offset
+		optimizeOpts.poisl = cfg.poisl;
+		optimizeOpts.poisbCell = cfg.poisb;
+		% 将分组存放在 cell 中的 poisb 串接成一个向量
+		optimizeOpts.poisb = cat(2, cfg.poisb{:});
 
-		[obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(cfg.layer,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
+		% 优化算法要追踪的参数个数
+		nvar = length(cfg.poisb);
+
+		% 如果 poisbl 为单个值，则扩展为向量
+		poisbl = cfg.poisbl;
+		if length(poisbl) == 1
+		    poisbl = poisbl * ones(1, nvar);
+		end
+		% 将 poisbl 的上下限限制在 0.250 到 0.499 之间
+		upperLimit = poisbl + cfg.offset;
+		lowerLimit = poisbl - cfg.offset;
+		upperLimit(upperLimit > 0.499) = 0.499;
+		lowerLimit(lowerLimit < 0.250) = 0.250;
+
+		% 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
+		[obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(cfg.poisl,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
 		save(optimizeOpts.rin_mat, '-struct', 'obj');
 
-		target_fun = fun_partialMain2(mainOpts,optimizeOpts,initPoisl,initPoisb,initPoisbl,cfg.layer,cfg.blockIndexs);
+		target_fun = fun_partialMain2(mainOpts,optimizeOpts);
 		gaoutfun = @gaoutfun_stem3;
 		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
 		[x, fval] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
 	end
 end
 
-% 依据层编号 layer，取出在该层内发生的事件对应的 ray
+% 依据层编号 poisl，取出在该层内发生的事件对应的 ray
 % 同时，挑选出相应的 ncbnd, cbnd, ivray
-function [ray, ncbnd, cbnd, ivray] = fun_select_rays(layers, ray, ncbnd, cbnd, ivray)
-	trace_layers = min(layers):max(layers);
+function [ray, ncbnd, cbnd, ivray] = fun_select_rays(poisl, ray, ncbnd, cbnd, ivray)
+	trace_layers = min(poisl):max(poisl);
 	if trace_layers(1)-1 > 1
 	    trace_layers = [trace_layers(1)-1, trace_layers];
 	end
@@ -109,6 +121,7 @@ function func = fun_partialMain1(mainOpts, optimizeOpts, initPois, layerIndexs)
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
+		if isempty(y), y = 999; end
 		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
 		if optimizeOpts.isPlot
 		    pause(0.1);
@@ -118,21 +131,25 @@ function func = fun_partialMain1(mainOpts, optimizeOpts, initPois, layerIndexs)
 end
 
 % ga by block
-function func = fun_partialMain2(mainOpts,optimizeOpts,initPoisl,initPoisb,initPoisbl,layer,blockIndexs)
-	optimizeOpts.poisl = initPoisl;
-	optimizeOpts.poisb = initPoisb;
-    save('history_optimize.mat', 'layer', 'blockIndexs');
+function func = fun_partialMain2(mainOpts,optimizeOpts)
+	poisl = optimizeOpts.poisl; poisb = optimizeOpts.poisb;
+    save('history_optimize.mat', 'poisl', 'poisb');
 	function y = wrapper(iterPois)
+		% 将分组存放的 poisbl 展开成与 poisl 相同的长度
+		poisbl = [];
+		for ii = 1:length(iterPois)
+			groupSize = length(optimizeOpts.poisbCell{ii});
+		    poisbl = [poisbl, iterPois(ii).*ones(1, groupSize)];
+		end
+		optimizeOpts.poisbl = poisbl;
 		disp('Optimizing pois by block: ');
-		fprintf('layer: %.0f\n', layer);
-		disp('block pois: ');
-		fprintf('%10.0f', blockIndexs); fprintf('\n');
-		fprintf('%10.4f', iterPois); fprintf('\n');
-		optimizeOpts.poisbl = initPoisbl;
-		optimizeOpts.poisbl(blockIndexs) = iterPois;
+		fprintf('poisl: '); fprintf('%6.0f,', optimizeOpts.poisl); fprintf('\n');
+		fprintf('poisb: '); fprintf('%6.0f,', optimizeOpts.poisb); fprintf('\n');
+		fprintf('poisbl:'); fprintf('%6.3f,', optimizeOpts.poisbl); fprintf('\n');
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
+		if isempty(y), y = 999; end
 		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
 		if optimizeOpts.isPlot
 		    pause(0.1);
@@ -147,7 +164,8 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	persistent hf populations scores h z;
 	nGen = options.Generations;
 	nPop = options.PopulationSize;
-	curGen = state.Generation;
+	% Generation 索引默认从 0 开始，加 1 方便索引
+	curGen = state.Generation + 1;
 	optchanged = false;
 	switch flag
 	    case 'init'
@@ -156,7 +174,7 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	        [x, y] = meshgrid(0:nGen, 1:nPop);
 	        z = zeros(nPop, nGen+1);
 	        x = x(:)'; y = y(:)'; z = z(:)';
-	        z((nPop*curGen+1):nPop*(curGen+1)) = state.Score';
+	        z((nPop*(curGen-1)+1):nPop*curGen) = state.Score';
 	        h = stem3(ax, x, y, z, 'Marker','s','MarkerEdgeColor','r','MarkerFaceColor','g');
 	        h.ZDataSource = 'z';
 	        ax.XTick = 0:nGen;
@@ -169,11 +187,10 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	        scores(:,1) = state.Score;
 	    case 'iter'
 	        % Update the history
-            ss = size(populations,3);
             populations(:,:,curGen) = state.Population;
             scores(:,curGen) = state.Score;
 	        % Update the plot.
-	        z(nPop*curGen+1:nPop*(curGen+1)) = state.Score';
+	        z(nPop*(curGen-1)+1:nPop*curGen) = state.Score';
 	        refreshdata(h, 'caller');
 	        figure(hf);
 	        pause(0.1);
