@@ -131,12 +131,14 @@ function [RMS, CHI] = main(options)
 
 	% 在基因算法优化中，需要覆盖某些 r.in 参数
 	if inOptimize
-	    ws = load(optimizeOpts.rin_mat);
-	    f = fieldnames(ws);
-	    for ii = 1:length(f)
-	    	eval([f{ii},'(1:end)=0;']);
-	        eval([f{ii},'(1:length(ws.(f{ii})))=ws.(f{ii});']);
-	    end
+		if exist(optimizeOpts.rin_mat, 'file')
+		    ws = load(optimizeOpts.rin_mat);
+		    f = fieldnames(ws);
+		    for ii = 1:length(f)
+		    	eval([f{ii},'(1:end)=0;']);
+		        eval([f{ii},'(1:length(ws.(f{ii})))=ws.(f{ii});']);
+		    end
+		end
 
 	    if optimizeOpts.type == 1
 			pois(1:length(optimizeOpts.pois)) = optimizeOpts.pois;

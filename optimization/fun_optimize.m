@@ -13,9 +13,11 @@ function [x,fval] = fun_optimize(mainOpts)
 	% PopulationSize: {50} when numberOfVariables <= 5, {200} otherwise | {min(max(10*nvar,40),100)} for mixed-integer problems
 	% options = gaoptimset('Generations', 10, 'PopulationSize', 20);
 
-	optimizeOpts.rin_mat = 'r_in_optimize.mat';
 	optimizeOpts.type = cfg.type;
 	optimizeOpts.isPlot = cfg.isPlot;
+	optimizeOpts.rin_mat = 'r_in_optimize.mat';
+	if exist(optimizeOpts.rin_mat, 'file'), delete(optimizeOpts.rin_mat); end
+
 	% ga by layer
 	if cfg.type == 1
 		% config includes layerIndexs, nGeneration, nPopulation, lowerLimit, upperLimit
@@ -54,9 +56,9 @@ function [x,fval] = fun_optimize(mainOpts)
 		upperLimit(upperLimit > 0.499) = 0.499;
 		lowerLimit(lowerLimit < 0.250) = 0.250;
 
-		% 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
-		[obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(cfg.poisl,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
-		save(optimizeOpts.rin_mat, '-struct', 'obj');
+		% % 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
+		% [obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(cfg.poisl,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
+		% save(optimizeOpts.rin_mat, '-struct', 'obj');
 
 		target_fun = fun_partialMain2(mainOpts,optimizeOpts);
 		gaoutfun = @gaoutfun_stem3;
@@ -121,7 +123,7 @@ function func = fun_partialMain1(mainOpts, optimizeOpts, initPois, layerIndexs)
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
-		if isempty(y), y = 999; end
+		if isempty(y), y = inf; end
 		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
 		if optimizeOpts.isPlot
 		    pause(0.1);
@@ -149,7 +151,7 @@ function func = fun_partialMain2(mainOpts,optimizeOpts)
 		mainOpts.optimizeOpts = optimizeOpts;
 		[RMS, CHI] = main(mainOpts);
 		y = CHI;
-		if isempty(y), y = 999; end
+		if isempty(y), y = inf; end
 		% 如果优化过程中仍需要绘图，则暂停一下等待绘图
 		if optimizeOpts.isPlot
 		    pause(0.1);
