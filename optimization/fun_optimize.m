@@ -134,8 +134,8 @@ end
 
 % ga by block
 function func = fun_partialMain2(mainOpts,optimizeOpts)
-	poisl = optimizeOpts.poisl; poisb = optimizeOpts.poisb;
-    save('history_optimize.mat', 'poisl', 'poisb');
+	poisl = optimizeOpts.poisl; poisb = optimizeOpts.poisb; poisbCell = optimizeOpts.poisbCell;
+    save('history_optimize.mat', 'poisl', 'poisb', 'poisbCell');
 	function y = wrapper(iterPois)
 		% 将分组存放的 poisbl 展开成与 poisl 相同的长度
 		poisbl = [];
