@@ -14,7 +14,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
     while ~feof(fin) % 当文件读取未结束
         currentLine = strtrim(fgetl(fin));
         inSection = false;
-        [tokens,split] = regexp(currentLine, '(&\w+)\s+', 'tokens', 'split');
+        [tokens,split] = regexp(currentLine, '(&\w+)\s*', 'tokens', 'split');
         if ~isempty(tokens)
             % 找出小节开头
             inSection = true;
@@ -23,7 +23,9 @@ function fileOut = fun_trans_rin2rm(file_rin)
             fprintf(fout, ['%% ',sectionName,'\n']);
         else
             % 未被section包括的部分直接作为注释输出
-            fprintf(fout, ['%% ',currentLine,'\n']);
+            if ~isempty(strtrim(currentLine))
+                fprintf(fout, ['%% ',currentLine,'\n']);
+            end
             continue;
         end
         while(inSection)
@@ -45,7 +47,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
 
         % 处理逗号，将每个完整的赋值语句后面的逗号替换成分号
         currentLine = sprintf(currentLine); % 将字符串转化为格式化字符串（这样\n之类的特殊字符才能被识别，否则\n将被看作2个普通字符）
-        currentLine = strrep(currentLine, ' ', ''); % 去掉所有空格
+        currentLine = strrep(strtrim(currentLine), ' ', ''); % 去掉首尾空白以及所有空格
         currentLine = regexprep(currentLine, ',(\s*\w+=)', ']; $1'); % 将每个完整的赋值语句后面的逗号替换成分号
         currentLine = regexprep(currentLine, ',$', ']; '); % 上一步不能识别最末尾的逗号，此处作为上一步的补充
         currentLine = strrep(currentLine, '=', '(1)=['); % 为赋值的开头添加方括号，对所有的数组默认加上下标1(后面再根据赋值的长度作调整)
