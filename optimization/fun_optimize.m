@@ -1,6 +1,6 @@
 % 通过优化算法寻找使得 CHI 最小的 pois 数组
 
-function [x,fval] = fun_optimize(mainOpts)
+function [final_x, final_val] = fun_optimize(mainOpts)
 	mainOpts.inOptimize = true;
 	file_rin = fullfile(mainOpts.pathIn, 'r.in');
 	file_rin_m = fun_trans_rin2m(file_rin);
@@ -32,7 +32,7 @@ function [x,fval] = fun_optimize(mainOpts)
 		target_fun = fun_partialMain1(mainOpts, optimizeOpts, rin.pois, layerIndexs);
 		gaoutfun = @gaoutfun_stem3;
 		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
-		[x, fval] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
+		[final_x, final_val] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
 
 	% ga by block
 	elseif cfg.type == 2
@@ -63,8 +63,12 @@ function [x,fval] = fun_optimize(mainOpts)
 		target_fun = fun_partialMain2(mainOpts,optimizeOpts);
 		gaoutfun = @gaoutfun_stem3;
 		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
-		[x, fval] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
+		[final_x, final_val] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
 	end
+	disp('final pois: ');
+	disp(final_x);
+	fprintf('final chi-squre: %f\n', final_val);
+	save('history_optimize.mat', 'final_x', 'final_val', '-append');
 end
 
 % 依据层编号 poisl，取出在该层内发生的事件对应的 ray
@@ -200,6 +204,7 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	        % save('history_optimize.mat', 'populations', 'scores');
 	    end
     save('history_optimize.mat', '-append', 'populations', 'scores');
+    hgsave(hf, 'optimize_result.fig');
 end
 
 function [state,options,optchanged] = gaoutfun_surf(options,state,flag)
@@ -235,8 +240,9 @@ function [state,options,optchanged] = gaoutfun_surf(options,state,flag)
 	        figure(hf);
 	        pause(0.1);
 	    case 'done'
-	        save('history_optimize.mat', '-append', 'populations', 'scores');
 	    end
+    save('history_optimize.mat', '-append', 'populations', 'scores');
+    hgsave(hf, 'optimize_result.fig');
 end
 
 function [state,options,optchanged] = gaoutfun_mesh(options,state,flag)
@@ -272,8 +278,9 @@ function [state,options,optchanged] = gaoutfun_mesh(options,state,flag)
 	        figure(hf);
 	        pause(0.1);
 	    case 'done'
-	        save('history_optimize.mat', '-append', 'populations', 'scores');
 	    end
+    save('history_optimize.mat', '-append', 'populations', 'scores');
+    hgsave(hf, 'optimize_result.fig');
 end
 
 function [state,options,optchanged] = gaoutfun_bar3(options,state,flag)
@@ -304,6 +311,7 @@ function [state,options,optchanged] = gaoutfun_bar3(options,state,flag)
 	        xlabel(ax, 'X - Generation');
 	        ylabel(ax, 'Y - Population');
 	        zlabel(ax, 'Z - Score');
-	        save('history_optimize.mat', '-append', 'populations', 'scores');
 	    end
+    save('history_optimize.mat', '-append', 'populations', 'scores');
+    hgsave(hf, 'optimize_result.fig');
 end

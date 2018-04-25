@@ -434,10 +434,10 @@ function gui
 		params.pathRin = pathRin;
 
 		[final_x, final_val] = fun_optimize(params);
-		disp('final pois: ');
-		disp(final_x);
-		fprintf('final chi-squre: %f\n', final_val);
-		save('history_optimize.mat', 'final_x', 'final_val', '-append');
+		% disp('final pois: ');
+		% disp(final_x);
+		% fprintf('final chi-squre: %f\n', final_val);
+		% save('history_optimize.mat', 'final_x', 'final_val', '-append');
 	end
 
 	% 运行按钮

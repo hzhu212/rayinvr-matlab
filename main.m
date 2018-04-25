@@ -33,14 +33,19 @@ function [RMS, CHI] = main(options)
 	inOptimize = false;
 
 	if nargin == 1
+		% Get path of input files
 		if isfield(options,'pathIn') && ~isempty(options.pathIn)
 			pathIn = options.pathIn;
-		end
-		if isfield(options,'pathVin') && ~isempty(options.pathVin)
-			pathVin = options.pathVin;
-		end
-		if isfield(options,'pathRin') && ~isempty(options.pathRin)
-			pathRin = options.pathRin;
+			if isfield(options,'pathVin') && ~isempty(options.pathVin)
+				pathVin = options.pathVin;
+			else
+				pathVin = fullfile(pathIn, 'v.in');
+			end
+			if isfield(options,'pathRin') && ~isempty(options.pathRin)
+				pathRin = options.pathRin;
+			else
+				pathRin = fullfile(pathIn, 'r.in');
+			end
 		end
 		if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
 			isUseOde = options.isUseOde;

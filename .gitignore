@@ -2,7 +2,7 @@
 /data/
 /dev_tools/
 /*profile*/
-*.py
 *.o
 *.exe
 *.mat
+*.fig
