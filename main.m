@@ -93,8 +93,6 @@ function [RMS, CHI] = main(options)
 	file_main_par = 'main_par.m';
 	file_block_data = 'blkdat.m';
 
-	file_rin_mat = 'r_in.mat';
-
 	file_rin = pathRin;
 	file_vin = pathVin;
 	file_txin = fullfile(pathIn,'tx.in');
@@ -130,8 +128,10 @@ function [RMS, CHI] = main(options)
 
 	% 1.4 为 r.in 中的所有变量赋值
 	% 将 r.in 文件转化为 r_in.m 脚本。载入脚本，为 r.in 中所有变量赋值
-	file_rin_m = fun_trans_rin2m(file_rin);
-	clear(file_rin_m);
+	% file_rin_m = fun_trans_rin2m(file_rin);
+	% clear(file_rin_m);
+	[file_rin_path,file_rin_name,~] = fileparts(file_rin);
+	file_rin_m = fullfile(file_rin_path,[file_rin_name,'_in.m']);
 	run(file_rin_m);
 
 	% 在基因算法优化中，需要覆盖某些 r.in 参数

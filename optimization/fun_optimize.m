@@ -31,7 +31,7 @@ function [final_x, final_val] = fun_optimize(mainOpts)
 
 		target_fun = fun_partialMain1(mainOpts, optimizeOpts, rin.pois, layerIndexs);
 		gaoutfun = @gaoutfun_stem3;
-		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
+		options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation,'UseParallel', true);
 		[final_x, final_val] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
 
 	% ga by block
@@ -189,12 +189,23 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
 	        ylabel(ax, 'Y - Population');
 	        zlabel(ax, 'Z - Score');
 	        pause(0.1);
-	        populations(:,:,1) = state.Population;
-	        scores(:,1) = state.Score;
+	        try
+		        populations(:,:,1) = state.Population;
+		        scores(:,1) = state.Score;
+	        catch e
+	        	disp('Round 1');
+	        	disp(populations);
+	        	disp(state.Population);
+	        end
 	    case 'iter'
-	        % Update the history
-            populations(:,:,curGen) = state.Population;
-            scores(:,curGen) = state.Score;
+	    	try
+	            populations(:,:,curGen) = state.Population;
+	            scores(:,curGen) = state.Score;
+	    	catch e
+	    		fprintf('Round %d\n', curGen);
+	        	disp(populations);
+	        	disp(state.Population);
+	    	end
 	        % Update the plot.
 	        z(nPop*(curGen-1)+1:nPop*curGen) = state.Score';
 	        refreshdata(h, 'caller');
