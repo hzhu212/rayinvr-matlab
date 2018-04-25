@@ -28,7 +28,7 @@ eng=['velunc?- an estimate of the uncertainty (square root of the variance) of t
     '(default: 0.1; however, if velunc is equal to zero, the uncertainties listed in the file i.out are used)'];
 chi=' ';
 velunc={'&dmppar','FFF',eng,chi,0.1,NaN,0.1,false,NaN}';
-         
+
 %bndunc
 allnames=[allnames; 'bndunc'];
 eng=['bndunc?- an estimate of the uncertainty (square root of the variance) of the depth of model boundary values (km) ',char(13,10)'...
@@ -124,7 +124,7 @@ global var atadi ata atad att pvar;  %2.2 matrix processing
 global nfrefl xfrefl zfrefl ivarf npfref fmodel;    %fun_load_fin
 global mpinch zmb grad igrad;  %check part
 
-%real 
+%real
 %apart=zeros(prayi,pnvar);
 %tres=zeros(prayi,1);
 %ata=zeros(pnvar,pnvar);
@@ -163,7 +163,7 @@ ifrbnd=0;
 
 %% 2 main function
 %% 2.1 load d.in & i.out
-fun_load_din('./alternative/d.in'); 
+fun_load_din('./alternative/d.in');
 %eval(['fun_load_din(''./file in/example',num2str(example),'/d.in'');']);
 %fun_load_din2('./file in/example1/d.in');    % if there is need to read more than one section
 if xmax{7}<-99998
@@ -193,9 +193,9 @@ for i=1:nvar
         end
         if i~=j
             ata(j,i)=ata(i,j);
-        end    
+        end
     end
-end    
+end
 
 for i=1:nvar
     att(i)=0;
@@ -275,7 +275,7 @@ ncont=0;    %layer boudary number
 %string='ncont,xm,zm,ivarz,xvel,vf,ivarv,vmodel';
 %eval(['[',string,']=fun_load_vin(',string,',''./file in/example',num2str(example),'/v',num2str(iteration),'.in'');']);
 %fun_load_vin('./file in/example1/v.in');
-nlayer=ncont-1; %layer number      
+nlayer=ncont-1; %layer number
 % nrzmax=ppcntr/10;
 % nrvmax=ppvel/10;
 
@@ -322,7 +322,7 @@ for i=1:nlayer
     end
 end
 
-nlyr=0; 
+nlyr=0;
 for i=2:ncont-1 %将源代码的ncont改为ncont-1，因为最后一层不含ivarz数据
     for j=1:nzed(i) %用每行节点个数nzed(i)控制访问的列数
         if ivarz(i,j)==-1
@@ -365,7 +365,7 @@ for i=1:nlayer
                     zu=zm(i,1);
                 end
                 %400
-                if nvel(i,1)>0  
+                if nvel(i,1)>0
                     vu=vf(i,j,1);
                 else
                     for k=i-1:-1:1
@@ -380,7 +380,7 @@ for i=1:nlayer
                     end
                 end
                 %402
-                if nzed(i+1)>1  
+                if nzed(i+1)>1
                     for k=1:nzed(i+1)-1
                         if xbndc >= xm(i+1,k) && xbndc <= xm(i+1,k+1)
                             zl=(zm(i+1,k+1)-zm(i+1,k))*(xbndc-xm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))+zm(i+1,k);
@@ -391,7 +391,7 @@ for i=1:nlayer
                     zl=zm(i+1,1);
                 end
                 %420
-                vl=vf(i,j,2);   
+                vl=vf(i,j,2);
                 if abs(vu-vl)>0.001
                     if abs(zl-zu)>0.001
                         grad(ngrad)=(vl-vu)/(zl-zu);
@@ -453,7 +453,7 @@ if nlayer>1
                     break;
                 end
             end
-        %282    
+        %282
         end
     end
 end
@@ -517,15 +517,15 @@ for i=1:nlayer
                 fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),abs(1.3*res(nvarw,nker{7}))/rnorm{7}]);  %dmplstsqr_new2.f无abs
             end
             %??????以上dmplstsqr.f不包含
-            zm(i,j)=zm(i,j)+dx(nvarw);   
+            zm(i,j)=zm(i,j)+dx(nvarw);
         end
         if ivarz(i,j)==-1
             nlyr=nlyr+1;
             zm(i,j)=zm(i-1,j)+thick(nlyr);
         end
-    %280    
+    %280
     end
-    
+
     if nvel(i,1)>0
         for j=1:nvel(i,1)
             if ivarv(i,j,1)>0
@@ -564,7 +564,7 @@ for i=1:nlayer
         xvel(i,1,1)=xmax;
         vf(i,1,1)=0.;
     end
-    
+
     if nvel(i,2)>0
         for j=1:nvel(i,2)
             if ivarv(i,j,2)>0
@@ -632,7 +632,7 @@ if ifrbnd==1
 end
 
 %% 2.9 maintain fixed velocity gradients
-            
+
 ngrad=0;
 flag=0;
 for i=1:nlayer
@@ -685,7 +685,7 @@ for i=1:nlayer
                 vf(i,j,2)=vu+grad(ngrad);
             end
         end
-    %272    
+    %272
     end
 end
 
@@ -750,15 +750,15 @@ if ifrbnd==1
         end
     end
 end
-        
+
 %% 3 tool function
 function fun_save_vin(fileout)
 
 %     switch precision
-% 	case 'high'
+%   case 'high'
 %         format_f='%8.3f';
 %         format_d='%8i';
-% 	case 'low'
+%   case 'low'
         format_f='%7.2f';
         format_d='%7i';
 %     end
@@ -798,7 +798,7 @@ function fun_save_vin(fileout)
             j1=nstart;  %620
             j2=j1+9;
             if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
-                j2=nvel(i,1);   
+                j2=nvel(i,1);
             end
             if j2<nvel(i,1)
                 icnt=1;
@@ -826,7 +826,7 @@ function fun_save_vin(fileout)
             j1=nstart;  %650
             j2=j1+9;
             if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
-                j2=nvel(i,2);  
+                j2=nvel(i,2);
             end
             if j2<nvel(i,2)
                 icnt=1;
@@ -848,18 +848,18 @@ function fun_save_vin(fileout)
             nstart=j2+1;
         end     % go to 650
     end     %570
-    
+
     fprintf(fid,'%2i ',ncont);
     fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
     fprintf(fid,'\n');
     fprintf(fid,'%2i ',0);
-    fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));   
-    
+    fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));
+
 end
 
 function fun_save_fbak(fmodel,fileout)
 %write out original floating reflectors
- 
+
 LN=length(fmodel);
 fid=fopen(fileout,'w');
 for i=1:LN
@@ -875,12 +875,12 @@ for i=1:LN
     fprintf(fid,'%7i',fmodel{i}(4,:));
     fprintf(fid,'\n');
 end
-fclose(fid);    
+fclose(fid);
 end
 
 function [nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel]=fun_load_fin(nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel,filein)
 %read in floating reflectors
-    
+
 fid = fopen(filein,'r');
 count=0;
 imdata={};
@@ -892,11 +892,11 @@ while ischar(line)
 end
 fclose(fid);
 
-line=imdata{2}; 
-value=sscanf(line,'%i'); 
+line=imdata{2};
+value=sscanf(line,'%i');
 startnum=value(1);  %the start number of floating reflector
-line=imdata{length(imdata)-2}; 
-value=sscanf(line,'%i'); 
+line=imdata{length(imdata)-2};
+value=sscanf(line,'%i');
 endnum=value(1);  %the end number of floating reflector
 
 fmodel={};
@@ -914,22 +914,22 @@ for i=startnum:endnum
     over10=1; % assume nodes number larger than 10
     final=[];
     while over10
-    	vv=cell(3,1);
+        vv=cell(3,1);
         vl=zeros(3,1); %length
         for j=1:3; % x, z, partial derivative
-        	pp=pp+1;
+            pp=pp+1;
             value=sscanf(imdata{pp},'%f'); % read values
-        	vv{j}=value'; % transverse to line vector
+            vv{j}=value'; % transverse to line vector
             vl(j)=length(value);
         end
         if vl(2)-vl(1)>2 || vl(3)~=vl(1)-1;
-        	errorcount=errorcount+1;
-        	error{errorcount}=['Number ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
+            errorcount=errorcount+1;
+            error{errorcount}=['Number ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
         elseif vl(2)==vl(1)-1;
             over10=0;
         elseif vl(2)==vl(1);
-            if vv{2}(1)==0, 
-            	over10=0;
+            if vv{2}(1)==0,
+                over10=0;
             end
         end
         [ll,cc]=size(final);
@@ -1001,8 +1001,8 @@ for i=1:LN
         end
     end
 end
-fclose(fid);    
-    
+fclose(fid);
+
 end
 
 function [ncont,xm,zm,ivarz,xvel,vf,ivarv,vmodel]=fun_load_vin(ncont,xm,zm,ivarz,xvel,vf,ivarv,vmodel,filein)
@@ -1042,12 +1042,12 @@ value=sscanf(line,'%f'); % read values of last boundary
 LN=value(1); % layer number of the model
 xmax=value(end); % model right boundary
 
-            
+
 % use structure to store model, bd=layer top boundary, tv=top velocity, bv=bottom velocity
 % each cell is a 3xNodes matrix for (1) x, (2) z or v, and (3) partial derivative for each node
 fieldname={'bd','tv','bv'};
 fullfn={'top boundary depth','top velocity','bottom velocity'};
-vmodel=struct(fieldname{1},{},fieldname{2},{},fieldname{3},{}); 
+vmodel=struct(fieldname{1},{},fieldname{2},{},fieldname{3},{});
 pp=1;  % first line of the v.in
 % xx=xmin:(xmax-xmin)/100:xmax;   % use for interpolation
 % ZZ=zeros(LN,length(xx));    % use for interpolation
@@ -1072,7 +1072,7 @@ for i=1:LN-1;
             elseif vl(2)==vl(1)-1;
                 over10=0;
             elseif vl(2)==vl(1);
-                if vv{2}(1)==0, 
+                if vv{2}(1)==0,
                     over10=0;
                 end
             end
@@ -1110,7 +1110,7 @@ for i=1:LN-1;
     end
 end
 
-% model bottom 
+% model bottom
 value=sscanf(imdata{pp},'%f')';
 pp=pp+1;
 final=sscanf(imdata{pp},'%f')';
@@ -1186,7 +1186,7 @@ if dtmatch==1
             vf(i,j,2)=vmodel(i).bv(2,j);
             ivarv(i,j,2)=vmodel(i).bv(3,j);
         end
-    end  
+    end
     [ll,cc]=size(vmodel(LN).bd);
     for j=1:cc
         xm(LN,j)=vmodel(LN).bd(1,j);
@@ -1201,7 +1201,7 @@ end
 
 function fun_save_dout(temp,fileout)
 
-if temp==1	% save the first part
+if temp==1  % save the first part
     fid=fopen(fileout,'w');
     fprintf(fid,'\n');
     fprintf(fid,'%s','overall damping factor: ');
@@ -1247,10 +1247,10 @@ end
 
 if temp==2  %save the second part
 %     switch precision
-% 	case 'high'
+%   case 'high'
 %         format_f='%8.3f';
 %         format_d='%8i';
-% 	case 'low'
+%   case 'low'
         format_f='%7.2f';
         format_d='%7i';
 %     end
@@ -1301,7 +1301,7 @@ if temp==2  %save the second part
             j1=nstart;  %620
             j2=j1+9;
             if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
-                j2=nvel(i,1);   
+                j2=nvel(i,1);
             end
             if j2<nvel(i,1)
                 icnt=1;
@@ -1340,7 +1340,7 @@ if temp==2  %save the second part
             j1=nstart;  %650
             j2=j1+9;
             if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
-                j2=nvel(i,2);  
+                j2=nvel(i,2);
             end
             if j2<nvel(i,2)
                 icnt=1;
@@ -1373,7 +1373,7 @@ if temp==2  %save the second part
             nstart=j2+1;
         end     % go to 650
     end     %570
-    
+
     fprintf(fid,'%2i ',ncont);
     fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
     fprintf(fid,'\n');
@@ -1464,7 +1464,7 @@ temp = fscanf(fid,'%f');
 for i=1:narinv
     for j=1:nvar
         apart(i, j) = temp((i - 1) * nvar + j);
-    end    
+    end
 end
 
 for i=1:narinv

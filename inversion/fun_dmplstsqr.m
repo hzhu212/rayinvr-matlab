@@ -29,14 +29,14 @@ dmpfct={'&dmppar','FFF',eng,chi,1.0,NaN,1.0,false,NaN}';
 %velunc
 allnames=[allnames; 'velunc'];
 eng=['velunc?- an estimate of the uncertainty (square root of the variance) of the model velocity values (km/s)',char(13,10)'...
-	'(default: 0.1; however, if velunc is equal to zero, the uncertainties listed in the file i.out are used)'];
+    '(default: 0.1; however, if velunc is equal to zero, the uncertainties listed in the file i.out are used)'];
 chi=' ';
 velunc={'&dmppar','FFF',eng,chi,0.1,NaN,0.1,false,NaN}';
 
 %bndunc
 allnames=[allnames; 'bndunc'];
 eng=['bndunc?- an estimate of the uncertainty (square root of the variance) of the depth of model boundary values (km) ',char(13,10)'...
-	'(default: 0.1; however, if bndunc is equal to zero, the uncertainties listed in the file i.out are used)'];
+    '(default: 0.1; however, if bndunc is equal to zero, the uncertainties listed in the file i.out are used)'];
 chi=' ';
 bndunc={'&dmppar','FFF',eng,chi,0.1,NaN,0.1,false,NaN}';
 
@@ -75,8 +75,8 @@ nker={'&dmppar','III',eng,chi,0,NaN,0,false,NaN}';
 % 除非某变量名被明确声明为整型或者实型，或者用implicit none 取消定义变量时的隐式声明规则。
 
 global player ppcntr ptrap pshot prayf ptrayf ppray pnrayf pray prefl preflt pconv pconvt pnsmth papois pnvar ...
-	   prayi ppvel pncntr picv pinvel prayt pshot2 pfrefl ppfref pn2pt pnobsf pr2pt pcol pxgrid pzgrid pitan pitan2 piray ...
-	   pi pi4 pi2 pi34 pi18 pit2;   %rayinvr.par
+       prayi ppvel pncntr picv pinvel prayt pshot2 pfrefl ppfref pn2pt pnobsf pr2pt pcol pxgrid pzgrid pitan pitan2 piray ...
+       pi pi4 pi2 pi34 pi18 pit2;   %rayinvr.par
 
 pi=3.141592654;
 pi4=.785398163;
@@ -169,10 +169,10 @@ pathPrev = fullfile(pathIn,['iteration',num2str(iteration-1)]);
 % 如果是第一轮反演，则检测 iteration0 目录，如果存在则删除并新建一个
 % 然后将 v.in, i.out 文件拷贝进去；否则直接新建并拷贝
 if iteration == 1
-	iteration0 = pathPrev;
-	if exist(iteration0, 'dir'), rmdir(iteration0,'s'); end
-	mkdir(iteration0);
-	copyfile(fullfile(pathIn,'v.in'), fullfile(iteration0,'v.in'));
+    iteration0 = pathPrev;
+    if exist(iteration0, 'dir'), rmdir(iteration0,'s'); end
+    mkdir(iteration0);
+    copyfile(fullfile(pathIn,'v.in'), fullfile(iteration0,'v.in'));
 end
 
 % 每轮反演之后需要进行一轮正演，正演会输出新的 i.out 文件，供下一轮反演使用
@@ -180,7 +180,7 @@ copyfile(fullfile(pathIn,'output','i.out'), fullfile(pathPrev,'i.out'));
 
 % 如果当前轮目录已存在，则将其重命名并新建一个目录，否则直接新建目录
 if exist(pathCurr,'dir')
-	movefile(pathCurr, [pathCurr,'_bak_',datestr(now,'yyyy-mm-dd_HH-MM-SS')]);
+    movefile(pathCurr, [pathCurr,'_bak_',datestr(now,'yyyy-mm-dd_HH-MM-SS')]);
 end
 mkdir(pathCurr);
 
@@ -204,8 +204,8 @@ fun_load_din(path_din);
 % eval(['fun_load_din(''./file in/example',num2str(example),'/d.in'');']);
 %fun_load_din2('./file in/example1/d.in');    % if there is need to read more than one section
 if xmax{7}<-99998
-		error='***  xmax not specified  ***';
-		disp(error);
+        error='***  xmax not specified  ***';
+        disp(error);
 end
 
 %read in matrix of partial derivatives and vector of traveltime residuals
@@ -215,33 +215,33 @@ fun_load_iout(path_iout);
 %% 2.2 matrix processing & inversing
 %zh: 作用：创建一个0向量hit，然后用hit的每个位置记录apart二维数组每列的非零元素个数
 for j=1:nvar    %dmplstsqr.f不包含
-	hit(j)=0;   %dmplstsqr.f不包含
-	for i=1:narinv  %dmplstsqr.f不包含
-		if apart(i,j)~=0    %dmplstsqr.f不包含
-			hit(j)=hit(j)+1;    %dmplstsqr.f不包含
-		end     %dmplstsqr.f不包含
-	end     %dmplstsqr.f不包含
+    hit(j)=0;   %dmplstsqr.f不包含
+    for i=1:narinv  %dmplstsqr.f不包含
+        if apart(i,j)~=0    %dmplstsqr.f不包含
+            hit(j)=hit(j)+1;    %dmplstsqr.f不包含
+        end     %dmplstsqr.f不包含
+    end     %dmplstsqr.f不包含
 end     %dmplstsqr.f不包含
 
 %zh: ata是一个对称矩阵
 %    apart和tunc通过fun_load_iout读入
 for i=1:nvar
-	for j=1:i
-		ata(i,j)=0;
-		for k=1:narinv
-			ata(i,j)=ata(i,j)+apart(k,i)*apart(k,j)/tunc(k)^2;
-		end
-		if i~=j
-			ata(j,i)=ata(i,j);
-		end
-	end
+    for j=1:i
+        ata(i,j)=0;
+        for k=1:narinv
+            ata(i,j)=ata(i,j)+apart(k,i)*apart(k,j)/tunc(k)^2;
+        end
+        if i~=j
+            ata(j,i)=ata(i,j);
+        end
+    end
 end
 
 for i=1:nvar
-	att(i)=0;
-	for j=1:narinv
-		att(i)=att(i)+apart(j,i)*tres(j)/tunc(j)^2;
-	end
+    att(i)=0;
+    for j=1:narinv
+        att(i)=att(i)+apart(j,i)*tres(j)/tunc(j)^2;
+    end
 end
 
 pvar(1)=bndunc{7}^2;
@@ -249,34 +249,34 @@ pvar(2)=velunc{7}^2;
 pvar(3)=bndunc{7}^2;
 
 for i=1:nvar
-	for j=1:nvar
-		atad(i,j)=ata(i,j);
-		if i==j
-			if partyp(i)==1
-				if bndunc{7} <= 0
-					parunc(i)=parunc(i)^2;
-				else
-					parunc(i)=pvar(1);
-				end
-			end
-			if partyp(i)==2
-				if velunc{7} <= 0
-					parunc(i)=parunc(i)^2;
-				else
-					parunc(i)=pvar(2);
-				end
-			end
-			if partyp(i)==3
-				if bndunc{7} <= 0
-					parunc(i)=parunc(i)^2;
-				else
-					parunc(i)=pvar(1);
-				end
-				ifrbnd=1;
-			end
-			atad(i,j)=atad(i,j)+dmpfct{7}/parunc(i);
-		end
-	end
+    for j=1:nvar
+        atad(i,j)=ata(i,j);
+        if i==j
+            if partyp(i)==1
+                if bndunc{7} <= 0
+                    parunc(i)=parunc(i)^2;
+                else
+                    parunc(i)=pvar(1);
+                end
+            end
+            if partyp(i)==2
+                if velunc{7} <= 0
+                    parunc(i)=parunc(i)^2;
+                else
+                    parunc(i)=pvar(2);
+                end
+            end
+            if partyp(i)==3
+                if bndunc{7} <= 0
+                    parunc(i)=parunc(i)^2;
+                else
+                    parunc(i)=pvar(1);
+                end
+                ifrbnd=1;
+            end
+            atad(i,j)=atad(i,j)+dmpfct{7}/parunc(i);
+        end
+    end
 end
 
 atadi=zeros(nvar);  %atadi需要初始化
@@ -286,24 +286,24 @@ atadi=zeros(nvar);  %atadi需要初始化
 %% 2.3 save the first part of d.out
 
 for i=1:nvar
-	dx(i)=0.0;
-	for j=1:nvar
-		dx(i)=dx(i)+atadi(i,j)*att(j);
-	end
+    dx(i)=0.0;
+    for j=1:nvar
+        dx(i)=dx(i)+atadi(i,j)*att(j);
+    end
 end
 
 for i=1:nvar
-	for j=1:nvar
-		res(i,j)=0;
-		for k=1:nvar
-			res(i,j)=res(i,j)+atadi(i,k)*ata(k,j);
-		end
-	end
+    for j=1:nvar
+        res(i,j)=0;
+        for k=1:nvar
+            res(i,j)=res(i,j)+atadi(i,k)*ata(k,j);
+        end
+    end
 end
 
 var=zeros(nvar,1);  %var需要初始化
 for i=1:nvar
-	var(i)=var(i)+(1.0-res(i,i))*parunc(i);
+    var(i)=var(i)+(1.0-res(i,i))*parunc(i);
 end
 
 fun_save_dout(1,path_dout);
@@ -323,53 +323,53 @@ nzed=ones(ncont,1);
 nvel=ones(nlayer,2);
 [ll,cc]=size(xm);
 for i=1:ncont
-	for j=1:cc
-		if abs(xm(i,j)-xmax)<0.0001 %用于计数的nzed、nvel从1而非0开始累计，故不包括该行x最大值
-			break;  % go to 180
-		else
-			nzed(i)=nzed(i)+1;  % 每层x值个数
-		end
-	end
+    for j=1:cc
+        if abs(xm(i,j)-xmax)<0.0001 %用于计数的nzed、nvel从1而非0开始累计，故不包括该行x最大值
+            break;  % go to 180
+        else
+            nzed(i)=nzed(i)+1;  % 每层x值个数
+        end
+    end
 %180
 end
 
 [ll,cc,ww]=size(xvel);
 for i=1:nlayer
-	for j=1:cc
-		if abs(xvel(i,j,1)-xmax)<0.0001
-			break;  % go to 212
-		else
-			nvel(i,1)=nvel(i,1)+1;  %每层x值个数
-		end
-	end
-	%212
-	if nvel(i,1)==1 && vf(i,1,1)==0.0   %不包括速度零点
-		nvel(i,1)=0;
-	end
+    for j=1:cc
+        if abs(xvel(i,j,1)-xmax)<0.0001
+            break;  % go to 212
+        else
+            nvel(i,1)=nvel(i,1)+1;  %每层x值个数
+        end
+    end
+    %212
+    if nvel(i,1)==1 && vf(i,1,1)==0.0   %不包括速度零点
+        nvel(i,1)=0;
+    end
 end
 
 for i=1:nlayer
-	for j=1:cc
-		if abs(xvel(i,j,2)-xmax)<0.0001
-			break;  % go to 260
-		else
-			nvel(i,2)=nvel(i,2)+1;  %每层x值个数
-		end
-	end
-	%260
-	if nvel(i,2)==1 && vf(i,1,2)==0.0   %不包括速度零点
-		nvel(i,2)=0;
-	end
+    for j=1:cc
+        if abs(xvel(i,j,2)-xmax)<0.0001
+            break;  % go to 260
+        else
+            nvel(i,2)=nvel(i,2)+1;  %每层x值个数
+        end
+    end
+    %260
+    if nvel(i,2)==1 && vf(i,1,2)==0.0   %不包括速度零点
+        nvel(i,2)=0;
+    end
 end
 
 nlyr=0;
 for i=2:ncont-1 %将源代码的ncont改为ncont-1，因为最后一层不含ivarz数据
-	for j=1:nzed(i) %用每行节点个数nzed(i)控制访问的列数
-		if ivarz(i,j)==-1
-			nlyr=nlyr+1;
-			thick(nlyr)=zm(i,j)-zm(i-1,j);
-		end
-	end
+    for j=1:nzed(i) %用每行节点个数nzed(i)控制访问的列数
+        if ivarz(i,j)==-1
+            nlyr=nlyr+1;
+            thick(nlyr)=zm(i,j)-zm(i-1,j);
+        end
+    end
 end
 
 fun_save_vbak(vmodel,path_vbak);
@@ -377,121 +377,121 @@ fun_save_vbak(vmodel,path_vbak);
 
 %% 2.5 load f.in & save f.bak
 if ifrbnd==1
-	[nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel]=fun_load_fin(nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel,path_fin_load);
-	% string='nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel';
-	% eval(['[',string,']=fun_load_fin(',string,',''./file in/example',num2str(example),'/f.in'');']);
-	fun_save_fbak(fmodel,path_fbak);
-	% eval(['fun_save_fbak(fmodel,''./file out/example',num2str(example),'/f.bak'');']);
+    [nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel]=fun_load_fin(nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel,path_fin_load);
+    % string='nfrefl,xfrefl,zfrefl,ivarf,npfref,fmodel';
+    % eval(['[',string,']=fun_load_fin(',string,',''./file in/example',num2str(example),'/f.in'');']);
+    fun_save_fbak(fmodel,path_fbak);
+    % eval(['fun_save_fbak(fmodel,''./file out/example',num2str(example),'/f.bak'');']);
 end
 
 %% 2.6 check for fixed velocity gradients
 
 ngrad=0;
 for i=1:nlayer
-	iflagg=0;
-	if nvel(i,2)>0
-		for j=1:nvel(i,2)
-			if ivarv(i,j,2)==-1
-				ngrad=ngrad+1;
-				xbndc=xvel(i,j,2);
-				if nzed(i)>1
-					for k=1:nzed(i)-1
-						if xbndc >= xm(i,k) && xbndc <= xm(i,k+1)
-							zu=(zm(i,k+1)-zm(i,k))*(xbndc-xm(i,k))/(xm(i,k+1)-xm(i,k))+zm(i,k);
-							break;  % go to 400
-						end
-					end
-				else
-					zu=zm(i,1);
-				end
-				%400
-				if nvel(i,1)>0
-					vu=vf(i,j,1);
-				else
-					for k=i-1:-1:1
-						if nvel(k,2)>0
-							vu=vf(k,j,2);
-							break;  % go to 402
-						end
-						if nvel(k,1)>0
-							vu=vf(k,j,1);
-							break;  % go to 402
-						end
-					end
-				end
-				%402
-				if nzed(i+1)>1
-					for k=1:nzed(i+1)-1
-						if xbndc >= xm(i+1,k) && xbndc <= xm(i+1,k+1)
-							zl=(zm(i+1,k+1)-zm(i+1,k))*(xbndc-xm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))+zm(i+1,k);
-							break;  % go to 420
-						end
-					end
-				else
-					zl=zm(i+1,1);
-				end
-				%420
-				vl=vf(i,j,2);
-				if abs(vu-vl)>0.001
-					if abs(zl-zu)>0.001
-						grad(ngrad)=(vl-vu)/(zl-zu);
-						igrad(ngrad)=1;
-					else
-						grad(ngrad)=vl-vu;
-						igrad(ngrad)=0;
-						iflagg=1;
-					end
-				else
-					grad(ngrad)=0.0;
-					igrad(ngrad)=1;
-				end
-			end
-		end
-	end
+    iflagg=0;
+    if nvel(i,2)>0
+        for j=1:nvel(i,2)
+            if ivarv(i,j,2)==-1
+                ngrad=ngrad+1;
+                xbndc=xvel(i,j,2);
+                if nzed(i)>1
+                    for k=1:nzed(i)-1
+                        if xbndc >= xm(i,k) && xbndc <= xm(i,k+1)
+                            zu=(zm(i,k+1)-zm(i,k))*(xbndc-xm(i,k))/(xm(i,k+1)-xm(i,k))+zm(i,k);
+                            break;  % go to 400
+                        end
+                    end
+                else
+                    zu=zm(i,1);
+                end
+                %400
+                if nvel(i,1)>0
+                    vu=vf(i,j,1);
+                else
+                    for k=i-1:-1:1
+                        if nvel(k,2)>0
+                            vu=vf(k,j,2);
+                            break;  % go to 402
+                        end
+                        if nvel(k,1)>0
+                            vu=vf(k,j,1);
+                            break;  % go to 402
+                        end
+                    end
+                end
+                %402
+                if nzed(i+1)>1
+                    for k=1:nzed(i+1)-1
+                        if xbndc >= xm(i+1,k) && xbndc <= xm(i+1,k+1)
+                            zl=(zm(i+1,k+1)-zm(i+1,k))*(xbndc-xm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))+zm(i+1,k);
+                            break;  % go to 420
+                        end
+                    end
+                else
+                    zl=zm(i+1,1);
+                end
+                %420
+                vl=vf(i,j,2);
+                if abs(vu-vl)>0.001
+                    if abs(zl-zu)>0.001
+                        grad(ngrad)=(vl-vu)/(zl-zu);
+                        igrad(ngrad)=1;
+                    else
+                        grad(ngrad)=vl-vu;
+                        igrad(ngrad)=0;
+                        iflagg=1;
+                    end
+                else
+                    grad(ngrad)=0.0;
+                    igrad(ngrad)=1;
+                end
+            end
+        end
+    end
 %    iflagg=1;
-	if iflagg==1
-		fprintf('%s','***  check gradient in layer ');
-		fprintf('%2i',i);
-		fprintf('%s','  ***');
-		fid=fopen(path_dout,'a');
-		% eval(['fid=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
-		fprintf(fid,'%s','***  check gradient in layer ');
-		fprintf(fid,'%2i',i);
-		fprintf(fid,'%s','  ***');
-		fclose(fid);
-	end
+    if iflagg==1
+        fprintf('%s','***  check gradient in layer ');
+        fprintf('%2i',i);
+        fprintf('%s','  ***');
+        fid=fopen(path_dout,'a');
+        % eval(['fid=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
+        fprintf(fid,'%s','***  check gradient in layer ');
+        fprintf(fid,'%2i',i);
+        fprintf(fid,'%s','  ***');
+        fclose(fid);
+    end
 end
 fid=fopen(path_dout,'a');
 % eval(['fid=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
 fprintf(fid,'velocity model:\n\n');
 if iscrn{7}==1
-	fprintf('velocity model:\n\n');
+    fprintf('velocity model:\n\n');
 end
 
 %% 2.7 check for pinchouts
 flag=0;
 if nlayer>1
-	ipinch=0;
-	for i=2:nlayer
-		for j=1:nzed(i);
-			mpinch(i,j,1)=0;
-			for k=1:i-1
-				for l=1:nzed(k)
-					if abs(xm(i,j)-xm(k,l))<0.005 && abs(zm(i,j)-zm(k,l))<0.005
-						ipinch=ipinch+1;
-						mpinch(i,j,1)=k;
-						mpinch(i,j,2)=l;
-						flag=1;
-						break;  % go to 282
-					end
-				end
-				if flag==1;
-					break;
-				end
-			end
-		%282
-		end
-	end
+    ipinch=0;
+    for i=2:nlayer
+        for j=1:nzed(i);
+            mpinch(i,j,1)=0;
+            for k=1:i-1
+                for l=1:nzed(k)
+                    if abs(xm(i,j)-xm(k,l))<0.005 && abs(zm(i,j)-zm(k,l))<0.005
+                        ipinch=ipinch+1;
+                        mpinch(i,j,1)=k;
+                        mpinch(i,j,2)=l;
+                        flag=1;
+                        break;  % go to 282
+                    end
+                end
+                if flag==1;
+                    break;
+                end
+            end
+        %282
+        end
+    end
 end
 
 %% 2.8 add the parameter adjustments
@@ -500,172 +500,172 @@ end
 % nker{7}=1;
 
 %if hnorm{7}>0.0
-	% fileh1='./file out/example1/z1.hit';   %63
-	fileh1=fullfile(pathCurr,'z1.hit');   %63
-	fileh2=fullfile(pathCurr,'v.hit');   %64
-	fileh3=fullfile(pathCurr,'f.hit');   %65
-	fileh4=fullfile(pathCurr,'z2.hit');   %66
+    % fileh1='./file out/example1/z1.hit';   %63
+    fileh1=fullfile(pathCurr,'z1.hit');   %63
+    fileh2=fullfile(pathCurr,'v.hit');   %64
+    fileh3=fullfile(pathCurr,'f.hit');   %65
+    fileh4=fullfile(pathCurr,'z2.hit');   %66
 %end
 %if rnorm{7}>0.0
-	filer1=fullfile(pathCurr,'z1.res');   %73
-	filer2=fullfile(pathCurr,'v.res');   %74
-	filer3=fullfile(pathCurr,'f.res');   %75
-	filer4=fullfile(pathCurr,'z2.res');   %76
+    filer1=fullfile(pathCurr,'z1.res');   %73
+    filer2=fullfile(pathCurr,'v.res');   %74
+    filer3=fullfile(pathCurr,'f.res');   %75
+    filer4=fullfile(pathCurr,'z2.res');   %76
 %end
 %if nker{7}>0
-	filen1=fullfile(pathCurr,'z1.ker');   %83
-	filen2=fullfile(pathCurr,'v.ker');   %84
-	filen3=fullfile(pathCurr,'f.ker');   %85
-	filen4=fullfile(pathCurr,'z2.ker');   %86
+    filen1=fullfile(pathCurr,'z1.ker');   %83
+    filen2=fullfile(pathCurr,'v.ker');   %84
+    filen3=fullfile(pathCurr,'f.ker');   %85
+    filen4=fullfile(pathCurr,'z2.ker');   %86
 %end
 
 nvarw=0;
 nlyr=0;
 for i=1:nlayer
-	for k=1:nzed(i)    %dmplstsqr.f不包含
-		zmb(k)=zm(i,k); %dmplstsqr.f不包含
-	end     %dmplstsqr.f不包含
-	for j=1:nzed(i)
-		if ipinch==1 && i>1
-			if mpinch(i,j,1)>0
-				zm(i,j)=zm(mpinch(i,j,1),mpinch(i,j,2));
-				continue;   % go to 280
-			end
-		end
-		if ivarz(i,j)>0
-			nvarw=nvarw+1;
-			%??????以下dmplstsqr.f不包含
-			if hnorm{7}>0.0
-				fid=fopen(fileh1,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),hit(nvarw)/hnorm{7}]);
-				fid=fopen(fileh4,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),1.3*hit(nvarw)/hnorm{7}]);
-			end
-			if rnorm{7}>0.0
-				fid=fopen(filer1,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),res(nvarw,nvarw)/rnorm{7}]);
-				fid=fopen(filer4,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),1.3*res(nvarw,nvarw)/rnorm{7}]);
-			end
-			if nker{7}>0.0
-				fid=fopen(filen1,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),abs(res(nvarw,nker{7}))/rnorm{7}]);  %dmplstsqr_new2.f无abs
-				fid=fopen(filen4,'w');
-				fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),abs(1.3*res(nvarw,nker{7}))/rnorm{7}]);  %dmplstsqr_new2.f无abs
-			end
-			%??????以上dmplstsqr.f不包含
-			zm(i,j)=zm(i,j)+dx(nvarw);
-		end
-		if ivarz(i,j)==-1
-			nlyr=nlyr+1;
-			zm(i,j)=zm(i-1,j)+thick(nlyr);
-		end
-	%280
-	end
+    for k=1:nzed(i)    %dmplstsqr.f不包含
+        zmb(k)=zm(i,k); %dmplstsqr.f不包含
+    end     %dmplstsqr.f不包含
+    for j=1:nzed(i)
+        if ipinch==1 && i>1
+            if mpinch(i,j,1)>0
+                zm(i,j)=zm(mpinch(i,j,1),mpinch(i,j,2));
+                continue;   % go to 280
+            end
+        end
+        if ivarz(i,j)>0
+            nvarw=nvarw+1;
+            %??????以下dmplstsqr.f不包含
+            if hnorm{7}>0.0
+                fid=fopen(fileh1,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),hit(nvarw)/hnorm{7}]);
+                fid=fopen(fileh4,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),1.3*hit(nvarw)/hnorm{7}]);
+            end
+            if rnorm{7}>0.0
+                fid=fopen(filer1,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),res(nvarw,nvarw)/rnorm{7}]);
+                fid=fopen(filer4,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),1.3*res(nvarw,nvarw)/rnorm{7}]);
+            end
+            if nker{7}>0.0
+                fid=fopen(filen1,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),abs(res(nvarw,nker{7}))/rnorm{7}]);  %dmplstsqr_new2.f无abs
+                fid=fopen(filen4,'w');
+                fprintf(fid,'%10.3f',[xm(i,j),-zm(i,j),abs(1.3*res(nvarw,nker{7}))/rnorm{7}]);  %dmplstsqr_new2.f无abs
+            end
+            %??????以上dmplstsqr.f不包含
+            zm(i,j)=zm(i,j)+dx(nvarw);
+        end
+        if ivarz(i,j)==-1
+            nlyr=nlyr+1;
+            zm(i,j)=zm(i-1,j)+thick(nlyr);
+        end
+    %280
+    end
 
-	if nvel(i,1)>0
-		for j=1:nvel(i,1)
-			if ivarv(i,j,1)>0
-				nvarw=nvarw+1;
-				%??????以下dmplstsqr.f不包含
-				if nzed(i)==1
-					zhit=zmb(1);
-				else
-					for k=1:nzed(i)-1
-						if xvel(i,j,1) >= xm(i,k) && xvel(i,j,1) <= xm(i,k+1)
-							zhit=(zmb(k+1)-zmb(k))/(xm(i,k+1)-xm(i,k))*(xvel(i,j,1)-xm(i,k))+zmb(k);
-							break;  % go to 3113
-						end
-					end
-				end
-				%3113
-				if hnorm{7}>0.0
-					fid=fopen(fileh2,'w');
-					fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7}]);
-					fprintf(fid,'%10i',hit(nvarw));
-				end
-				if rnorm{7}>0.0
-					fid=fopen(filer2,'w');
-					fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7},res(nvarw,nvarw)]);
-				end
-				if nker{7}>0.0
-					fid=fopen(filen2,'w');
-					fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7},abs(res(nvarw,nker{7}))]);    %dmplstsqr_new2.f无abs
-				end
-				%??????以上dmplstsqr.f不包含
-				vf(i,j,1)=vf(i,j,1)+dx(nvarw);
-			end
-		end
-	else
-		nvel(i,1)=1;
-		xvel(i,1,1)=xmax;
-		vf(i,1,1)=0.;
-	end
+    if nvel(i,1)>0
+        for j=1:nvel(i,1)
+            if ivarv(i,j,1)>0
+                nvarw=nvarw+1;
+                %??????以下dmplstsqr.f不包含
+                if nzed(i)==1
+                    zhit=zmb(1);
+                else
+                    for k=1:nzed(i)-1
+                        if xvel(i,j,1) >= xm(i,k) && xvel(i,j,1) <= xm(i,k+1)
+                            zhit=(zmb(k+1)-zmb(k))/(xm(i,k+1)-xm(i,k))*(xvel(i,j,1)-xm(i,k))+zmb(k);
+                            break;  % go to 3113
+                        end
+                    end
+                end
+                %3113
+                if hnorm{7}>0.0
+                    fid=fopen(fileh2,'w');
+                    fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7}]);
+                    fprintf(fid,'%10i',hit(nvarw));
+                end
+                if rnorm{7}>0.0
+                    fid=fopen(filer2,'w');
+                    fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7},res(nvarw,nvarw)]);
+                end
+                if nker{7}>0.0
+                    fid=fopen(filen2,'w');
+                    fprintf(fid,'%10.3f',[xvel(i,j,1),-zhit-zshift{7},abs(res(nvarw,nker{7}))]);    %dmplstsqr_new2.f无abs
+                end
+                %??????以上dmplstsqr.f不包含
+                vf(i,j,1)=vf(i,j,1)+dx(nvarw);
+            end
+        end
+    else
+        nvel(i,1)=1;
+        xvel(i,1,1)=xmax;
+        vf(i,1,1)=0.;
+    end
 
-	if nvel(i,2)>0
-		for j=1:nvel(i,2)
-			if ivarv(i,j,2)>0
-				nvarw=nvarw+1;
-				%??????以下dmplstsqr.f不包含
-				if nzed(i+1)==1
-					zhit=zm(i+1,1);
-				else
-					for k=1:nzed(i+1)-1
-						if xvel(i,j,2) >= xm(i+1,k) && xvel(i,j,2) <= xm(i+1,k+1)
-							zhit=(zm(i+1,k+1)-zm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))*(xvel(i,j,2)-xm(i+1,k))+zm(i+1,k);
-							break;  % go to 3114
-						end
-					end
-				end
-				%3114
-				if hnorm{7}>0.0
-					fid=fopen(fileh2,'a');
-					fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7}]);
-					fprintf(fid,'%10i',hit(nvarw));
-				end
-				if rnorm{7}>0.0
-					fid=fopen(filer2,'a');
-					fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7},res(nvarw,nvarw)]);
-				end
-				if nker{7}>0.0
-					fid=fopen(filen2,'a');
-					fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7},abs(res(nvarw,nker{7}))]);    %dmplstsqr_new2.f无abs
-				end
-				%??????以上dmplstsqr.f不包含
-				vf(i,j,2)=vf(i,j,2)+dx(nvarw);
-			end
-		end
-	else
-		nvel(i,2)=1;
-		xvel(i,1,2)=xmax;
-		vf(i,1,2)=0.;
-	end
+    if nvel(i,2)>0
+        for j=1:nvel(i,2)
+            if ivarv(i,j,2)>0
+                nvarw=nvarw+1;
+                %??????以下dmplstsqr.f不包含
+                if nzed(i+1)==1
+                    zhit=zm(i+1,1);
+                else
+                    for k=1:nzed(i+1)-1
+                        if xvel(i,j,2) >= xm(i+1,k) && xvel(i,j,2) <= xm(i+1,k+1)
+                            zhit=(zm(i+1,k+1)-zm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))*(xvel(i,j,2)-xm(i+1,k))+zm(i+1,k);
+                            break;  % go to 3114
+                        end
+                    end
+                end
+                %3114
+                if hnorm{7}>0.0
+                    fid=fopen(fileh2,'a');
+                    fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7}]);
+                    fprintf(fid,'%10i',hit(nvarw));
+                end
+                if rnorm{7}>0.0
+                    fid=fopen(filer2,'a');
+                    fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7},res(nvarw,nvarw)]);
+                end
+                if nker{7}>0.0
+                    fid=fopen(filen2,'a');
+                    fprintf(fid,'%10.3f',[xvel(i,j,2),-zhit+zshift{7},abs(res(nvarw,nker{7}))]);    %dmplstsqr_new2.f无abs
+                end
+                %??????以上dmplstsqr.f不包含
+                vf(i,j,2)=vf(i,j,2)+dx(nvarw);
+            end
+        end
+    else
+        nvel(i,2)=1;
+        xvel(i,1,2)=xmax;
+        vf(i,1,2)=0.;
+    end
 end
 
 %ifrbnd=1;
 if ifrbnd==1
-	for j=1:nfrefl
-		for i=1:npfref(j)
-			if ivarf(j,i)==1
-				nvarw=nvarw+1;
-				%??????以下dmplstsqr.f不包含
-				if hnorm{7}>0.0
-					fid=fopen(fileh3,'w');
-					fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),hit(nvarw)/hnorm{7}]);
-				end
-				if rnorm{7}>0.0
-					fid=fopen(filer3,'w');
-					fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),res(nvarw,nvarw)/rnorm{7}]);
-				end
-				if nker{7}>0.0
-					fid=fopen(filen3,'w');
-					fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),abs(res(nvarw,nker{7})/rnorm{7})]);  %dmplstsqr_new2.f无abs
-				end
-				%??????以上dmplstsqr.f不包含
-				zfrefl(j,i)=zfrefl(j,i)+dx(nvarw);
-			end
-		end
-	end
+    for j=1:nfrefl
+        for i=1:npfref(j)
+            if ivarf(j,i)==1
+                nvarw=nvarw+1;
+                %??????以下dmplstsqr.f不包含
+                if hnorm{7}>0.0
+                    fid=fopen(fileh3,'w');
+                    fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),hit(nvarw)/hnorm{7}]);
+                end
+                if rnorm{7}>0.0
+                    fid=fopen(filer3,'w');
+                    fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),res(nvarw,nvarw)/rnorm{7}]);
+                end
+                if nker{7}>0.0
+                    fid=fopen(filen3,'w');
+                    fprintf(fid,'%10.3f',[xfrefl(j,i),-zfrefl(j,i),abs(res(nvarw,nker{7})/rnorm{7})]);  %dmplstsqr_new2.f无abs
+                end
+                %??????以上dmplstsqr.f不包含
+                zfrefl(j,i)=zfrefl(j,i)+dx(nvarw);
+            end
+        end
+    end
 end
 
 %% 2.9 maintain fixed velocity gradients
@@ -673,57 +673,57 @@ end
 ngrad=0;
 flag=0;
 for i=1:nlayer
-	for j=1:nvel(i,2)
-		if ivarv(i,j,2)==-1
-			ngrad=ngrad+1;
-			xbndc=xvel(i,j,2);
-			if nzed(i)>1
-				for k=1:nzed(i)-1
-					if xbndc >= xm(i,k) && xbndc <= xm(i,k+1)
-						zu=(zm(i,k+1)-zm(i,k))*(xbndc-xm(i,k))/(xm(i,k+1)-xm(i,k))+zm(i,k);
-						break;  % go to 450
-					end
-				end
-			else
-				zu=zm(i,1);
-			end
-			%450
-			if nvel(i,1)>0 && vf(i,1,1)>0
-				vu=vf(i,j,1);
-			else
-				for k=i-1:-1:1
-					if nvel(k,2)>0 && vf(k,1,2)>0
-						vu=vf(k,j,2);
-						flag=1;
-						break;  % go to 452
-					end
-					if nvel(k,1)>0 && vf(k,1,1)>0
-						vu=vf(k,j,1);
-						flag=1;
-						break;  % go to 452
-					end
-				end
-			end
-			if igrad(ngrad)==1 || flag==1
-				%452
-				if nzed(i+1)>1
-					for k=1:nzed(i+1)-1
-						if xbndc >= xm(i+1,k) && xbndc <= xm(i+1,k+1)
-							zl=(zm(i+1,k+1)-zm(i+1,k))*(xbndc-xm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))+zm(i+1,k);
-							vf(i,j,2)=vu+grad(ngrad)*(zl-zu);
-							break;  % go to 272
-						end
-					end
-				else
-					zl=zm(i+1,1);
-					vf(i,j,2)=vu+grad(ngrad)*(zl-zu);
-				end
-			else
-				vf(i,j,2)=vu+grad(ngrad);
-			end
-		end
-	%272
-	end
+    for j=1:nvel(i,2)
+        if ivarv(i,j,2)==-1
+            ngrad=ngrad+1;
+            xbndc=xvel(i,j,2);
+            if nzed(i)>1
+                for k=1:nzed(i)-1
+                    if xbndc >= xm(i,k) && xbndc <= xm(i,k+1)
+                        zu=(zm(i,k+1)-zm(i,k))*(xbndc-xm(i,k))/(xm(i,k+1)-xm(i,k))+zm(i,k);
+                        break;  % go to 450
+                    end
+                end
+            else
+                zu=zm(i,1);
+            end
+            %450
+            if nvel(i,1)>0 && vf(i,1,1)>0
+                vu=vf(i,j,1);
+            else
+                for k=i-1:-1:1
+                    if nvel(k,2)>0 && vf(k,1,2)>0
+                        vu=vf(k,j,2);
+                        flag=1;
+                        break;  % go to 452
+                    end
+                    if nvel(k,1)>0 && vf(k,1,1)>0
+                        vu=vf(k,j,1);
+                        flag=1;
+                        break;  % go to 452
+                    end
+                end
+            end
+            if igrad(ngrad)==1 || flag==1
+                %452
+                if nzed(i+1)>1
+                    for k=1:nzed(i+1)-1
+                        if xbndc >= xm(i+1,k) && xbndc <= xm(i+1,k+1)
+                            zl=(zm(i+1,k+1)-zm(i+1,k))*(xbndc-xm(i+1,k))/(xm(i+1,k+1)-xm(i+1,k))+zm(i+1,k);
+                            vf(i,j,2)=vu+grad(ngrad)*(zl-zu);
+                            break;  % go to 272
+                        end
+                    end
+                else
+                    zl=zm(i+1,1);
+                    vf(i,j,2)=vu+grad(ngrad)*(zl-zu);
+                end
+            else
+                vf(i,j,2)=vu+grad(ngrad);
+            end
+        end
+    %272
+    end
 end
 
 %% 2.10 save v.in & the second part of d.out
@@ -734,59 +734,59 @@ fun_save_dout(2,path_dout);
 
 %% 2.11 write out floating reflectors
 if ifrbnd==1
-	fid1=fopen(path_dout,'a');
-	% eval(['fid1=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
-	fprintf(fid1,'\n');
-	fprintf(fid1,'\n');
-	fprintf(fid1,'%s','floating reflectors:');
-	fprintf(fid1,'\n');
-	fprintf(fid1,'\n');
-	if iscrn{7}==1
-		fprintf('\n');
-		fprintf('\n');
-		fprintf('%s','floating reflectors:');
-		fprintf('\n');
-		fprintf('\n');
-	end
-	fid2=fopen(path_fin_save,'w');
-	% eval(['fid2=fopen(''./file out/example',num2str(example),'/f',num2str(iteration),'.in'',''w'');']);
-	for j=1:nfrefl
-		fprintf(fid2,'%2i',npfref(j));
-		fprintf(fid2,'\n');
-		fprintf(fid1,'%2i',npfref(j));
-		fprintf(fid1,'\n');
-		fprintf(fid2,'%2i ',j);
-		fprintf(fid2,'%7.2f',xfrefl(j,1:npfref(j)));
-		fprintf(fid2,'\n');
-		fprintf(fid1,'%2i ',j);
-		fprintf(fid1,'%7.2f',xfrefl(j,1:npfref(j)));
-		fprintf(fid1,'\n');
-		fprintf(fid2,'%s',blanks(3));
-		fprintf(fid2,'%7.2f',zfrefl(j,1:npfref(j)));
-		fprintf(fid2,'\n');
-		fprintf(fid1,'%s',blanks(3));
-		fprintf(fid1,'%7.2f',zfrefl(j,1:npfref(j)));
-		fprintf(fid1,'\n');
-		fprintf(fid2,'%s',blanks(3));
-		fprintf(fid2,'%7i',ivarf(j,1:npfref(j)));
-		fprintf(fid2,'\n');
-		fprintf(fid1,'%s',blanks(3));
-		fprintf(fid1,'%7i',ivarf(j,1:npfref(j)));
-		fprintf(fid1,'\n');
-		if iscrn{7}==1
-			fprintf('%2i',npfref(j));
-			fprintf('\n');
-			fprintf('%2i ',j);
-			fprintf('%7.2f',xfrefl(j,1:npfref(j)));
-			fprintf('\n');
-			fprintf('%s',blanks(3));
-			fprintf('%7.2f',zfrefl(j,1:npfref(j)));
-			fprintf('\n');
-			fprintf('%s',blanks(3));
-			fprintf('%7i',ivarf(j,1:npfref(j)));
-			fprintf('\n');
-		end
-	end
+    fid1=fopen(path_dout,'a');
+    % eval(['fid1=fopen(''./file out/example',num2str(example),'/d',num2str(iteration),'.out'',''a'');']);
+    fprintf(fid1,'\n');
+    fprintf(fid1,'\n');
+    fprintf(fid1,'%s','floating reflectors:');
+    fprintf(fid1,'\n');
+    fprintf(fid1,'\n');
+    if iscrn{7}==1
+        fprintf('\n');
+        fprintf('\n');
+        fprintf('%s','floating reflectors:');
+        fprintf('\n');
+        fprintf('\n');
+    end
+    fid2=fopen(path_fin_save,'w');
+    % eval(['fid2=fopen(''./file out/example',num2str(example),'/f',num2str(iteration),'.in'',''w'');']);
+    for j=1:nfrefl
+        fprintf(fid2,'%2i',npfref(j));
+        fprintf(fid2,'\n');
+        fprintf(fid1,'%2i',npfref(j));
+        fprintf(fid1,'\n');
+        fprintf(fid2,'%2i ',j);
+        fprintf(fid2,'%7.2f',xfrefl(j,1:npfref(j)));
+        fprintf(fid2,'\n');
+        fprintf(fid1,'%2i ',j);
+        fprintf(fid1,'%7.2f',xfrefl(j,1:npfref(j)));
+        fprintf(fid1,'\n');
+        fprintf(fid2,'%s',blanks(3));
+        fprintf(fid2,'%7.2f',zfrefl(j,1:npfref(j)));
+        fprintf(fid2,'\n');
+        fprintf(fid1,'%s',blanks(3));
+        fprintf(fid1,'%7.2f',zfrefl(j,1:npfref(j)));
+        fprintf(fid1,'\n');
+        fprintf(fid2,'%s',blanks(3));
+        fprintf(fid2,'%7i',ivarf(j,1:npfref(j)));
+        fprintf(fid2,'\n');
+        fprintf(fid1,'%s',blanks(3));
+        fprintf(fid1,'%7i',ivarf(j,1:npfref(j)));
+        fprintf(fid1,'\n');
+        if iscrn{7}==1
+            fprintf('%2i',npfref(j));
+            fprintf('\n');
+            fprintf('%2i ',j);
+            fprintf('%7.2f',xfrefl(j,1:npfref(j)));
+            fprintf('\n');
+            fprintf('%s',blanks(3));
+            fprintf('%7.2f',zfrefl(j,1:npfref(j)));
+            fprintf('\n');
+            fprintf('%s',blanks(3));
+            fprintf('%7i',ivarf(j,1:npfref(j)));
+            fprintf('\n');
+        end
+    end
 end
 
 fclose('all');
@@ -795,105 +795,105 @@ fclose('all');
 function fun_save_vin(fileout)
 
 %     switch precision
-% 	case 'high'
+%   case 'high'
 %         format_f='%8.3f';
 %         format_d='%8i';
-% 	case 'low'
-		format_f='%7.2f';
-		format_d='%7i';
+%   case 'low'
+        format_f='%7.2f';
+        format_d='%7i';
 %     end
-	fid=fopen(fileout,'w');
-	for i=1:nlayer
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %590
-			j2=j1+9;
-			if j2>nzed(i)   %nzed(i)为该层boundary depth数据个数
-				j2=nzed(i);
-			end
-			if j2<nzed(i)
-				icnt=1; %是否未完待续
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xm(i,j1:j2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,zm(i,j1:j2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarz(i,j1:j2));
-			fprintf(fid,'\n');
-			if j2==nzed(i)
-				flag=1;     % go to 600
-			end
-			nstart=j2+1;
-		end     % go to 590
-		%600
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %620
-			j2=j1+9;
-			if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
-				j2=nvel(i,1);
-			end
-			if j2<nvel(i,1)
-				icnt=1;
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xvel(i,j1:j2,1));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,vf(i,j1:j2,1));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarv(i,j1:j2,1));
-			fprintf(fid,'\n');
-			if j2==nvel(i,1)
-				flag=1;     % go to 630
-			end
-			nstart=j2+1;
-		end     % go to 620
-		%630
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %650
-			j2=j1+9;
-			if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
-				j2=nvel(i,2);
-			end
-			if j2<nvel(i,2)
-				icnt=1;
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xvel(i,j1:j2,2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,vf(i,j1:j2,2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarv(i,j1:j2,2));
-			fprintf(fid,'\n');
-			if j2==nvel(i,2)
-				flag=1;     % go to 570
-			end
-			nstart=j2+1;
-		end     % go to 650
-	end     %570
+    fid=fopen(fileout,'w');
+    for i=1:nlayer
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %590
+            j2=j1+9;
+            if j2>nzed(i)   %nzed(i)为该层boundary depth数据个数
+                j2=nzed(i);
+            end
+            if j2<nzed(i)
+                icnt=1; %是否未完待续
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xm(i,j1:j2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,zm(i,j1:j2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarz(i,j1:j2));
+            fprintf(fid,'\n');
+            if j2==nzed(i)
+                flag=1;     % go to 600
+            end
+            nstart=j2+1;
+        end     % go to 590
+        %600
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %620
+            j2=j1+9;
+            if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
+                j2=nvel(i,1);
+            end
+            if j2<nvel(i,1)
+                icnt=1;
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xvel(i,j1:j2,1));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,vf(i,j1:j2,1));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarv(i,j1:j2,1));
+            fprintf(fid,'\n');
+            if j2==nvel(i,1)
+                flag=1;     % go to 630
+            end
+            nstart=j2+1;
+        end     % go to 620
+        %630
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %650
+            j2=j1+9;
+            if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
+                j2=nvel(i,2);
+            end
+            if j2<nvel(i,2)
+                icnt=1;
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xvel(i,j1:j2,2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,vf(i,j1:j2,2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarv(i,j1:j2,2));
+            fprintf(fid,'\n');
+            if j2==nvel(i,2)
+                flag=1;     % go to 570
+            end
+            nstart=j2+1;
+        end     % go to 650
+    end     %570
 
-	fprintf(fid,'%2i ',ncont);
-	fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
-	fprintf(fid,'\n');
-	fprintf(fid,'%2i ',0);
-	fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));
+    fprintf(fid,'%2i ',ncont);
+    fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
+    fprintf(fid,'\n');
+    fprintf(fid,'%2i ',0);
+    fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));
 
 end
 
@@ -903,17 +903,17 @@ function fun_save_fbak(fmodel,fileout)
 LN=length(fmodel);
 fid=fopen(fileout,'w');
 for i=1:LN
-	fprintf(fid,'%2i',fmodel{i}(1,1));
-	fprintf(fid,'\n');
-	fprintf(fid,'%2i ',i);
-	fprintf(fid,'%7.2f',fmodel{i}(2,:));
-	fprintf(fid,'\n');
-	fprintf(fid,'%s',blanks(3));
-	fprintf(fid,'%7.2f',fmodel{i}(3,:));
-	fprintf(fid,'\n');
-	fprintf(fid,'%s',blanks(3));
-	fprintf(fid,'%7i',fmodel{i}(4,:));
-	fprintf(fid,'\n');
+    fprintf(fid,'%2i',fmodel{i}(1,1));
+    fprintf(fid,'\n');
+    fprintf(fid,'%2i ',i);
+    fprintf(fid,'%7.2f',fmodel{i}(2,:));
+    fprintf(fid,'\n');
+    fprintf(fid,'%s',blanks(3));
+    fprintf(fid,'%7.2f',fmodel{i}(3,:));
+    fprintf(fid,'\n');
+    fprintf(fid,'%s',blanks(3));
+    fprintf(fid,'%7i',fmodel{i}(4,:));
+    fprintf(fid,'\n');
 end
 fclose(fid);
 end
@@ -926,9 +926,9 @@ count=0;
 imdata={};
 line = fgetl(fid);
 while ischar(line)
-	count=count+1;
-	imdata{count,1}=line;
-	line = fgetl(fid);
+    count=count+1;
+    imdata{count,1}=line;
+    line = fgetl(fid);
 end
 fclose(fid);
 
@@ -944,46 +944,46 @@ pp=1;  % first line of the v.in
 error={};
 errorcount=0;
 for i=startnum:endnum
-	line=imdata{(i-1)*4+1};
-	value=sscanf(line,'%i');
-	nn=value;   %the number of nodes
-	if nn<2 || nn>ppfref
-		disp('***  error in f.in file  ***');
-		return;
-	end
-	over10=1; % assume nodes number larger than 10
-	final=[];
-	while over10
-		vv=cell(3,1);
-		vl=zeros(3,1); %length
-		for j=1:3; % x, z, partial derivative
-			pp=pp+1;
-			value=sscanf(imdata{pp},'%f'); % read values
-			vv{j}=value'; % transverse to line vector
-			vl(j)=length(value);
-		end
-		if vl(2)-vl(1)>2 || vl(3)~=vl(1)-1;
-			errorcount=errorcount+1;
-			error{errorcount}=['Number ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
-		elseif vl(2)==vl(1)-1;
-			over10=0;
-		elseif vl(2)==vl(1);
-			if vv{2}(1)==0,
-				over10=0;
-			end
-		end
-		[ll,cc]=size(final);
-		final(:,cc+1:cc+vl(3))=[vv{1}(2:end); vv{2}(end-vl(3)+1:end); vv{3}];
-	end
-	[ll,cc]=size(final);
-	temp(1,1:cc)=[nn, zeros(1,cc-1)];
-	final=[temp; final];
-	fmodel{i}=final;
-	pp=pp+1;
-	xfrefl(i,1:nn)=final(2,:);
-	zfrefl(i,1:nn)=final(3,:);
-	ivarf(i,1:nn)=final(4,:);
-	npfref(i,1)=nn;
+    line=imdata{(i-1)*4+1};
+    value=sscanf(line,'%i');
+    nn=value;   %the number of nodes
+    if nn<2 || nn>ppfref
+        disp('***  error in f.in file  ***');
+        return;
+    end
+    over10=1; % assume nodes number larger than 10
+    final=[];
+    while over10
+        vv=cell(3,1);
+        vl=zeros(3,1); %length
+        for j=1:3; % x, z, partial derivative
+            pp=pp+1;
+            value=sscanf(imdata{pp},'%f'); % read values
+            vv{j}=value'; % transverse to line vector
+            vl(j)=length(value);
+        end
+        if vl(2)-vl(1)>2 || vl(3)~=vl(1)-1;
+            errorcount=errorcount+1;
+            error{errorcount}=['Number ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
+        elseif vl(2)==vl(1)-1;
+            over10=0;
+        elseif vl(2)==vl(1);
+            if vv{2}(1)==0,
+                over10=0;
+            end
+        end
+        [ll,cc]=size(final);
+        final(:,cc+1:cc+vl(3))=[vv{1}(2:end); vv{2}(end-vl(3)+1:end); vv{3}];
+    end
+    [ll,cc]=size(final);
+    temp(1,1:cc)=[nn, zeros(1,cc-1)];
+    final=[temp; final];
+    fmodel{i}=final;
+    pp=pp+1;
+    xfrefl(i,1:nn)=final(2,:);
+    zfrefl(i,1:nn)=final(3,:);
+    ivarf(i,1:nn)=final(4,:);
+    npfref(i,1)=nn;
 end
 nfrefl=endnum;  %total number of nodes
 end
@@ -996,50 +996,50 @@ function fun_save_vbak(vmodel,fileout)
 %         format_f='%8.3f';
 %         format_d='%8i';
 %     case 'low'
-		format_f='%7.2f';
-		format_d='%7i';
+        format_f='%7.2f';
+        format_d='%7i';
 % end
 fn=fieldnames(vmodel); % {'bd';'tv';'bv'}
 LN=length(vmodel);
 fid=fopen(fileout,'w');
 for i=1:LN
-	for j=1:length(fn)  %fieldnames的个数=3
-		if (i==LN) && (j>1) %最后一层无第2、3fieldname
-		else
-			value=getfield(vmodel,{i},fn{j});    %第i层的第j个fieldname
-			nodes=length(value(1,:));
-			startnode=1:10:1000;    %由于每行最多10个数，故每行开始的节点编号为1、11、21……
-			startnode=startnode(find(startnode<=nodes));
-			linecount=length(startnode);    %需要输出多少行
-			if linecount==1;
-				endnode=nodes;
-			else
-				endnode=[startnode(2:end)-1 nodes]; %结束节点编号为下一行开头编号-1及最后一个节点
-			end
-			flag=1; %是否未完待续
-			for k=1:linecount;
-				if k==linecount;
-					flag=0;
-				end
-				fprintf(fid,'%2i ',i);
-				fprintf(fid,format_f,value(1,startnode(k):endnode(k)));
-				fprintf(fid,'\n');
-				%                 if flag==0;
-				%                     fprintf(fid,'%s',blanks(3));
-				%                 else
-				%                     fprintf(fid,'%2i ',flag);
-				%                 end
-				fprintf(fid,'%2i ',flag);  % use 0 instead of 3X
-				fprintf(fid,format_f,value(2,startnode(k):endnode(k)));
-				fprintf(fid,'\n');
-				if i<LN;    %第LN层无第三行
-					fprintf(fid,'%s',blanks(3));
-					fprintf(fid,format_d,value(3,startnode(k):endnode(k)));
-					fprintf(fid,'\n');
-				end
-			end
-		end
-	end
+    for j=1:length(fn)  %fieldnames的个数=3
+        if (i==LN) && (j>1) %最后一层无第2、3fieldname
+        else
+            value=getfield(vmodel,{i},fn{j});    %第i层的第j个fieldname
+            nodes=length(value(1,:));
+            startnode=1:10:1000;    %由于每行最多10个数，故每行开始的节点编号为1、11、21……
+            startnode=startnode(find(startnode<=nodes));
+            linecount=length(startnode);    %需要输出多少行
+            if linecount==1;
+                endnode=nodes;
+            else
+                endnode=[startnode(2:end)-1 nodes]; %结束节点编号为下一行开头编号-1及最后一个节点
+            end
+            flag=1; %是否未完待续
+            for k=1:linecount;
+                if k==linecount;
+                    flag=0;
+                end
+                fprintf(fid,'%2i ',i);
+                fprintf(fid,format_f,value(1,startnode(k):endnode(k)));
+                fprintf(fid,'\n');
+                %                 if flag==0;
+                %                     fprintf(fid,'%s',blanks(3));
+                %                 else
+                %                     fprintf(fid,'%2i ',flag);
+                %                 end
+                fprintf(fid,'%2i ',flag);  % use 0 instead of 3X
+                fprintf(fid,format_f,value(2,startnode(k):endnode(k)));
+                fprintf(fid,'\n');
+                if i<LN;    %第LN层无第三行
+                    fprintf(fid,'%s',blanks(3));
+                    fprintf(fid,format_d,value(3,startnode(k):endnode(k)));
+                    fprintf(fid,'\n');
+                end
+            end
+        end
+    end
 end
 fclose(fid);
 
@@ -1068,9 +1068,9 @@ xmin=value(2); % model left boundary
 % end
 
 while ischar(line)
-	count=count+1;
-	imdata{count,1}=line; % save every line in the file to the cell'imdata'
-	line = fgetl(fid);
+    count=count+1;
+    imdata{count,1}=line; % save every line in the file to the cell'imdata'
+    line = fgetl(fid);
 end
 fclose(fid);
 % imdata=importdata(filein,'D');  % use an INVALID delimiter to force the data is imported in as a string cell; each line is a cell element
@@ -1094,31 +1094,31 @@ pp=1;  % first line of the v.in
 error={};
 errorcount=0;
 for i=1:LN-1;
-	for j=1:3; % bd=layer top boundary, tv=top velocity, bv=bottom velocity
-		over10=1; % assume nodes number larger than 10
-		final=[];
-		while over10
-			vv=cell(3,1);
-			vl=zeros(3,1); %length
-			for k=1:3; % x, z(v), partial derivative
-				value=sscanf(imdata{pp},'%f'); % read values
-				vl(k)=length(value);
-				vv{k}=value'; % transverse to line vector
-				pp=pp+1;
-			end
-			if vl(2)-vl(1)>2 || vl(3)~=vl(1)-1;
-				errorcount=errorcount+1;
-				error{errorcount}=['Layer ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
-			elseif vl(2)==vl(1)-1;
-				over10=0;
-			elseif vl(2)==vl(1);
-				if vv{2}(1)==0,
-					over10=0;
-				end
-			end
-			[ll,cc]=size(final);
-			final(:,cc+1:cc+vl(3))=[vv{1}(2:end); vv{2}(end-vl(3)+1:end); vv{3}];
-		end
+    for j=1:3; % bd=layer top boundary, tv=top velocity, bv=bottom velocity
+        over10=1; % assume nodes number larger than 10
+        final=[];
+        while over10
+            vv=cell(3,1);
+            vl=zeros(3,1); %length
+            for k=1:3; % x, z(v), partial derivative
+                value=sscanf(imdata{pp},'%f'); % read values
+                vl(k)=length(value);
+                vv{k}=value'; % transverse to line vector
+                pp=pp+1;
+            end
+            if vl(2)-vl(1)>2 || vl(3)~=vl(1)-1;
+                errorcount=errorcount+1;
+                error{errorcount}=['Layer ',num2str(i),', parameter ',num2str(j),': Node numbers do not equal!'];
+            elseif vl(2)==vl(1)-1;
+                over10=0;
+            elseif vl(2)==vl(1);
+                if vv{2}(1)==0,
+                    over10=0;
+                end
+            end
+            [ll,cc]=size(final);
+            final(:,cc+1:cc+vl(3))=[vv{1}(2:end); vv{2}(end-vl(3)+1:end); vv{3}];
+        end
 %         if length(final(1,:))==1; % extend one node format to standard 2 or more nodes format
 %             final(:,2)=final;
 %             final(1,1)=xmin;
@@ -1146,8 +1146,8 @@ for i=1:LN-1;
 %         if j==1;    %'bd'
 %             ZZ(i,:)=interp1(final(1,:),final(2,:),xx,'linear');  % for later depth check
 %         end
-		eval(['vmodel(',num2str(i),').',fieldname{j},'=final;']);
-	end
+        eval(['vmodel(',num2str(i),').',fieldname{j},'=final;']);
+    end
 end
 
 % model bottom
@@ -1155,9 +1155,9 @@ value=sscanf(imdata{pp},'%f')';
 pp=pp+1;
 final=sscanf(imdata{pp},'%f')';
 if length(value)>length(final);
-	vmodel(LN).bd=[value(2:end); final];
+    vmodel(LN).bd=[value(2:end); final];
 else
-	vmodel(LN).bd=[value(2:end); final(2:end)];
+    vmodel(LN).bd=[value(2:end); final(2:end)];
 end
 
 % final=vmodel(LN).bd;
@@ -1182,302 +1182,302 @@ end
 % check if data match
 dtmatch=1;
 for i=1:LN-1
-	laa=length(vmodel(i).bd(1,:));
-	lab=length(vmodel(i).bd(2,:));
-	lac=length(vmodel(i).bd(3,:));
-	if laa~=lab||laa~=lac||lab~=lac
-		dtmatch=0;
-		break;
-	end
-	lba=length(vmodel(i).tv(1,:));
-	lbb=length(vmodel(i).tv(2,:));
-	lbc=length(vmodel(i).tv(3,:));
-	if lba~=lbb||lba~=lbc||lbb~=lbc
-		dtmatch=0;
-		break;
-	end
-	lca=length(vmodel(i).bv(1,:));
-	lcb=length(vmodel(i).bv(2,:));
-	lcc=length(vmodel(i).bv(3,:));
-	if lca~=lcb||lca~=lcc||lcb~=lcc
-		dtmatch=0;
-		break;
-	end
+    laa=length(vmodel(i).bd(1,:));
+    lab=length(vmodel(i).bd(2,:));
+    lac=length(vmodel(i).bd(3,:));
+    if laa~=lab||laa~=lac||lab~=lac
+        dtmatch=0;
+        break;
+    end
+    lba=length(vmodel(i).tv(1,:));
+    lbb=length(vmodel(i).tv(2,:));
+    lbc=length(vmodel(i).tv(3,:));
+    if lba~=lbb||lba~=lbc||lbb~=lbc
+        dtmatch=0;
+        break;
+    end
+    lca=length(vmodel(i).bv(1,:));
+    lcb=length(vmodel(i).bv(2,:));
+    lcc=length(vmodel(i).bv(3,:));
+    if lca~=lcb||lca~=lcc||lcb~=lcc
+        dtmatch=0;
+        break;
+    end
 end
 
 if dtmatch==1
-	ncont=LN;
-	for i=1:LN-1
-		[ll,cc]=size(vmodel(i).bd);
-		for j=1:cc
-			xm(i,j)=vmodel(i).bd(1,j);
-			zm(i,j)=vmodel(i).bd(2,j);
-			ivarz(i,j)=vmodel(i).bd(3,j);
-		end
-		[ll,cc]=size(vmodel(i).tv);
-		for j=1:cc
-			xvel(i,j,1)=vmodel(i).tv(1,j);
-			vf(i,j,1)=vmodel(i).tv(2,j);
-			ivarv(i,j,1)=vmodel(i).tv(3,j);
-		end
-		[ll,cc]=size(vmodel(i).bv);
-		for j=1:cc
-			xvel(i,j,2)=vmodel(i).bv(1,j);
-			vf(i,j,2)=vmodel(i).bv(2,j);
-			ivarv(i,j,2)=vmodel(i).bv(3,j);
-		end
-	end
-	[ll,cc]=size(vmodel(LN).bd);
-	for j=1:cc
-		xm(LN,j)=vmodel(LN).bd(1,j);
-		zm(LN,j)=vmodel(LN).bd(2,j);
-	end
+    ncont=LN;
+    for i=1:LN-1
+        [ll,cc]=size(vmodel(i).bd);
+        for j=1:cc
+            xm(i,j)=vmodel(i).bd(1,j);
+            zm(i,j)=vmodel(i).bd(2,j);
+            ivarz(i,j)=vmodel(i).bd(3,j);
+        end
+        [ll,cc]=size(vmodel(i).tv);
+        for j=1:cc
+            xvel(i,j,1)=vmodel(i).tv(1,j);
+            vf(i,j,1)=vmodel(i).tv(2,j);
+            ivarv(i,j,1)=vmodel(i).tv(3,j);
+        end
+        [ll,cc]=size(vmodel(i).bv);
+        for j=1:cc
+            xvel(i,j,2)=vmodel(i).bv(1,j);
+            vf(i,j,2)=vmodel(i).bv(2,j);
+            ivarv(i,j,2)=vmodel(i).bv(3,j);
+        end
+    end
+    [ll,cc]=size(vmodel(LN).bd);
+    for j=1:cc
+        xm(LN,j)=vmodel(LN).bd(1,j);
+        zm(LN,j)=vmodel(LN).bd(2,j);
+    end
 else
-	disp('***  error in velocity model  ***');
-	disp('the number of data does not match');
+    disp('***  error in velocity model  ***');
+    disp('the number of data does not match');
 end
 
 end
 
 function fun_save_dout(temp,fileout)
 
-if temp==1	% save the first part
-	fid=fopen(fileout,'w');
-	fprintf(fid,'\n');
-	fprintf(fid,'%s','overall damping factor: ');
-	fprintf(fid,'%10.5f',dmpfct{7});
-	fprintf(fid,'\n');
-	fprintf(fid,'\n');
-	fprintf(fid,'%s','type  orig. val.  uncert.    adjust.   new val. resolution std. error');
-	for i=1:nvar
-		fprintf(fid,'\n');
-		fprintf(fid,'%3i',partyp(i));
-		fprintf(fid,'%11.4f',parorg(i));
-		fprintf(fid,'%11.4f',parunc(i)^0.5);
-		fprintf(fid,'%11.4f',dx(i));
-		fprintf(fid,'%11.4f',parorg(i)+dx(i));
-		fprintf(fid,'%11.4f',res(i,i));
-		fprintf(fid,'%11.4f',sqrt(var(i)));
-	end
-	fprintf(fid,'\n');
-	fprintf(fid,'\n');
+if temp==1  % save the first part
+    fid=fopen(fileout,'w');
+    fprintf(fid,'\n');
+    fprintf(fid,'%s','overall damping factor: ');
+    fprintf(fid,'%10.5f',dmpfct{7});
+    fprintf(fid,'\n');
+    fprintf(fid,'\n');
+    fprintf(fid,'%s','type  orig. val.  uncert.    adjust.   new val. resolution std. error');
+    for i=1:nvar
+        fprintf(fid,'\n');
+        fprintf(fid,'%3i',partyp(i));
+        fprintf(fid,'%11.4f',parorg(i));
+        fprintf(fid,'%11.4f',parunc(i)^0.5);
+        fprintf(fid,'%11.4f',dx(i));
+        fprintf(fid,'%11.4f',parorg(i)+dx(i));
+        fprintf(fid,'%11.4f',res(i,i));
+        fprintf(fid,'%11.4f',sqrt(var(i)));
+    end
+    fprintf(fid,'\n');
+    fprintf(fid,'\n');
 
-	if iscrn{7}==1
-		fprintf('\n');
-		fprintf('%s','overall damping factor: ');
-		fprintf('%10.5f',dmpfct{7});
-		fprintf('\n');
-		fprintf('\n');
-		fprintf('%s','type  orig. val.  uncert.    adjust.   new val. resolution std. error');
-		for i=1:nvar
-			fprintf('\n');
-			fprintf('%3i',partyp(i));
-			fprintf('%11.4f',parorg(i));
-			fprintf('%11.4f',parunc(i)^0.5);
-			fprintf('%11.4f',dx(i));
-			fprintf('%11.4f',parorg(i)+dx(i));
-			fprintf('%11.4f',res(i,i));
-			fprintf('%11.4f',sqrt(var(i)));
-		end
-		fprintf('\n');
-		fprintf('\n');
-	end
-	fclose(fid);
+    if iscrn{7}==1
+        fprintf('\n');
+        fprintf('%s','overall damping factor: ');
+        fprintf('%10.5f',dmpfct{7});
+        fprintf('\n');
+        fprintf('\n');
+        fprintf('%s','type  orig. val.  uncert.    adjust.   new val. resolution std. error');
+        for i=1:nvar
+            fprintf('\n');
+            fprintf('%3i',partyp(i));
+            fprintf('%11.4f',parorg(i));
+            fprintf('%11.4f',parunc(i)^0.5);
+            fprintf('%11.4f',dx(i));
+            fprintf('%11.4f',parorg(i)+dx(i));
+            fprintf('%11.4f',res(i,i));
+            fprintf('%11.4f',sqrt(var(i)));
+        end
+        fprintf('\n');
+        fprintf('\n');
+    end
+    fclose(fid);
 end
 
 if temp==2  %save the second part
 %     switch precision
-% 	case 'high'
+%   case 'high'
 %         format_f='%8.3f';
 %         format_d='%8i';
-% 	case 'low'
-		format_f='%7.2f';
-		format_d='%7i';
+%   case 'low'
+        format_f='%7.2f';
+        format_d='%7i';
 %     end
-	fid=fopen(fileout,'a');
-	for i=1:nlayer
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %590
-			j2=j1+9;
-			if j2>nzed(i)   %nzed(i)为该层boundary depth数据个数
-				j2=nzed(i);
-			end
-			if j2<nzed(i)
-				icnt=1; %是否未完待续
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xm(i,j1:j2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,zm(i,j1:j2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarz(i,j1:j2));
-			fprintf(fid,'\n');
-			if iscrn{7}==1
-				fprintf('%2i ',i);
-				fprintf(format_f,xm(i,j1:j2));
-				fprintf('\n');
-				fprintf('%2i ',icnt);
-				fprintf(format_f,zm(i,j1:j2));
-				fprintf('\n');
-				fprintf('%s',blanks(3));
-				fprintf(format_d,ivarz(i,j1:j2));
-				fprintf('\n');
-			end
-			if j2==nzed(i)
-				flag=1;     % go to 600
-			end
-			nstart=j2+1;
-		end     % go to 590
-		%600
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %620
-			j2=j1+9;
-			if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
-				j2=nvel(i,1);
-			end
-			if j2<nvel(i,1)
-				icnt=1;
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xvel(i,j1:j2,1));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,vf(i,j1:j2,1));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarv(i,j1:j2,1));
-			fprintf(fid,'\n');
-			if iscrn{7}==1
-				fprintf('%2i ',i);
-				fprintf(format_f,xvel(i,j1:j2,1));
-				fprintf('\n');
-				fprintf('%2i ',icnt);
-				fprintf(format_f,vf(i,j1:j2,1));
-				fprintf('\n');
-				fprintf('%s',blanks(3));
-				fprintf(format_d,ivarv(i,j1:j2,1));
-				fprintf('\n');
-			end
-			if j2==nvel(i,1)
-				flag=1;     % go to 630
-			end
-			nstart=j2+1;
-		end     % go to 620
-		%630
-		nstart=1;
-		flag=0;
-		while flag==0
-			j1=nstart;  %650
-			j2=j1+9;
-			if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
-				j2=nvel(i,2);
-			end
-			if j2<nvel(i,2)
-				icnt=1;
-			else
-				icnt=0;
-			end
-			fprintf(fid,'%2i ',i);
-			fprintf(fid,format_f,xvel(i,j1:j2,2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%2i ',icnt);
-			fprintf(fid,format_f,vf(i,j1:j2,2));
-			fprintf(fid,'\n');
-			fprintf(fid,'%s',blanks(3));
-			fprintf(fid,format_d,ivarv(i,j1:j2,2));
-			fprintf(fid,'\n');
-			if iscrn{7}==1
-				fprintf('%2i ',i);
-				fprintf(format_f,xvel(i,j1:j2,2));
-				fprintf('\n');
-				fprintf('%2i ',icnt);
-				fprintf(format_f,vf(i,j1:j2,2));
-				fprintf('\n');
-				fprintf('%s',blanks(3));
-				fprintf(format_d,ivarv(i,j1:j2,2));
-				fprintf('\n');
-			end
-			if j2==nvel(i,2)
-				flag=1;     % go to 570
-			end
-			nstart=j2+1;
-		end     % go to 650
-	end     %570
+    fid=fopen(fileout,'a');
+    for i=1:nlayer
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %590
+            j2=j1+9;
+            if j2>nzed(i)   %nzed(i)为该层boundary depth数据个数
+                j2=nzed(i);
+            end
+            if j2<nzed(i)
+                icnt=1; %是否未完待续
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xm(i,j1:j2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,zm(i,j1:j2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarz(i,j1:j2));
+            fprintf(fid,'\n');
+            if iscrn{7}==1
+                fprintf('%2i ',i);
+                fprintf(format_f,xm(i,j1:j2));
+                fprintf('\n');
+                fprintf('%2i ',icnt);
+                fprintf(format_f,zm(i,j1:j2));
+                fprintf('\n');
+                fprintf('%s',blanks(3));
+                fprintf(format_d,ivarz(i,j1:j2));
+                fprintf('\n');
+            end
+            if j2==nzed(i)
+                flag=1;     % go to 600
+            end
+            nstart=j2+1;
+        end     % go to 590
+        %600
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %620
+            j2=j1+9;
+            if j2>nvel(i,1)     %nvel(i,1)为该层top velocity数据个数
+                j2=nvel(i,1);
+            end
+            if j2<nvel(i,1)
+                icnt=1;
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xvel(i,j1:j2,1));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,vf(i,j1:j2,1));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarv(i,j1:j2,1));
+            fprintf(fid,'\n');
+            if iscrn{7}==1
+                fprintf('%2i ',i);
+                fprintf(format_f,xvel(i,j1:j2,1));
+                fprintf('\n');
+                fprintf('%2i ',icnt);
+                fprintf(format_f,vf(i,j1:j2,1));
+                fprintf('\n');
+                fprintf('%s',blanks(3));
+                fprintf(format_d,ivarv(i,j1:j2,1));
+                fprintf('\n');
+            end
+            if j2==nvel(i,1)
+                flag=1;     % go to 630
+            end
+            nstart=j2+1;
+        end     % go to 620
+        %630
+        nstart=1;
+        flag=0;
+        while flag==0
+            j1=nstart;  %650
+            j2=j1+9;
+            if j2>nvel(i,2)     %nvel(i,2)为该层bottom velocity数据个数
+                j2=nvel(i,2);
+            end
+            if j2<nvel(i,2)
+                icnt=1;
+            else
+                icnt=0;
+            end
+            fprintf(fid,'%2i ',i);
+            fprintf(fid,format_f,xvel(i,j1:j2,2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%2i ',icnt);
+            fprintf(fid,format_f,vf(i,j1:j2,2));
+            fprintf(fid,'\n');
+            fprintf(fid,'%s',blanks(3));
+            fprintf(fid,format_d,ivarv(i,j1:j2,2));
+            fprintf(fid,'\n');
+            if iscrn{7}==1
+                fprintf('%2i ',i);
+                fprintf(format_f,xvel(i,j1:j2,2));
+                fprintf('\n');
+                fprintf('%2i ',icnt);
+                fprintf(format_f,vf(i,j1:j2,2));
+                fprintf('\n');
+                fprintf('%s',blanks(3));
+                fprintf(format_d,ivarv(i,j1:j2,2));
+                fprintf('\n');
+            end
+            if j2==nvel(i,2)
+                flag=1;     % go to 570
+            end
+            nstart=j2+1;
+        end     % go to 650
+    end     %570
 
-	fprintf(fid,'%2i ',ncont);
-	fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
-	fprintf(fid,'\n');
-	fprintf(fid,'%2i ',0);
-	fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));
-	if iscrn{7}==1
-		fprintf('%2i ',ncont);
-		fprintf(format_f,xm(ncont,1:nzed(ncont)));
-		fprintf('\n');
-		fprintf('%2i ',0);
-		fprintf(format_f,zm(ncont,1:nzed(ncont)));
-		fprintf('\n');
-	end
+    fprintf(fid,'%2i ',ncont);
+    fprintf(fid,format_f,xm(ncont,1:nzed(ncont)));
+    fprintf(fid,'\n');
+    fprintf(fid,'%2i ',0);
+    fprintf(fid,format_f,zm(ncont,1:nzed(ncont)));
+    if iscrn{7}==1
+        fprintf('%2i ',ncont);
+        fprintf(format_f,xm(ncont,1:nzed(ncont)));
+        fprintf('\n');
+        fprintf('%2i ',0);
+        fprintf(format_f,zm(ncont,1:nzed(ncont)));
+        fprintf('\n');
+    end
 end
 end
 
 function fun_load_din(filein)
 
-	fid = fopen(filein,'r');
-	currentline = fgetl(fid);
-	%disp(currentline)
-	index_and=findstr(currentline,'&');
-	currentline=currentline(index_and+8:end); % 只留下"&dmppar"后的数据部分
-	tline=fgetl(fid);
-	%disp(tline)
-	index_and=findstr(tline,'&');
-	while isempty(index_and) % index_and为空，即未到&end
-		currentline=[currentline tline]; % 将同一个section的有效部分整合成一个字符串
-		tline=fgetl(fid);
-		index_and=findstr(tline,'&');
-	end
+    fid = fopen(filein,'r');
+    currentline = fgetl(fid);
+    %disp(currentline)
+    index_and=findstr(currentline,'&');
+    currentline=currentline(index_and+8:end); % 只留下"&dmppar"后的数据部分
+    tline=fgetl(fid);
+    %disp(tline)
+    index_and=findstr(tline,'&');
+    while isempty(index_and) % index_and为空，即未到&end
+        currentline=[currentline tline]; % 将同一个section的有效部分整合成一个字符串
+        tline=fgetl(fid);
+        index_and=findstr(tline,'&');
+    end
 
-	% 开始进行拆分处理
-	% currentline='  &pltpar  modout=2, dxmod=0.010, dzmod=0.010, modi=2,3,4*1,5,6,7,8,9*0,  ';  % 调试范例
-	currentline=strrep(currentline,' ',''); % 删除所有的空格
-	currentline=regexprep(currentline,'\t',''); % 删除所有的tab，由于tab是特殊符号，需要用regexprep
-	%disp(currentline)
-	index_comma=findstr(currentline,',');
-	index_equal=findstr(currentline,'=');
-	wordnumber=length(index_equal); % 该行包含的字段个数与=号个数相同
-	for i=1:wordnumber;
-		index=find(index_comma<index_equal(i)); % 找到比当前=号位置小的所有，号
-		if isempty(index);  % 说明这是第一个word
-			wordstart=1;
-		else  % 其他普通的情况
-			wordstart=index_comma(index(end))+1;
-		end
-		if  i==wordnumber; % 最后一个字段的情况
-			wordend=length(currentline);
-		else % 其他普通的情况
-			index=find(index_comma<index_equal(i+1)); % 找到比下一个=号位置小的所有，号
-			wordend=index_comma(index(end));
-		end
-		currentword=currentline(wordstart:wordend);
-		position_equal=findstr(currentword,'=');
-		wordname=currentword(1:position_equal-1);
-		position_comma=findstr(currentword,',');
-		wordvalue=currentword(position_equal+1:position_comma-1);
-		eval([wordname,'{6}=',wordvalue,';']); % 给对应wordname的cell的导入值赋值;eval命令可以把字符串（符合命令形式）当作命令来执行
-		eval([wordname,'{7}=',wordvalue,';']); % 给对应wordname的cell的输出值赋值；例如wordname='iplot'，则这句相当于 iplot{7}=vv;
-		eval([wordname,'{8}=true;']); % 该wordname需要输出
-	end  % 结束 for i=1:wordnumber;
-	fclose(fid);
-	%display (['Finish reading ',filein]);
+    % 开始进行拆分处理
+    % currentline='  &pltpar  modout=2, dxmod=0.010, dzmod=0.010, modi=2,3,4*1,5,6,7,8,9*0,  ';  % 调试范例
+    currentline=strrep(currentline,' ',''); % 删除所有的空格
+    currentline=regexprep(currentline,'\t',''); % 删除所有的tab，由于tab是特殊符号，需要用regexprep
+    %disp(currentline)
+    index_comma=findstr(currentline,',');
+    index_equal=findstr(currentline,'=');
+    wordnumber=length(index_equal); % 该行包含的字段个数与=号个数相同
+    for i=1:wordnumber;
+        index=find(index_comma<index_equal(i)); % 找到比当前=号位置小的所有，号
+        if isempty(index);  % 说明这是第一个word
+            wordstart=1;
+        else  % 其他普通的情况
+            wordstart=index_comma(index(end))+1;
+        end
+        if  i==wordnumber; % 最后一个字段的情况
+            wordend=length(currentline);
+        else % 其他普通的情况
+            index=find(index_comma<index_equal(i+1)); % 找到比下一个=号位置小的所有，号
+            wordend=index_comma(index(end));
+        end
+        currentword=currentline(wordstart:wordend);
+        position_equal=findstr(currentword,'=');
+        wordname=currentword(1:position_equal-1);
+        position_comma=findstr(currentword,',');
+        wordvalue=currentword(position_equal+1:position_comma-1);
+        eval([wordname,'{6}=',wordvalue,';']); % 给对应wordname的cell的导入值赋值;eval命令可以把字符串（符合命令形式）当作命令来执行
+        eval([wordname,'{7}=',wordvalue,';']); % 给对应wordname的cell的输出值赋值；例如wordname='iplot'，则这句相当于 iplot{7}=vv;
+        eval([wordname,'{8}=true;']); % 该wordname需要输出
+    end  % 结束 for i=1:wordnumber;
+    fclose(fid);
+    %display (['Finish reading ',filein]);
 end
 
 function fun_load_iout(filein)
@@ -1492,103 +1492,103 @@ nvar = temp(2);
 fgetl(fid);
 
 for i=1:nvar
-	line = fgetl(fid);
-	temp = sscanf(line,'%i');
-	partyp(i) = temp(1);
-	temp = sscanf(line,'%f');
-	parorg(i) = temp(2);
-	parunc(i) = temp(3);
+    line = fgetl(fid);
+    temp = sscanf(line,'%i');
+    partyp(i) = temp(1);
+    temp = sscanf(line,'%f');
+    parorg(i) = temp(2);
+    parunc(i) = temp(3);
 end
 
 fgetl(fid);
 temp = fscanf(fid,'%f');
 for i=1:narinv
-	for j=1:nvar
-		apart(i, j) = temp((i - 1) * nvar + j);
-	end
+    for j=1:nvar
+        apart(i, j) = temp((i - 1) * nvar + j);
+    end
 end
 
 for i=1:narinv
-	tres(i) = temp(narinv * nvar + i);
+    tres(i) = temp(narinv * nvar + i);
 end
 
 for i=1:narinv
-	tunc(i) = temp(narinv * nvar + narinv + i);
+    tunc(i) = temp(narinv * nvar + narinv + i);
 end
 fclose(fid);
 end
 
 function fun_load_din2(filein)  % if there is need to read more than one section
-		fid = fopen(filein,'r');
-		currentline = fgetl(fid);
-		while ischar(currentline);  % 当最后一行读完后，fgetl返回-1，就不是char类型了，跳出while循环
-			disp(currentline)
-			% 开始进行块section的识别和整合
-			index_and=findstr(currentline,'&');
-			if ~isempty(index_and); % index_and非空，即存在&符号
-				samesect=true;  % 进入了一个section
-				sectname=currentline(index_and:index_and+6); % &参数部分的名字都是6个字符，例如pltpar
-				currentline=currentline(index_and+8:end); % 只留下数据部分
-				while samesect;
-					tline=fgetl(fid);
-					disp(tline)
-					index_and=findstr(tline,'&');
-					if ~isempty(index_and); % index_and非空，即存在&符号
-						if strcmp(tline(index_and+1:index_and+3),'end'); % 如果是&end，表明这个section结束了
-							samesect=false;
-						end
-					else
-						currentline=[currentline tline]; % 将同一个section的有效部分整合成一个字符串
-					end
-				end
-			end
-			% 开始进行拆分处理
-			% currentline='  &pltpar  modout=2, dxmod=0.010, dzmod=0.010, modi=2,3,4*1,5,6,7,8,9*0,  ';  % 调试范例
-			currentline=strrep(currentline,' ',''); % 删除所有的空格
-			currentline=regexprep(currentline,'\t',''); % 删除所有的tab，由于tab是特殊符号，需要用regexprep
-			disp(currentline)
-			index_comma=findstr(currentline,',');
-			index_equal=findstr(currentline,'=');
-			wordnumber=length(index_equal); % 该行包含的字段个数与=号个数相同
-			for i=1:wordnumber;
-				index=find(index_comma<index_equal(i)); % 找到比当前=号位置小的所有，号
-				if isempty(index);  % 说明这是第一个word
-					wordstart=1;
-				else  % 其他普通的情况
-					wordstart=index_comma(index(end))+1;
-				end
-				if  i==wordnumber; % 最后一个字段的情况
-					wordend=length(currentline);
-				else % 其他普通的情况
-					index=find(index_comma<index_equal(i+1)); % 找到比下一个=号位置小的所有，号
-					wordend=index_comma(index(end));
-				end
-				currentword=currentline(wordstart:wordend);
-				position_equal=findstr(currentword,'=');
-				wordname=currentword(1:position_equal-1);
-				position_comma=findstr(currentword,',');
-				vv=[];
-				for j=1:length(position_comma); % 有多少个逗号，就有多少个数据
-					if j==1;
-						vs=currentword(position_equal+1:position_comma(j)-1);
-					else
-						vs=currentword(position_comma(j-1)+1:position_comma(j)-1);
-					end
-					position_star=findstr(vs,'*');
-					if ~isempty(position_star); % index_star非空，即存在*，需要把重复的数字给展开
-						vv=[vv ones(1,str2num(vs(1:position_star-1))).*str2num(vs(position_star+1:end))]; % ones用来创建全是1的向量或者矩阵，点乘同一个数字，就得到全部重复的数据
-					else  % 没有重复的普通情况
-						vv=[vv sscanf(vs,'%f')];
-					end
-				end
-				eval([wordname '{6}=vv;']); % 给对应wordname的cell的导入值赋值;eval命令可以把字符串（符合命令形式）当作命令来执行
-				eval([wordname '{7}=vv;']); % 给对应wordname的cell的输出值赋值；例如wordname='iplot'，则这句相当于 iplot{7}=vv;
-				eval([wordname '{8}=true;']); % 该wordname需要输出
-			end  % 结束 for i=1:wordnumber;
-			currentline = fgetl(fid); % 处理完毕，读入下一行
-		end % 结束 while ischar(currentline);
-		fclose(fid);
-		% display (['Finish reading ',filein]);
+        fid = fopen(filein,'r');
+        currentline = fgetl(fid);
+        while ischar(currentline);  % 当最后一行读完后，fgetl返回-1，就不是char类型了，跳出while循环
+            disp(currentline)
+            % 开始进行块section的识别和整合
+            index_and=findstr(currentline,'&');
+            if ~isempty(index_and); % index_and非空，即存在&符号
+                samesect=true;  % 进入了一个section
+                sectname=currentline(index_and:index_and+6); % &参数部分的名字都是6个字符，例如pltpar
+                currentline=currentline(index_and+8:end); % 只留下数据部分
+                while samesect;
+                    tline=fgetl(fid);
+                    disp(tline)
+                    index_and=findstr(tline,'&');
+                    if ~isempty(index_and); % index_and非空，即存在&符号
+                        if strcmp(tline(index_and+1:index_and+3),'end'); % 如果是&end，表明这个section结束了
+                            samesect=false;
+                        end
+                    else
+                        currentline=[currentline tline]; % 将同一个section的有效部分整合成一个字符串
+                    end
+                end
+            end
+            % 开始进行拆分处理
+            % currentline='  &pltpar  modout=2, dxmod=0.010, dzmod=0.010, modi=2,3,4*1,5,6,7,8,9*0,  ';  % 调试范例
+            currentline=strrep(currentline,' ',''); % 删除所有的空格
+            currentline=regexprep(currentline,'\t',''); % 删除所有的tab，由于tab是特殊符号，需要用regexprep
+            disp(currentline)
+            index_comma=findstr(currentline,',');
+            index_equal=findstr(currentline,'=');
+            wordnumber=length(index_equal); % 该行包含的字段个数与=号个数相同
+            for i=1:wordnumber;
+                index=find(index_comma<index_equal(i)); % 找到比当前=号位置小的所有，号
+                if isempty(index);  % 说明这是第一个word
+                    wordstart=1;
+                else  % 其他普通的情况
+                    wordstart=index_comma(index(end))+1;
+                end
+                if  i==wordnumber; % 最后一个字段的情况
+                    wordend=length(currentline);
+                else % 其他普通的情况
+                    index=find(index_comma<index_equal(i+1)); % 找到比下一个=号位置小的所有，号
+                    wordend=index_comma(index(end));
+                end
+                currentword=currentline(wordstart:wordend);
+                position_equal=findstr(currentword,'=');
+                wordname=currentword(1:position_equal-1);
+                position_comma=findstr(currentword,',');
+                vv=[];
+                for j=1:length(position_comma); % 有多少个逗号，就有多少个数据
+                    if j==1;
+                        vs=currentword(position_equal+1:position_comma(j)-1);
+                    else
+                        vs=currentword(position_comma(j-1)+1:position_comma(j)-1);
+                    end
+                    position_star=findstr(vs,'*');
+                    if ~isempty(position_star); % index_star非空，即存在*，需要把重复的数字给展开
+                        vv=[vv ones(1,str2num(vs(1:position_star-1))).*str2num(vs(position_star+1:end))]; % ones用来创建全是1的向量或者矩阵，点乘同一个数字，就得到全部重复的数据
+                    else  % 没有重复的普通情况
+                        vv=[vv sscanf(vs,'%f')];
+                    end
+                end
+                eval([wordname '{6}=vv;']); % 给对应wordname的cell的导入值赋值;eval命令可以把字符串（符合命令形式）当作命令来执行
+                eval([wordname '{7}=vv;']); % 给对应wordname的cell的输出值赋值；例如wordname='iplot'，则这句相当于 iplot{7}=vv;
+                eval([wordname '{8}=true;']); % 该wordname需要输出
+            end  % 结束 for i=1:wordnumber;
+            currentline = fgetl(fid); % 处理完毕，读入下一行
+        end % 结束 while ischar(currentline);
+        fclose(fid);
+        % display (['Finish reading ',filein]);
 end
 
 end

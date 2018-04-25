@@ -32,7 +32,7 @@ for j=1:n
             end
         end
     end
-    aamax=0;    
+    aamax=0;
     for i=j:n   %左下半矩阵
         sum=a(i,j); %第一列不替换
         if j>1
@@ -42,12 +42,12 @@ for j=1:n
             a(i,j)=sum;     %值替换
         end
         dum=vv(i)*abs(sum);     %原矩阵每行最大绝对值的倒数*左下半矩阵新替换值的绝对值
-        if dum>=aamax   
+        if dum>=aamax
             imax=i;     %替换后左下半矩阵该列最大计算值所在行数（j<=i<=n）
             aamax=dum;  %aamax为替换后左下半矩阵该列最大计算值
         end
     end
-    if j~=imax  
+    if j~=imax
         for k=1:n
             dum=a(imax,k);
             a(imax,k)=a(j,k);
@@ -59,16 +59,16 @@ for j=1:n
     indx(j)=imax;   %替换后左下半矩阵该列最大计算值所在行数
     if j~=n
         if a(j,j)==0.0
-            a(j,j)=tiny;    
+            a(j,j)=tiny;
         end
         dum=1.0/a(j,j);      %对角线倒数
         for i=(j+1):n       %不包括对角线的左下半矩阵值替换
-            a(i,j)=a(i,j)*dum;  
+            a(i,j)=a(i,j)*dum;
         end
     end
 end
 if a(n,n)==0.0
-    a(n,n)=tiny;    
+    a(n,n)=tiny;
 end
 
 end

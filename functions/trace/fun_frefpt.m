@@ -11,9 +11,9 @@ function [xfr,zfr,ifrpt,iflagf] = fun_frefpt(npt)
 % iflagf: 1-找到交点
 % ifrpt: 交点对应的浮动界面节点编号
 
-	% ifcbnd: 当前浮动边界的编号
-	% npfref: 数组，每个浮动边界的节点个数
-	% xfrefl,zfrefl: 浮动界面上每个节点的坐标
+    % ifcbnd: 当前浮动边界的编号
+    % npfref: 数组，每个浮动边界的节点个数
+    % xfrefl,zfrefl: 浮动界面上每个节点的坐标
     global ifcbnd npfref xfrefl xr zfrefl zr;
 
     a1 = zr(npt-1) - zr(npt);

@@ -53,9 +53,9 @@ function h = Lerrorbarv6(cax, varargin)
 args = varargin;
 nargs = length(args);
 try
-	narginchk(2,6);
+    narginchk(2,6);
 catch e
-	error(nargchk(2,6,nargs,'struct'));
+    error(nargchk(2,6,nargs,'struct'));
 end
 
 x = args{1};
