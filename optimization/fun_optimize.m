@@ -207,6 +207,7 @@ function [state,options,optchanged] = gaoutfun_surf(options,state,flag)
     optchanged = false;
     switch flag
         case 'init'
+            populations = []; scores = [];
             hf = figure;
             ax = gca;
             [x, y] = meshgrid(0:nGen, 1:nPop);
@@ -245,6 +246,7 @@ function [state,options,optchanged] = gaoutfun_mesh(options,state,flag)
     optchanged = false;
     switch flag
         case 'init'
+            populations = []; scores = [];
             hf = figure;
             ax = gca;
             [x, y] = meshgrid(0:nGen, 1:nPop);
@@ -283,6 +285,7 @@ function [state,options,optchanged] = gaoutfun_bar3(options,state,flag)
     optchanged = false;
     switch flag
         case 'init'
+            populations = []; scores = [];
             hf = figure;
             ax = gca;
             y = zeros(nPop, nGen+1);
