@@ -1,14 +1,3 @@
-% \bvar\b(\(.*\))*\s*=[^=]
-% (\[.*)?\bvar\b(.*\])?(\(.*\))*\s*=[^=]
-% profile on; main; profile off; profile viewer; profsave(profile('info'),'profile_test');
-% rayinvr_par.m, rayinvr_com.m, main_par.m, blkdat.m, input/r.in, -old/*.*
-
-% call: fun_auto; fun_calmod; fun_trace; fun_xzpt; fun_modwr; fun_vel;
-% fun_ttime; fun_cells; fun_fxtinv; fun_calprt; fun_fd;
-% fun_load_vin; fun_trans_rin2m; fun_load_txin; fun_load_fin;
-
-% fun_aldone; fun_empty; fun_plotnd;
-
 function [RMS, CHI] = main(options)
 % main function for rayinvr
 %
@@ -16,49 +5,32 @@ function [RMS, CHI] = main(options)
 %
 % options is an Object with keys below:
 %   pathIn: path of input files. You should put all of your `.in` files in this path. Default: `'./data/examples/e1'`.
-%   pathVin: optional. path of specified v.in file. Default: `'pathIn/v.in'`
+%   pathVin: path of v.in file.
+%   pathRinm: path of converted r.in file(r_in.m).
 
-    % default parameters
-    global appRoot;
-    if isempty(appRoot)
-        appRoot = mfilename('fullpath');
-        filesepIndexs = strfind(appRoot, filesep);
-        appRoot = appRoot(1:filesepIndexs(end));
-    end
-    pathIn = fullfile(appRoot, 'data','examples','e1');
-    pathVin = fullfile(pathIn, 'v.in');
-    pathRin = fullfile(pathIn, 'r.in');
+    % Get path of input files
+    pathIn = options.pathIn;
+    pathVin = options.pathVin;
+    pathRinm = options.pathRinm;
+
+    % Default parameters
     isUseOde = false;
     isPlot = true;
     inOptimize = false;
 
-    if nargin == 1
-        % Get path of input files
-        if isfield(options,'pathIn') && ~isempty(options.pathIn)
-            pathIn = options.pathIn;
-            if isfield(options,'pathVin') && ~isempty(options.pathVin)
-                pathVin = options.pathVin;
-            else
-                pathVin = fullfile(pathIn, 'v.in');
-            end
-            if isfield(options,'pathRin') && ~isempty(options.pathRin)
-                pathRin = options.pathRin;
-            else
-                pathRin = fullfile(pathIn, 'r.in');
-            end
-        end
-        if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
-            isUseOde = options.isUseOde;
-        end
-        if isfield(options,'inOptimize') && ~isempty(options.inOptimize)
-            inOptimize = options.inOptimize;
-        end
-        if inOptimize
-            optimizeOpts = options.optimizeOpts;
-            isPlot = optimizeOpts.isPlot;
-        end
+    % Optional parameters
+    if isfield(options,'isUseOde') && ~isempty(options.isUseOde)
+        isUseOde = options.isUseOde;
+    end
+    if isfield(options,'inOptimize') && ~isempty(options.inOptimize)
+        inOptimize = options.inOptimize;
+    end
+    if inOptimize
+        optimizeOpts = options.optimizeOpts;
+        isPlot = optimizeOpts.isPlot;
     end
 
+    % Validate input directiory
     if ~exist(pathIn, 'dir')
         error('main:IOError','Input path: "%s" not exist',pathIn);
     end
@@ -67,14 +39,15 @@ function [RMS, CHI] = main(options)
         mkdir(pathOut);
     end
 
-    addpath(genpath('./functions'));
-    % addpath(genpath(fullfile(pwd(),'functions')));
-
+    % Set global values
     clear('global');
     global file_rayinvr_par file_rayinvr_com file_main_par;
     global fID_11 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35 fID_63;
     global file_iout file_nout;
     global fun_trace;
+
+    % Figure handle for ploting
+    global hFigure1 hFigure2;
 
     if isUseOde
         fun_trace = @fun_trace_new;
@@ -82,18 +55,12 @@ function [RMS, CHI] = main(options)
         fun_trace = @fun_trace_old;
     end
 
-    % 控制绘图颜色
-    global matlabColors currentColor;
-
-    % 图像句柄，1-模型图像，2-走时图像
-    global hFigure1 hFigure2;
-
     file_rayinvr_par = 'rayinvr_par.m';
     file_rayinvr_com = 'rayinvr_com.m';
     file_main_par = 'main_par.m';
     file_block_data = 'blkdat.m';
 
-    file_rin = pathRin;
+    file_rin_m = pathRinm;
     file_vin = pathVin;
     file_txin = fullfile(pathIn,'tx.in');
     file_fin = fullfile(pathIn,'f.in');
@@ -112,7 +79,6 @@ function [RMS, CHI] = main(options)
     file_fort35 = fullfile(pathOut,'fort.35');
     file_fort63 = fullfile(pathOut,'fort.63');
 
-
     % 1 variables
     % 1.1 声明 rayinvr.par 文件中的变量并赋值
     run(file_rayinvr_par);
@@ -127,21 +93,16 @@ function [RMS, CHI] = main(options)
     run(file_block_data);
 
     % 1.4 为 r.in 中的所有变量赋值
-    % 将 r.in 文件转化为 r_in.m 脚本。载入脚本，为 r.in 中所有变量赋值
-    % file_rin_m = fun_trans_rin2m(file_rin);
-    % clear(file_rin_m);
-    [file_rin_path,file_rin_name,~] = fileparts(file_rin);
-    file_rin_m = fullfile(file_rin_path,[file_rin_name,'_in.m']);
     run(file_rin_m);
 
-    % 在基因算法优化中，需要覆盖某些 r.in 参数
+    % Rewrite some parameters in optimizing
     if inOptimize
-        if exist(optimizeOpts.rin_mat, 'file')
-            ws = load(optimizeOpts.rin_mat);
-            f = fieldnames(ws);
+        if isfield(optimizeOpts, 'rewriteVars')
+            obj = optimizeOpts.rewriteVars;
+            f = fieldnames(obj);
             for ii = 1:length(f)
                 eval([f{ii},'(1:end)=0;']);
-                eval([f{ii},'(1:length(ws.(f{ii})))=ws.(f{ii});']);
+                eval([f{ii},'(1:length(obj.(f{ii})))=obj.(f{ii});']);
             end
         end
 
@@ -157,12 +118,13 @@ function [RMS, CHI] = main(options)
     end
 
 
-    % matlab colors，设定当前颜色为默认色（前景色）
-    % matlabColors = 'krgbcmyy';
+    % Colors for ploting
+    global matlabColors currentColor;
     matlabColors = {'k','r','g','b','c','m',[1,0.65,0],[0.5,0.2,0.9],[0.6,0.8,0.2],[0.4,0.2,0.2],[0.4,0.4,1]};
     currentColor = matlabColors{ifcol};
 
-    % 2 main
+
+    %% 2 Starting of main calculation
     % 如果未指定 xmax，则程序结束
     if xmax < -99998
         error('e:stop','\n***  xmax not specified  ***\n\n');

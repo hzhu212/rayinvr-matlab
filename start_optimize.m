@@ -1,18 +1,30 @@
+function [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOde)
 %% Run optimize when starting at no-GUI environment
 
-function [final_x, final_val] = start_optimize(pathIn)
-
-    addpath('./functions');
-    addpath('./optimization');
-
-    if nargin == 0
+    if nargin < 1
         pathIn = fullfile(pwd, 'data', 'subbarao_s');
     end
-    mainOpts.pathIn = pathIn;
-    % mainOpts.pathVin = fullfile(mainOpts.pathIn, 'v.in');
-    % mainOpts.pathRin = fullfile(mainOpts.pathIn, 'r.in');
-    file_rin = fullfile(mainOpts.pathIn, 'r.in');
-    file_rin_m = fun_trans_rin2m(file_rin);
+    if nargin < 2
+        pathRin = fullfile(pathIn, 'r.in');
+    end
+    if nargin < 3
+        pathVin = fullfile(pathIn, 'v.in');
+    end
+    if nargin < 4
+        isUseOde = false;
+    end
 
-    [final_x, final_val] = fun_optimize(mainOpts);
+    % Add functions to path.
+    % `genpath` will add all the children path
+    addpath(genpath('./functions'));
+    addpath('./optimization');
+
+    obj.pathIn = pathIn;
+    obj.pathRinm = fun_trans_rin2m(pathRin);
+    obj.pathVin = pathVin;
+    obj.isUseOde = isUseOde;
+
+    obj.inOptimize = true;
+
+    [final_x, final_val] = fun_optimize(obj);
 end

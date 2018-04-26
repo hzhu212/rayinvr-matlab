@@ -1,22 +1,12 @@
+function [final_x, final_val] = fun_optimize(mainOpts)
 % 通过优化算法寻找使得 CHI 最小的 pois 数组
 
-function [final_x, final_val] = fun_optimize(mainOpts)
-    mainOpts.inOptimize = true;
-    file_rin = fullfile(mainOpts.pathIn, 'r.in');
-    file_rin_m = fun_trans_rin2m(file_rin);
-    file_rin_mat = fun_restore_rin_mat(file_rin_m);
-    rin = load(file_rin_mat);
+    file_rin_m = mainOpts.pathRinm;
+    rin = fun_load_rin_vars(file_rin_m, {'ray', 'ncbnd', 'cbnd', 'ivray', 'pois'});
     cfg = fun_get_config();
-
-    % default ga options:
-    % Generations: 100 * nvar
-    % PopulationSize: {50} when numberOfVariables <= 5, {200} otherwise | {min(max(10*nvar,40),100)} for mixed-integer problems
-    % options = gaoptimset('Generations', 10, 'PopulationSize', 20);
 
     optimizeOpts.type = cfg.type;
     optimizeOpts.isPlot = cfg.isPlot;
-    optimizeOpts.rin_mat = 'r_in_optimize.mat';
-    if exist(optimizeOpts.rin_mat, 'file'), delete(optimizeOpts.rin_mat); end
 
     % ga by layer
     if cfg.type == 1
@@ -26,8 +16,10 @@ function [final_x, final_val] = fun_optimize(mainOpts)
         upperLimit = cfg.upperLimit .* ones(nvar,1);
         lowerLimit = cfg.lowerLimit .* ones(nvar,1);
 
-        [obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(layerIndexs,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
-        save(optimizeOpts.rin_mat, '-struct', 'obj');
+        % 只追踪优化过程所涉及的层的事件，忽略其他层的事件以节省时间
+        [ray, ncbnd, cbnd, ivray] = fun_select_rays(layerIndexs, rin.ray, rin.ncbnd, rin.cbnd, rin.ivray);
+        tmp.ray = ray; tmp.ncbnd = ncbnd; tmp.cbnd = cbnd; tmp.ivray = ivray;
+        optimizeOpts.rewriteVars = tmp;
 
         target_fun = fun_partialMain1(mainOpts, optimizeOpts, rin.pois, layerIndexs);
         gaoutfun = @gaoutfun_stem3;
@@ -56,10 +48,6 @@ function [final_x, final_val] = fun_optimize(mainOpts)
         upperLimit(upperLimit > 0.499) = 0.499;
         lowerLimit(lowerLimit < 0.250) = 0.250;
 
-        % % 当优化某一层的所有块时，只追踪该层的事件，其他层的事件对优化结果影响不大，去掉以节省时间
-        % [obj.ray,obj.ncbnd,obj.cbnd,obj.ivray] = fun_select_rays(cfg.poisl,rin.ray,rin.ncbnd,rin.cbnd,rin.ivray);
-        % save(optimizeOpts.rin_mat, '-struct', 'obj');
-
         target_fun = fun_partialMain2(mainOpts,optimizeOpts);
         gaoutfun = @gaoutfun_stem3;
         options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
@@ -71,9 +59,11 @@ function [final_x, final_val] = fun_optimize(mainOpts)
     save('history_optimize.mat', 'final_x', 'final_val', '-append');
 end
 
+
+function [ray, ncbnd, cbnd, ivray] = fun_select_rays(poisl, ray, ncbnd, cbnd, ivray)
 % 依据层编号 poisl，取出在该层内发生的事件对应的 ray
 % 同时，挑选出相应的 ncbnd, cbnd, ivray
-function [ray, ncbnd, cbnd, ivray] = fun_select_rays(poisl, ray, ncbnd, cbnd, ivray)
+
     trace_layers = min(poisl):max(poisl);
     if trace_layers(1)-1 > 1
         trace_layers = [trace_layers(1)-1, trace_layers];
@@ -115,8 +105,10 @@ function [ray, ncbnd, cbnd, ivray] = fun_select_rays(poisl, ray, ncbnd, cbnd, iv
     end
 end
 
-% ga by layer
+
 function func = fun_partialMain1(mainOpts, optimizeOpts, initPois, layerIndexs)
+% ga by layer
+
     save('history_optimize.mat', 'layerIndexs');
     function y = wrapper(iterPois)
         disp('Optimizing pois by layer: ');
@@ -175,6 +167,7 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
     optchanged = false;
     switch flag
         case 'init'
+            populations = []; scores = [];
             hf = figure;
             ax = gca;
             [x, y] = meshgrid(0:nGen, 1:nPop);
@@ -189,23 +182,11 @@ function [state,options,optchanged] = gaoutfun_stem3(options,state,flag)
             ylabel(ax, 'Y - Population');
             zlabel(ax, 'Z - Score');
             pause(0.1);
-            try
-                populations(:,:,1) = state.Population;
-                scores(:,1) = state.Score;
-            catch e
-                disp('Round 1');
-                disp(populations);
-                disp(state.Population);
-            end
+            populations(:,:,1) = state.Population;
+            scores(:,1) = state.Score;
         case 'iter'
-            try
-                populations(:,:,curGen) = state.Population;
-                scores(:,curGen) = state.Score;
-            catch e
-                fprintf('Round %d\n', curGen);
-                disp(populations);
-                disp(state.Population);
-            end
+            populations(:,:,curGen) = state.Population;
+            scores(:,curGen) = state.Score;
             % Update the plot.
             z(nPop*(curGen-1)+1:nPop*curGen) = state.Score';
             refreshdata(h, 'caller');

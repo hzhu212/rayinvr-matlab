@@ -1,6 +1,5 @@
-%% 优化算法参数配置
-
 function options = fun_get_config()
+%% 优化算法参数配置
 
     % 优化过程中是否绘图，如是，则每个个体均绘图
     options.isPlot = false;
@@ -12,9 +11,9 @@ function options = fun_get_config()
         % 待优化的泊松比在 pois 数组中的 index
         options.layerIndexs = [2:9];
         % 基因算法代数
-        options.nGeneration = 3;
+        options.nGeneration = 1;
         % 每代的个体数
-        options.nPopulation = 4;
+        options.nPopulation = 1;
         % 待优化的自变量的下限和上限（此处指泊松比）
         % options.lowerLimit = 0.43;
         % options.upperLimit = 0.499;
@@ -39,8 +38,8 @@ function options = fun_get_config()
         options.offset = 0.015;
 
         % 基因算法参数
-        options.nGeneration = 2;
-        options.nPopulation = 2;
+        options.nGeneration = 1;
+        options.nPopulation = 1;
 
     else
         error('config error!');
