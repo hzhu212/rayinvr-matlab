@@ -21,6 +21,8 @@ function [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOd
 
     obj.pathIn = pathIn;
     obj.pathRinm = fun_trans_rin2m(pathRin);
+    % Clear cached r_in.m, or the modification for r.in won't work
+    clear(obj.pathRinm);
     obj.pathVin = pathVin;
     obj.isUseOde = isUseOde;
 
