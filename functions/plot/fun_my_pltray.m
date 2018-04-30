@@ -55,7 +55,7 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
     hold on;
 
     if ircol ~= 0
-        currentColor = matlabColors{irrcol};
+        currentColor = matlabColors{mod(irrcol, length(matlabColors)) + 1};
     end
 
     % 设置线型与节点符号
