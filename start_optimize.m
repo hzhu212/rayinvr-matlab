@@ -18,6 +18,7 @@ function [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOd
     % `genpath` will add all the children path
     addpath(genpath('./functions'));
     addpath('./optimization');
+    rmpath('./overwrite/fprintf');
 
     obj.pathIn = pathIn;
     obj.pathRinm = fun_trans_rin2m(pathRin);
@@ -28,5 +29,22 @@ function [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOd
 
     obj.inOptimize = true;
 
-    [final_x, final_val] = fun_optimize(obj);
+    % Enable parallel computing
+    try
+        parpool;
+    catch e
+        ;
+    end
+
+    % There is no need to write output file when optimizing.
+    addpath('./overwrite/fprintf');
+    try
+        tic;
+        [final_x, final_val] = fun_optimize(obj);
+        toc;
+    catch e
+        rmpath('./overwrite/fprintf');
+        rethrow(e);
+    end
+    rmpath('./overwrite/fprintf');
 end
