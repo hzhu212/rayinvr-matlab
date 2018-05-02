@@ -9,15 +9,13 @@ function options = fun_get_config()
     %% by layer
     if options.type == 1
         % 待优化的泊松比在 pois 数组中的 index
-        options.layerIndexs = [2:9];
+        options.layerIndexs = [2:10];
         % 基因算法代数
         options.nGeneration = 1;
         % 每代的个体数
-        options.nPopulation = 1;
+        options.nPopulation = 4;
         % 待优化的自变量的下限和上限（此处指泊松比）
-        % options.lowerLimit = 0.43;
-        % options.upperLimit = 0.499;
-        options.lowerLimit = 0.42;
+        options.lowerLimit = 0.43;
         options.upperLimit = 0.499;
 
     %% by block
