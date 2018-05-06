@@ -10,7 +10,7 @@ function [itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(is,
 %
 % for the travel time between two points a distance h apart
 
-    global fID_11 fID_12;
+    global fID_11 fID_ray fID_12;
     % global ar_ fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
     %   range_ rayid time timer_ tr tt vr vred xr xshtar zr;
 
@@ -26,8 +26,11 @@ function [itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(is,
     time = 0.0;
     iflagw = 0;
 
+    % npt: the number of points defining current ray path
     for ii = 1:npt-1 % 10
+        % the distance between two adjacent points of a ray
         tr(ii) = sqrt((xr(ii+1)-xr(ii)).^2 + (zr(ii+1)-zr(ii)).^2);
+        % average velocity between the two points
         vave(ii) = (vr(ii,2) + vr(ii+1,1)) ./ 2.0;
         if iflagw == 0 && vave(ii) > 1.53
             iflagw = 1;
@@ -37,21 +40,37 @@ function [itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(is,
             % fprintf(fID_67, '%5d%10.3f%10.3f%10.3f%10.3f%10d\n', nr,xr(ii),zr(ii),time,uf,irayf);
             iflagw = 2;
         end
+        % accumulate the travel time
         time = time + tr(ii) ./ vave(ii);
     end % 10
 
+    % angle of the ray when reaching receiver
     a2 = fid1 .* (90.0-fid.*ar_(npt,1).*pi18) ./ fid;
+
     nptr = npt;
+
+    % get reduced travel time. Why not original travel time? Maybe for better plotting...
     if vred == 0.0
         timer_ = time;
     else
         timer_ = time - abs(xr(npt)-xshot) ./ vred;
     end
+
+    % get the ray code
     rayid(ntt) = idray(1) + idray(2)./10.0; % float
     if nr == 0, return; end % go to 999
-    % 5
+
+    % output to r1.out
     fprintf(fID_11, '%4d%4d%9.3f%9.3f%9.3f%8.2f%8.3f%6d%6.1f\n',...
         is,nr,a1,a2,xr(npt),zr(npt),timer_,nptr,rayid(ntt));
+
+    % output to ray.out
+    [zturn, idx] = max(zr(1:npt));
+    xturn = xr(idx);
+    % 'shot','code','#ray','xreceive','time','rtime','xturn','zturn','xturn2','zturn2'
+    fprintf(fID_ray,'%4d%5.1f%5d%9.3f%8.3f%8.3f%9.3f%9.3f%9.3f%9.3f\n',...
+        is,rayid(ntt),nr,xr(npt),time,timer_,xturn,zturn,-1,-1);
+
     if vr(npt,2) ~= 0.0
         itt(ifam) = itt(ifam) + 1;
         if iszero == 0
