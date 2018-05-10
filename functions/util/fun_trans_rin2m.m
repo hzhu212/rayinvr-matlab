@@ -11,28 +11,35 @@ function fileOut = fun_trans_rin2rm(file_rin)
     [fout,errmsg2] = fopen(fileOut, 'wt'); % 文本形式打开，只写
     error(errmsg1);
     error(errmsg2);
-    while ~feof(fin) % 当文件读取未结束
+
+    while ~feof(fin)
         currentLine = strtrim(fgetl(fin));
         inSection = false;
         [tokens,split] = regexp(currentLine, '(&\w+)\s*', 'tokens', 'split');
         if ~isempty(tokens)
-            % 找出小节开头
+            % detect section beginning
             inSection = true;
             currentLine = strtrim(strjoin(split));
             sectionName = tokens{1}{1};
             fprintf(fout, ['%% ',sectionName,'\n']);
         else
-            % 未被section包括的部分直接作为注释输出
+            % if contents are out of section marks, just print them as comment
             if ~isempty(strtrim(currentLine))
                 fprintf(fout, ['%% ',currentLine,'\n']);
             end
             continue;
         end
+
+        % join all lines of the same section into one string, separating by '\n'
         while(inSection)
-            % 将同一小节连接成一个字符串
             tempLine = strtrim(fgetl(fin));
+
+            % if the line is empty or comment, just skip
             if isempty(tempLine), continue; end
+            if startsWith(tempLine, '!'), continue; end
             [tokens] = regexp(tempLine, '(&\w+)\s*', 'tokens');
+
+            % detect section ending
             if ~isempty(tokens)
                 sectionEnd = tokens{1}{1};
                 if ~strcmp(sectionEnd, '&end')
@@ -43,7 +50,6 @@ function fileOut = fun_trans_rin2rm(file_rin)
                 currentLine = [currentLine,'\n',tempLine];
             end
         end
-
 
         % 处理逗号，将每个完整的赋值语句后面的逗号替换成分号
         currentLine = sprintf(currentLine); % 将字符串转化为格式化字符串（这样\n之类的特殊字符才能被识别，否则\n将被看作2个普通字符）
@@ -63,7 +69,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
         end
         currentLine = strjoin(split,replaced);
 
-        % 对于数组形式的赋值，修正变量的下标，如a(1)=[1,2,3]，变为a(1:3)=[1,2,3]
+        % 对于数组形式的赋值，修正变量的下标，如 a(1)=[1,2,3]，变为 a(1:3)=[1,2,3]
         [tokens,split] = regexp(currentLine,'\(1\)=\[(([\d\n\.-]+,)+)','tokens','split');
         replaced = {};
         for t = tokens
@@ -77,5 +83,4 @@ function fileOut = fun_trans_rin2rm(file_rin)
     end
     fclose(fin);
     fclose(fout);
-    % type([fileIn,'.m']);
 end
