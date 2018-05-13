@@ -23,7 +23,7 @@ function [final_x, final_val] = fun_optimize(mainOpts)
 
         target_fun = fun_partialMain1(mainOpts, optimizeOpts, rin.pois, layerIndexs);
         gaoutfun = @gaoutfun_stem3;
-        options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation,'UseParallel', true);
+        options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation,'UseParallel',true);
         [final_x, final_val] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
 
     % ga by block
@@ -50,7 +50,7 @@ function [final_x, final_val] = fun_optimize(mainOpts)
 
         target_fun = fun_partialMain2(mainOpts,optimizeOpts);
         gaoutfun = @gaoutfun_stem3;
-        options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation);
+        options = optimoptions('ga','OutputFcn',gaoutfun,'Generations',cfg.nGeneration,'PopulationSize',cfg.nPopulation,,'UseParallel',true);
         [final_x, final_val] = ga(target_fun, nvar, [],[],[],[], lowerLimit, upperLimit, [], options);
     end
     disp('final pois: ');
