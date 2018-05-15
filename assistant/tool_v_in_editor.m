@@ -1,122 +1,130 @@
 function tool_v_in_editor
-global model LN xmin xmax zmin zmax precision xx ZZ vinerror selectL scolor;
-global veditorh;
-% disp ('1: v.in editor');
 
-% initial file path and names
-[loadpath,loadname,savepath,savename,fullload,fullsave]=deal('');
-DX=0.005; DY=0.005;  % 对模型进行离散化时的横向和深度方向的采样间隔，单位 km
-overlayboundary='1'; % 彩色图上是否叠加层的边界
-labelboundary='1'; % 彩色图上的层边界是否标注序号
-pois=0.25; % rayinvr缺省的泊松比值
-poisbl={}; % 微调四边形块中的泊松比值，缺省为空；存储方式为：每层为一个cell元素，每个cell元素为n*2的矩阵，第一列是块号，第二列是泊松比值
-X1D=[]; % 用于存放绘制一维速度剖面x坐标的数组
-plot1D=false; % 是否画出一维剖面
-output1D=false; % 是否输出一维剖面到文本文件
+    global model LN xmin xmax zmin zmax precision xx ZZ vinerror selectL scolor;
+    global veditorh;
+    % disp ('1: v.in editor');
 
-% load last run information
-if exist('history_vin.mat','file');
-    s=load ('history_vin.mat');
-    loadpath=s.loadpath;
-    loadname=s.loadname;
-    fullload=s.fullload;
-    savepath=s.savepath;
-    savename=s.savename;
-    fullsave=s.fullsave;
-    DX=s.DX;
-    DY=s.DY;
-    overlayboundary=s.overlayboundary;
-    labelboundary=s.labelboundary;
-    pois=s.pois;
-    poisbl=s.poisbl;
-    X1D=s.X1D;
-end
-if isempty(fullload)
-    loadprevious='off';
-else
-    loadprevious='on';
-end
-if isempty(fullsave)
-    saveprevious='off';
-else
-    saveprevious='on';
-end
-if isempty(pois)
+    % variables to save to history_vin.mat
+    save_list = {
+        'veditorh', 'loadpath', 'loadname', 'fullload', 'savepath', 'savename', ...
+        'fullsave', 'DX', 'DY', 'overlayboundary', 'labelboundary', 'pois', ...
+        'poisbl', 'X1D'};
+
+    % initial file path and names
+    [loadpath,loadname,savepath,savename,fullload,fullsave]=deal('');
+    DX=0.005; DY=0.005;  % 对模型进行离散化时的横向和深度方向的采样间隔，单位 km
+    overlayboundary='1'; % 彩色图上是否叠加层的边界
+    labelboundary='1'; % 彩色图上的层边界是否标注序号
     pois=0.25; % rayinvr缺省的泊松比值
-end
-% if isempty(X1D)
-%     X1D=mean(xx([1,end]));
-% end
+    poisbl={}; % 微调四边形块中的泊松比值，缺省为空；存储方式为：每层为一个cell元素，每个cell元素为n*2的矩阵，第一列是块号，第二列是泊松比值
+    X1D=[]; % 用于存放绘制一维速度剖面x坐标的数组
+    plot1D=false; % 是否画出一维剖面
+    output1D=false; % 是否输出一维剖面到文本文件
 
-% labelL='y'; % 'y' for yes to label the layer boundary number; 'n' for no
-% symbolZ='n'; %
-% labelZ='n'; % 'y' for yes to label depth value; 'n' for no: only valid if the symbol is drawn
-% symbolV='y'; %
-% labelV='y'; %
+    % load last run information
+    if exist('history_vin.mat','file');
+        s=load ('history_vin.mat');
+        veditorh=s.veditorh;
+        loadpath=s.loadpath;
+        loadname=s.loadname;
+        fullload=s.fullload;
+        savepath=s.savepath;
+        savename=s.savename;
+        fullsave=s.fullsave;
+        DX=s.DX;
+        DY=s.DY;
+        overlayboundary=s.overlayboundary;
+        labelboundary=s.labelboundary;
+        pois=s.pois;
+        poisbl=s.poisbl;
+        X1D=s.X1D;
+    end
+    if isempty(fullload)
+        loadprevious='off';
+    else
+        loadprevious='on';
+    end
+    if isempty(fullsave)
+        saveprevious='off';
+    else
+        saveprevious='on';
+    end
+    if isempty(pois)
+        pois=0.25; % rayinvr缺省的泊松比值
+    end
+    % if isempty(X1D)
+    %     X1D=mean(xx([1,end]));
+    % end
 
-slswitch={true,true,false,true,false,false,true,false,true}; % checkbox状态，依次为（1）Label all layer top boundary；（2）Display depth nodes (open square)；
-% （3）Label depth values (km)；（4）Display velocity nodes (solid dot)；（5）Label velocity values (km/s)；（6）Discretise and color plot the P-wave velocity model；
-% （7）Plot layer boundary of color S-wave velocity model；（8）Display color map of Poisson''s ratio；（9）Output S-wave velocity model to v_s.in file as well as Poisson's ratio table to Poisson.txt
+    % labelL='y'; % 'y' for yes to label the layer boundary number; 'n' for no
+    % symbolZ='n'; %
+    % labelZ='n'; % 'y' for yes to label depth value; 'n' for no: only valid if the symbol is drawn
+    % symbolV='y'; %
+    % labelV='y'; %
 
-[plotzmin,plotzmax,xmax,zmax]=deal([]);
+    slswitch={true,true,false,true,false,false,true,false,true}; % checkbox状态，依次为（1）Label all layer top boundary；（2）Display depth nodes (open square)；
+    % （3）Label depth values (km)；（4）Display velocity nodes (solid dot)；（5）Label velocity values (km/s)；（6）Discretise and color plot the P-wave velocity model；
+    % （7）Plot layer boundary of color S-wave velocity model；（8）Display color map of Poisson''s ratio；（9）Output S-wave velocity model to v_s.in file as well as Poisson's ratio table to Poisson.txt
 
-% blocks：model每层的四边形块是把这层顶、底的所有深度和速度节点的横坐标从左往右排序、去除重复项后划出来的。
-blocks={}; % 每一层是一个cell元素，用n*3的矩阵存储block纵向竖线的横坐标和上、下深度坐标
-bselect={false false}; % 控制block绘制的开关，分别对应：是否绘制短竖线；是否从左到右标记block的序号（标识方法：层号-block序号）
+    [plotzmin,plotzmax,xmax,zmax]=deal([]);
 
-%--------------- UI ---------------------%
-if ishandle(veditorh);
-    % veditorh = 1;
-    % set(veditorh,'Visible','on');
-    figure(veditorh);
-else
-    veditorh = figure();
-    set(veditorh,'Visible','off','Name','v.in editor',...
-        'NumberTitle','on','Position',[100,10,1000,700]);
-    % menu item
-    menuh1 = uimenu(veditorh,'Label','File','position',1);
-    ch11=uimenu(menuh1,'Label','Load v.in','Callback',@loadvin_callback);
-    ch12=uimenu(menuh1,'Label','Load previous edit v.in','Callback',@loadvin_callback,'Enable',loadprevious);
-    ch13=uimenu(menuh1,'Label','Save','Callback',@savevin_callback,'Enable','off');
-    ch14=uimenu(menuh1,'Label','Save as','Callback',@savevinas_callback,'Enable','off');
-    uimenu(menuh1,'Label','Quit','Callback','exit','Separator','on','Accelerator','Q');
+    % blocks：model每层的四边形块是把这层顶、底的所有深度和速度节点的横坐标从左往右排序、去除重复项后划出来的。
+    blocks={}; % 每一层是一个cell元素，用n*3的矩阵存储block纵向竖线的横坐标和上、下深度坐标
+    bselect={false false}; % 控制block绘制的开关，分别对应：是否绘制短竖线；是否从左到右标记block的序号（标识方法：层号-block序号）
 
-    menuh2 = uimenu(veditorh,'Label','Plot','position',2);
-    ch21=uimenu(menuh2,'Label','Replot model','Callback',@plot_callback,'Enable','off');
-    ch22=uimenu(menuh2,'Label','Plot control','Callback',@control_callback,'Enable','off');
-    ch23=uimenu(menuh2,'tag','35','Label','Color plot discretised velocity model (fort.35 file)','Callback',@fort_file_callback,'Enable','off','Separator','on');
-    ch24=uimenu(menuh2,'tag','63','Label','Color plot ray density (fort.63 file)','Callback',@fort_file_callback,'Enable','off');
-    ch25=uimenu(menuh2,'tag','Swave','Label','Color plot S-wave velocity and/or Poisson ratio model ','Callback',@S_plot_callback,'Enable','off','Separator','on');
+    %--------------- UI ---------------------%
+    if ishandle(veditorh);
+        % veditorh = 1;
+        % set(veditorh,'Visible','on');
+        figure(veditorh);
+    else
+        veditorh = figure();
+        set(veditorh,'Visible','off','Name','v.in editor',...
+            'NumberTitle','on','Position',[100,10,1000,700]);
+        % menu item
+        menuh1 = uimenu(veditorh,'Label','File','position',1);
+        ch11=uimenu(menuh1,'Label','Load v.in','Callback',@loadvin_callback);
+        ch12=uimenu(menuh1,'Label','Load previous edit v.in','Callback',@loadvin_callback,'Enable',loadprevious);
+        ch13=uimenu(menuh1,'Label','Save','Callback',@savevin_callback,'Enable','off');
+        ch14=uimenu(menuh1,'Label','Save as','Callback',@savevinas_callback,'Enable','off');
+        uimenu(menuh1,'Label','Quit','Callback','exit','Separator','on','Accelerator','Q');
 
-    menuh3 = uimenu(veditorh,'Label','Edit model','position',3);
-    ch31=uimenu(menuh3,'Label','Create from zero','Callback',@createnew_callback,'Enable','on');
-    ch32=uimenu(menuh3,'Label','Create by import bathymetry','Callback','','Enable','off');
-    ch33=uimenu(menuh3,'Label','Edit layers','Separator','on','Enable','off','Callback',@editlayer_callback);
-    ch36=uimenu(menuh3,'Label','Precision convertor (current model)','Separator','on','Callback',@precision_callback,'Enable','off');
-    uimenu(menuh3,'Label','Precision convertor (batch)','Callback',@precisionbatch_callback);
+        menuh2 = uimenu(veditorh,'Label','Plot','position',2);
+        ch21=uimenu(menuh2,'Label','Replot model','Callback',@plot_callback,'Enable','off');
+        ch22=uimenu(menuh2,'Label','Plot control','Callback',@control_callback,'Enable','off');
+        ch23=uimenu(menuh2,'tag','35','Label','Color plot discretised velocity model (fort.35 file)','Callback',@fort_file_callback,'Enable','off','Separator','on');
+        ch24=uimenu(menuh2,'tag','63','Label','Color plot ray density (fort.63 file)','Callback',@fort_file_callback,'Enable','off');
+        ch25=uimenu(menuh2,'tag','Swave','Label','Color plot S-wave velocity and/or Poisson ratio model ','Callback',@S_plot_callback,'Enable','off','Separator','on');
 
-    menuh4 = uimenu(veditorh,'Label','Debug','position',4);
-    ch41=uimenu(menuh4,'Label','Export all virables to base workspace','Callback',@debug_callback,'Enable','off');
+        menuh3 = uimenu(veditorh,'Label','Edit model','position',3);
+        ch31=uimenu(menuh3,'Label','Create from zero','Callback',@createnew_callback,'Enable','on');
+        ch32=uimenu(menuh3,'Label','Create by import bathymetry','Callback','','Enable','off');
+        ch33=uimenu(menuh3,'Label','Edit layers','Separator','on','Enable','off','Callback',@editlayer_callback);
+        ch36=uimenu(menuh3,'Label','Precision convertor (current model)','Separator','on','Callback',@precision_callback,'Enable','off');
+        uimenu(menuh3,'Label','Precision convertor (batch)','Callback',@precisionbatch_callback);
 
-    menuh5 = uimenu(veditorh,'Label','Help','position',5,'Enable','on');
-    uimenu(menuh5,'Label','Read me','Callback','');
+        menuh4 = uimenu(veditorh,'Label','Debug','position',4);
+        ch41=uimenu(menuh4,'Label','Export all virables to base workspace','Callback',@debug_callback,'Enable','off');
 
-    uimenu(veditorh,'Label','   >>> SYSTEM MENU >>>','position',6,'Enable','off');
+        menuh5 = uimenu(veditorh,'Label','Help','position',5,'Enable','on');
+        uimenu(menuh5,'Label','Read me','Callback','');
 
-    set(veditorh,'CloseRequestFcn',@my_closerequest)
-    % make the window visable
-    set(veditorh,'Visible','on');
-end
+        uimenu(veditorh,'Label','   >>> SYSTEM MENU >>>','position',6,'Enable','off');
+
+        set(veditorh,'CloseRequestFcn',@my_closerequest)
+        % make the window visable
+        set(veditorh,'Visible','on');
+    end
 
 
-%----- Callback Functions ------%
+    %----- Callback Functions ------%
     function my_closerequest(hObject, eventdata)
         selection = questdlg('Do you want to exit ?',...
             'Close Request Function',...
             'Yes','No','Yes');
         switch selection,
             case 'Yes',
-                save ('history_vin.mat');
+                save('history_vin.mat', save_list{:});
                 delete(veditorh);
             case 'No'
         end
@@ -142,7 +150,7 @@ end
             set (ch21,'Enable','on'); set (ch22,'Enable','on'); set (ch23,'Enable','on'); set (ch24,'Enable','on'); set (ch25,'Enable','on');
             set (ch31,'Enable','off'); set (ch33,'Enable','on'); set (ch36,'Enable','on');
             set (ch41,'Enable','on');
-            save ('history_vin.mat');
+            % save ('history_vin.mat');
             [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,error]=fun_load_vin(fullload);
             if ~isempty(error)
                 hh=warndlg(error);
@@ -153,7 +161,7 @@ end
             plotzmin=zmin;
             plotzmax=zmax;
             fun_plot_model(veditorh,model,xmin,xmax,plotzmin,plotzmax,xx,ZZ,selectL,DX,DY,blocks,bselect,X1D,plot1D,output1D,loadpath,slswitch);
-            save ('history_vin.mat');
+            % save ('history_vin.mat');
         end
     end
 
@@ -167,9 +175,9 @@ end
         if savename==0
         else
             fullsave=fullfile(savepath,savename);
-            save ('history_vin.mat');
+            % save ('history_vin.mat');
             fun_save_v_in(model,fullsave,precision);
-            save ('history_vin.mat');
+            % save ('history_vin.mat');
             if strcmpi(get(ch11,'Enable'),'off')
                 set (ch11,'Enable','on');
                 set (ch12,'Enable','on');
@@ -184,7 +192,7 @@ end
         switch selection,
             case 'Yes',
                 fun_save_v_in(model,fullload,precision)
-                save ('history_vin.mat');
+                % save ('history_vin.mat');
             case 'No'
         end
     end
@@ -207,7 +215,7 @@ end
                 if savename==0
                 else
                     fullsave=fullfile(savepath,savename);
-                    save ('history_vin.mat');
+                    % save ('history_vin.mat');
                     fun_save_v_in(model,fullsave,target)
                 end
             case 'Cancel'
@@ -220,7 +228,7 @@ end
 
     function plot_callback(src,event)
         fun_plot_model(veditorh,model,xmin,xmax,plotzmin,plotzmax,xx,ZZ,selectL,DX,DY,blocks,bselect,X1D,plot1D,output1D,loadpath,slswitch);
-        save ('history_vin.mat');
+        % save ('history_vin.mat');
     end
 
     function control_callback(src,event)
