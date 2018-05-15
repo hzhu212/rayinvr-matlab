@@ -6,7 +6,7 @@ function tool_v_in_editor
 
     % variables to save to history_vin.mat
     save_list = {
-        'veditorh', 'loadpath', 'loadname', 'fullload', 'savepath', 'savename', ...
+        'loadpath', 'loadname', 'fullload', 'savepath', 'savename', ...
         'fullsave', 'DX', 'DY', 'overlayboundary', 'labelboundary', 'pois', ...
         'poisbl', 'X1D'};
 
@@ -22,9 +22,11 @@ function tool_v_in_editor
     output1D=false; % 是否输出一维剖面到文本文件
 
     % load last run information
-    if exist('history_vin.mat','file');
-        s=load ('history_vin.mat');
-        veditorh=s.veditorh;
+    if exist('history_vin.fig','file')
+        veditorh = openfig('history_vin.fig');
+    end
+    if exist('history_vin.mat','file')
+        s=load('history_vin.mat');
         loadpath=s.loadpath;
         loadname=s.loadname;
         fullload=s.fullload;
@@ -125,6 +127,7 @@ function tool_v_in_editor
         switch selection,
             case 'Yes',
                 save('history_vin.mat', save_list{:});
+                savefig(veditorh, 'history_vin.fig');
                 delete(veditorh);
             case 'No'
         end
