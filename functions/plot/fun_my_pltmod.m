@@ -54,7 +54,8 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
                 xcp = xm(ii,1:nptsc);
                 zcp = zm(ii,1:nptsc);
             end
-            plot(xcp,zcp,lineStyle,'Color',currentColor);
+            hline = plot(xcp,zcp,lineStyle,'Color',currentColor);
+            hline.UserData.tag = 'model/layer';
         end
 
         currentColor = matlabColors{mcol(3)};
@@ -65,7 +66,8 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
             for ii = 1:nfrefl
                 xcp = xfrefl(ii,1:npfref(ii));
                 zcp = zfrefl(ii,1:npfref(ii));
-                plot(xcp,zcp,lineStyle,'Color',currentColor);
+                hline = plot(xcp,zcp,lineStyle,'Color',currentColor);
+                hline.UserData.tag = 'model/floating';
             end
         end
 
@@ -79,7 +81,8 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
                         coorx = xbnd(ii,jj,2);
                         xcp = [coorx, coorx];
                         zcp = squeeze(s(ii,jj,1:2) .* coorx + b(ii,jj,1:2));
-                        plot(xcp,zcp,lineStyle,'Color',currentColor);
+                        hline = plot(xcp,zcp,lineStyle,'Color',currentColor);
+                        hline.UserData.tag = 'model/block';
                     end
                 end
             end
@@ -93,7 +96,8 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
             for ii = 1:nlayer+1
                 % zcp = cosmth(ii,1:npbnd) - zmax;
                 zcp = cosmth(ii,1:npbnd) - zmin;
-                plot(xcp,zcp,lineStyle,'Color',currentColor);
+                hline = plot(xcp,zcp,lineStyle,'Color',currentColor);
+                hline.UserData.tag = 'model/layer/smooth';
             end
         end
 

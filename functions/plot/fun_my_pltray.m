@@ -10,6 +10,9 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
         vp vr xmin xmm xr xscale zmin zr zscale;
     global matlabColors currentColor hFigure1;
 
+    % assign tag for ray groups
+    global xshotr idray;
+
     npts = npt - nskip;
     if npts < 2, return; end
 
@@ -71,16 +74,23 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
         lineStyle = '';
     end
 
+    % get current ray code and x coordinate of current shot for tag
+    ray_code = idray(1) + idray(2)./10.0;
+    tag = sprintf('%.4f-%.1f', xshotr, ray_code);
+
     % p 波画实线，s 波画虚线
     if idot ~= 2 && irayps == 1
         maskp = (vra(1:npts-1) == vpa(1:npts-1));
         masks = ~maskp;
         maskp = [maskp, 0] | [0, maskp];
         masks = [masks, 0] | [0, masks];
-        plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
-        plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        hline = plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        hline.UserData.tag = ['ray/', tag, '/p'];
+        hline = plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        hline.UserData.tag = ['ray/', tag, '/s'];
     else
-        plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        hline = plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        hline.UserData.tag = ['ray/', tag, '/ps'];
     end
 
     if ircol ~= 0

@@ -13,6 +13,9 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
     % 源程序中未声明以下2个变量，因为其不在 rayinvr.par 和 rayinvr.com 中
     global imod iray;
 
+    % assign tag for ray groups
+    global ray ivray;
+
     % 将 figure2(走时图像)设为当前图像
     figure(hFigure2);
     % set(hFigure2,'CurrentAxes',gca());
@@ -90,7 +93,15 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             lineSymbol = 's';
             markerSize = symht .* 5;
 
+            % get current ray code and x coordinate of current shot for tag
+            % convert ray group to ray code. see r.in: ray, ivray
+            ray_code = ray(find(ivray==ip(1), 1));
+            [~, idx] = min(abs(xshot(1:nshot) - xThisShot));
+            tag = sprintf('%.4f-%.1f', xshot(idx), ray_code);
+
             if idata > 0
+                hline = plot(xplot,tplot,'Visible','off');
+                hline.UserData.tag = ['time/observe/', tag];
                 try
                     hErrorbar = my_errorbar(xplot,tplot,1.*up,[lineStyle,lineSymbol]);
                 catch e
@@ -98,7 +109,8 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
                 end
                 set(hErrorbar,'MarkerSize',markerSize,'Color',currentColor);
             else
-                plot(xplot,tplot,[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                hline = plot(xplot,tplot,[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                hline.UserData.tag = ['time/observe/', tag];
             end
         end
     end

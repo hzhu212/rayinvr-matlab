@@ -16,6 +16,9 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
         xtmint xwndow ytitle ywndow;
     global currentColor matlabColors hFigure2;
 
+    % assign tag for ray groups
+    global ivray
+
     if itx > 0 || idata ~= 0
         ipflag = 1;
     else
@@ -190,7 +193,13 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
                                 ipcol = colour(mod(thisCode-1,ncol)+1);
                                 currentColor = matlabColors{ipcol};
                             end
-                            plot(xplot(codeIndex),tplot(codeIndex),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                            % get current ray code and x coordinate of current shot for tag
+                            % convert ray group to ray code. see r.in: ray, ivray
+                            ray_code = ray(find(ivray==thisCode, 1));
+                            tag = sprintf('%.4f-%.1f', xshota, ray_code);
+
+                            hline = plot(xplot(codeIndex),tplot(codeIndex),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                            hline.UserData.tag = ['time/calculate/', tag];
                         end
                     end
 
@@ -257,7 +266,11 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
                     if itxbox ~= 0
                         index = find(x(index)>=xbmin & x(index)<=xbmax & t(index)>=tbmin & t(index)<=tbmax);
                     end
-                    plot(x(index),t(index),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                    % get current ray code and x coordinate of current shot for tag
+                    tag = sprintf('%.4f-%.1f', xshota, rhc);
+
+                    hline = plot(x(index),t(index),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                    hline.UserData.tag = ['time/calculate/', tag];
                 end
             end % -------------------- cycle1000 end
         end
