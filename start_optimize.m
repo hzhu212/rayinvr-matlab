@@ -1,5 +1,7 @@
 function [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOde)
-%% Run optimize when starting at no-GUI environment
+% [final_x, final_val] = start_optimize(pathIn, pathRin, pathVin, isUseOde)
+% Rayinvr inversed calculating without GUI.
+% Will find the best parameters automaticly with genetic algorithm.
 
     if nargin < 1
         pathIn = fullfile(pwd, 'data', 'subbarao_s');

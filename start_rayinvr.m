@@ -1,5 +1,6 @@
-function [RMS, CHI] = start_main(pathIn, pathRin, pathVin, isUseOde)
-%% Run main when starting at no-GUI environment
+function [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde)
+% [RMS, CHI] = start_main(pathIn, pathRin, pathVin, isUseOde)
+% Rayinvr forward calculating without GUI.
 
     if nargin < 1
         pathIn = fullfile(pwd, 'data', 'subbarao_s');

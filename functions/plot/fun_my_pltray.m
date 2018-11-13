@@ -84,13 +84,17 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
         masks = ~maskp;
         maskp = [maskp, 0] | [0, maskp];
         masks = [masks, 0] | [0, masks];
-        hline = plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
-        hline.UserData.tag = ['ray/', tag, '/p'];
-        hline = plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
-        hline.UserData.tag = ['ray/', tag, '/s'];
+        if any(maskp)
+            curvep = plot(x(maskp),z(maskp),['-',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+            curvep.UserData.tag = ['ray/', tag, '/p'];
+        end
+        if any(masks)
+            curves = plot(x(masks),z(masks),['--',lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+            curves.UserData.tag = ['ray/', tag, '/s'];
+        end
     else
-        hline = plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
-        hline.UserData.tag = ['ray/', tag, '/ps'];
+        curve = plot(x(1:npts),z(1:npts),[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+        curve.UserData.tag = ['ray/', tag, '/ps'];
     end
 
     if ircol ~= 0
