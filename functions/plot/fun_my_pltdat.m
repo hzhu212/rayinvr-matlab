@@ -96,6 +96,12 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             % get current ray code and x coordinate of current shot for tag
             % convert ray group to ray code. see r.in: ray, ivray
             ray_code = ray(find(ivray==ip(1), 1));
+
+            % ray groups not in ivray will not be observed
+            if ray_code == 0
+                continue;
+            end
+
             [~, idx] = min(abs(xshot(1:nshot) - xThisShot));
             tag = sprintf('%.4f-%.1f', xshot(idx), ray_code);
 

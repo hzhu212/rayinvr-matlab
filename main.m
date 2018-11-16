@@ -876,7 +876,7 @@ function [RMS, CHI] = main(options)
                         if irayf == 0
                             xshotf = xf;
                             idf = 1.0 .* sign(tf);
-                            if abs(xshotr-xshotf) < 0.001 && idr(is) == idf
+                            if abs(xshotr-xshotf) < 1e-5 && idr(is) == idf
                                 i2flag = 1;
                                 isf = isf + 1;
                             else
@@ -925,8 +925,12 @@ function [RMS, CHI] = main(options)
                     while cycle90
                         % ir: 追踪到第几条射线
                         ir = ir + 1;
-                        if ir>nrayr && ni2pt<=1, break; end % go to 890
-                        if i2pt==0 && iend==1, break; end % go to 890
+                        if ir>nrayr && ni2pt<=1
+                            break; % go to 890
+                        end
+                        if i2pt==0 && iend==1
+                            break; % go to 890
+                        end
                         ircbnd = 1; iccbnd = 1;
                         % iwave: 1-当前射线为 P 波，-1-当前射线为 S 波
                         iwave = 1;
@@ -1001,7 +1005,9 @@ function [RMS, CHI] = main(options)
                                 end
                                 break; % go to nothing
                             end % -------------------- cycle891 end
-                            if isGoto890, break; end % go to 890 step2
+                            if isGoto890
+                                break; % go to 890 step2
+                            end
                         end
                         angle_ = fid .* (90.0-angled) ./ pi18;
                         if ir > 1 && ihdwf ~= 1
@@ -1071,7 +1077,9 @@ function [RMS, CHI] = main(options)
                             [~] = fun_fxtinv(npt);
                         end
 
-                        if ihdwf == 0, break; end % go to 890
+                        if ihdwf == 0
+                            break; % go to 890
+                        end
                         if ntt > pray
                             % 995
                             fprintf('\n***  max number of rays reaching surface exceeded  ***\n\n');
