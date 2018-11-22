@@ -451,10 +451,10 @@ function gui
         isTimeCounting = get(checkboxTimer,'Value');
         if isTimeCounting
             profile on;
-            [RMS, CHI] = start_main(pathIn, pathRin, pathVin, isUseOde);
+            [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde);
             profile off; profile viewer;
         else
-            [RMS, CHI] = start_main(pathIn, pathRin, pathVin, isUseOde);
+            [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde);
         end
 
         % 正演结束后，释放反演按钮的禁用状态

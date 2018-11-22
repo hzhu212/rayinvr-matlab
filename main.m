@@ -876,7 +876,7 @@ function [RMS, CHI] = main(options)
                         if irayf == 0
                             xshotf = xf;
                             idf = 1.0 .* sign(tf);
-                            if abs(xshotr-xshotf) < 1e-5 && idr(is) == idf
+                            if abs(xshotr-xshotf) < 9.9e-4 && idr(is) == idf
                                 i2flag = 1;
                                 isf = isf + 1;
                             else
@@ -1152,7 +1152,7 @@ function [RMS, CHI] = main(options)
         % 暂停一下，先显示绘图再继续
         pause(0.1);
         % store plot data to a mat file
-        fun_store_plotdata(hFigure1, hFigure2);
+        fun_store_plotdata(hFigure1, hFigure2, pathIn);
     end
 
     if itxout > 0
