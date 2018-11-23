@@ -27,4 +27,6 @@ function [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde)
     obj.isUseOde = isUseOde;
 
     [RMS, CHI] = main(obj);
+
+    rmpath(genpath('./functions'));
 end
