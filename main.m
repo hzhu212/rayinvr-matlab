@@ -1152,7 +1152,7 @@ function [RMS, CHI] = main(options)
         % 暂停一下，先显示绘图再继续
         pause(0.1);
         % store plot data to a mat file
-        fun_store_plotdata(hFigure1, hFigure2, pathIn);
+        fun_store_rayinvr_plot(hFigure1, hFigure2, pathIn);
     end
 
     if itxout > 0

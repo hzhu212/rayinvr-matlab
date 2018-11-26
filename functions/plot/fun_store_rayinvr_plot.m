@@ -1,4 +1,4 @@
-function fun_store_plotdata(hfig1, hfig2, working_dir)
+function fun_store_rayinvr_plot(hfig1, hfig2, working_dir)
 % store plot data to a .mat file
 
     file = fullfile(working_dir, 'plotdata.rayinvr.mat');
