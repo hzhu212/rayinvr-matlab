@@ -58,7 +58,8 @@ function fun_my_pltray(npt,nskip,idot,irayps,istep,anglew)
     hold on;
 
     if ircol ~= 0
-        currentColor = matlabColors{mod(irrcol, length(matlabColors)) + 1};
+        % 第一个颜色为黑色，加一跳过
+        currentColor = matlabColors{mod(irrcol, length(matlabColors)+1) + 1};
     end
 
     % 设置线型与节点符号

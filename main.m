@@ -121,7 +121,7 @@ function [RMS, CHI] = main(options)
 
     % Colors for ploting
     global matlabColors currentColor;
-    matlabColors = {'k','r','g','b','c','m',[1,0.65,0],[0.5,0.2,0.9],[0.6,0.8,0.2],[0.4,0.2,0.2],[0.4,0.4,1]};
+    matlabColors = {'k','b','g','r','c','m',[1,0.65,0],[0.5,0.2,0.9],[0.6,0.8,0.2],[0.4,0.2,0.2],[0.4,0.4,1]};
     currentColor = matlabColors{ifcol};
 
 
@@ -736,11 +736,14 @@ function [RMS, CHI] = main(options)
                 idifff = 0;
 
                 % 每个射线到达类型分配一种颜色
-                if ircol==1, irrcol=colour(mod(ivray(ii)-1,ncol)+1); end
+                % if ircol==1, irrcol=colour(mod(ivray(ii)-1,ncol)+1); end
+                if ircol==1, irrcol = find(ivray == ivray(ii)); end
                 % 每个炮点分配一种颜色
-                if ircol==2, irrcol=colour(mod(is-1,ncol)+1); end
+                % if ircol==2, irrcol=colour(mod(is-1,ncol)+1); end
+                if ircol==2, irrcol = is; end
                 % 每个射线组分配一种颜色
-                if ircol==3, irrcol=colour(mod(ii-1,ncol)+1); end
+                % if ircol==3, irrcol=colour(mod(ii-1,ncol)+1); end
+                if ircol==3, irrcol = ii; end
                 if ircol< 0, irrcol=-ircol; end
 
                 % 当前射线组待追踪射线数目为 0，直接进入下一个射线组

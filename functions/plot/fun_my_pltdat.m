@@ -5,6 +5,7 @@
 
 function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida)
 % plot observed travel times
+% 绘制模型计算的走时，带 error bar
 
     global colour ifcol ilshot ipf ipinv isep itcol itx narinv ncol orig symht ...
         tpf tscale upf xmint xpf xscalt;
@@ -75,11 +76,13 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 
             if itcol == 1 || itcol == 2
                 if itcol == 1
-                    ipcol = colour(mod(ip(1)-1,ncol)+1);
+                    % ipcol = colour(mod(ip(1)-1,ncol)+1);
+                    ipcol = find(ivray == ip(1));
                 else
-                    ipcol = colour(mod(ii-1,ncol)+1);
+                    % ipcol = colour(mod(ii-1,ncol)+1);
+                    ipcol = ii;
                 end
-                currentColor = matlabColors{mod(ipcol,length(matlabColors))+1};
+                currentColor = matlabColors{mod(ipcol, length(matlabColors)+1) + 1};
             end
 
             if itxbox ~= 0
@@ -120,6 +123,20 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             end
         end
     end
+
+    % 绘制图例，颜色为线条颜色，标签为对应的 ray code
+    tmp_ray = ray(1:(find(ray == 0, 'first')-1));
+    handles = [];
+    labels = {};
+    for ii = 1:numel(tmp_ray)
+        colour = matlabColors{mod(ii, length(matlabColors)+1) + 1};
+        label = sprintf('%.1f', tmp_ray(ii));
+        dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour);
+        handles = [handles, dummy];
+        labels = {labels, label};
+    end
+    % 阻止后续更新图像后图例自动更新
+    legend(handles, labels, 'AutoUpdate', 'off');
 
     % 999
     if itcol ~= 0
