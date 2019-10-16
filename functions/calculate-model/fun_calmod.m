@@ -1106,7 +1106,8 @@ function [ncont,pois,poisb,poisl,poisbl,invr,iflagm,ifrbnd,xmin1d,xmax1d,insmth,
     % through the arrays poisbl, poisl and poisb
 
     % 270
-    for ii = 1:papois
+    % for ii = 1:papois
+    for ii = 1:length(poisbl)
         if poisbl(ii)<-10.0, break; end % go to 400
         vsvp(poisl(ii),poisb(ii)) = sqrt((1.0-2.0*poisbl(ii))/(2.0*(1.0-poisbl(ii))));
     end

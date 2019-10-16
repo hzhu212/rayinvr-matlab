@@ -44,7 +44,8 @@ if isempty(has_main_par_init)
     space = zeros(1,prayf);
     zshot = ones(1,pshot) * -9999.0;
     pois = ones(1,player) * -99.0;
-    poisbl = ones(1,papois) * -99.0;
+    % poisbl = ones(1,papois) * -99.0;
+    poisbl = [];
     parunc = zeros(1,3);
     zsmth = zeros(1,pnsmth);
     xshota = zeros(1,pshot2);
@@ -74,8 +75,10 @@ if isempty(has_main_par_init)
     cbnd = ones(1,pconvt) * -99;
     irayt = ones(1,prayt) * 1;
     ihead = zeros(1,player);
-    poisl = zeros(1,papois);
-    poisb = zeros(1,papois);
+    % poisl = zeros(1,papois);
+    % poisb = zeros(1,papois);
+    poisl = [];
+    poisb = [];
     ibreak = ones(1,prayf) * 1;
     frbnd = zeros(1,prayf);
     ifo2pt = zeros(1,pnobsf);

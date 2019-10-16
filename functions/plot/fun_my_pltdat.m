@@ -5,102 +5,147 @@
 
 function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida)
 % plot observed travel times
+% 绘制从地震数据拾取的标准走时，带 error bar
 
-	global colour ifcol ilshot ipf ipinv isep itcol itx narinv ncol orig symht ...
-		tpf tscale upf xmint xpf xscalt;
-	global hFigure2 currentColor matlabColors;
+    global colour ifcol ilshot ipf ipinv isep itcol itx narinv ncol orig symht ...
+        tpf tscale upf xmint xpf xscalt;
+    global hFigure2 currentColor matlabColors;
 
-	% 源程序中未声明以下2个变量，因为其不在 rayinvr.par 和 rayinvr.com 中
-	global imod iray;
+    % 源程序中未声明以下2个变量，因为其不在 rayinvr.par 和 rayinvr.com 中
+    global imod iray;
 
-	% 将 figure2(走时图像)设为当前图像
-	figure(hFigure2);
-	% set(hFigure2,'CurrentAxes',gca());
+    % assign tag for ray groups
+    global ray ivray;
 
-	for ii = 1:nshot
-		thisShot = ilshot(ii);
-		nextShot = ilshot(ii+1);
+    % 将 figure2(走时图像)设为当前图像
+    figure(hFigure2);
+    % set(hFigure2,'CurrentAxes',gca());
 
-		xThisShot = xpf(thisShot);
-		dThisShot = sign(tpf(thisShot));
+    rayGroupBeginIdx = find(ipf == 0) + 1;
+    nRayGroups = length(rayGroupBeginIdx);
+%     allRayIds = sort(unique(ipf(rayGroupBeginIdx)));
+    for ii = 1:nRayGroups
+        thisShot = ilshot(ii);
+        nextShot = ilshot(ii+1);
 
-		% 要绘制的射线所在的行号
-		index = thisShot+1:nextShot-1;
+        xThisShot = xpf(thisShot);
+        dThisShot = sign(tpf(thisShot));
 
-		% abs(data) = 2 时，只绘制反演过的射线，未反演的跳过
-		if abs(idata) == 2
-			% 射线编号，即射线所在行号减去当前炮点编号(因为每个炮点信息占一行)
-			rayNumbers = index - ii;
-			% 取交集，找到反演过的射线编号
-			inversedRay = intersect(rayNumbers,ipinv(1:narinv));
-			index = inversedRay + ii;
-		end
+        % 要绘制的射线所在的行号
+        index = thisShot+1:nextShot-1;
 
-		codeChange = find(ipf(index(1:end-1)) ~= ipf(index(2:end)));
-		codeChange = [0; codeChange; length(index)];
-		for jj = 1:length(codeChange)-1
-			codeBegin = codeChange(jj) + 1;
-			codeEnd = codeChange(jj+1);
-			indexThisCode = index(codeBegin:codeEnd);
+        % abs(data) = 2 时，只绘制反演过的射线，未反演的跳过
+        if abs(idata) == 2
+            % 射线编号，即射线所在行号减去当前炮点编号(因为每个炮点信息占一行)
+            rayNumbers = index - ii;
+            % 取交集，找到反演过的射线编号
+            inversedRay = intersect(rayNumbers,ipinv(1:narinv));
+            index = inversedRay + ii;
+        end
 
-			xp = xpf(indexThisCode);
-			tp = tpf(indexThisCode);
-			up = upf(indexThisCode);
-			ip = ipf(indexThisCode);
-			% rayCode = ip(1);
+        % 如果待绘制的射线组为空，则进行下一组
+        if isempty(index)
+            continue
+        end
 
-			if iszero == 0
-				% xplot = xp - xmint;
-				xplot = xp;
-			else
-				% xplot = (xp - xThisShot) .* dThisShot - xmint;
-				xplot = (xp - xThisShot) .* dThisShot;
-			end
-			if itx ~= 4
-				% tplot = tp - tadj;
-				tplot = tp;
-			else
-				% tplot = abs(ip) - tadj;
-				tplot = abs(ip);
-			end
+        codeChange = find(ipf(index(1:end-1)) ~= ipf(index(2:end)));
+        codeChange = [0; codeChange; length(index)];
+        for jj = 1:length(codeChange)-1
+            codeBegin = codeChange(jj) + 1;
+            codeEnd = codeChange(jj+1);
+            indexThisCode = index(codeBegin:codeEnd);
 
-			if itcol == 1 || itcol == 2
-				if itcol == 1
-					ipcol = colour(mod(ip(1)-1,ncol)+1);
-				else
-					ipcol = colour(mod(ii-1,ncol)+1);
-				end
-				currentColor = matlabColors{ipcol};
-			end
+            xp = xpf(indexThisCode);
+            tp = tpf(indexThisCode);
+            up = upf(indexThisCode);
+            ip = ipf(indexThisCode);
+            % rayCode = ip(1);
 
-			if itxbox ~= 0
-				filtIndex = find(xplot >= xbmin & xplot <= xbmax & tplot >= tbmin & tplot <= tbmax);
-				xplot = xplot(filtIndex);
-				tplot = tplot(filtIndex);
-				up = up(filtIndex);
-			end
+            % 仅绘制在 r.in 的 ivray 中指定的射线组
+            % ray groups not in ivray will not be observed
+            ray_idx = find(ivray == ip(1), 1);
+            if isempty(ray_idx)
+                continue;
+            end
 
-			lineStyle = '';
-			lineSymbol = 's';
-			markerSize = symht .* 5;
+            % get current ray code and x coordinate of current shot for tag
+            % convert ray group to ray code. see r.in: ray, ivray
+            ray_code = ray(ray_idx);
 
-			if idata > 0
-				try
-					hErrorbar = my_errorbar(xplot,tplot,2.*up,[lineStyle,lineSymbol]);
-				catch e
-					hErrorbar = errorbar(xplot,tplot,2.*up,[lineStyle,lineSymbol]);
-				end
-				set(hErrorbar,'MarkerSize',markerSize,'Color',currentColor);
-			else
-				plot(xplot,tplot,[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
-			end
-		end
-	end
+            if iszero == 0
+                % xplot = xp - xmint;
+                xplot = xp;
+            else
+                % xplot = (xp - xThisShot) .* dThisShot - xmint;
+                xplot = (xp - xThisShot) .* dThisShot;
+            end
+            if itx ~= 4
+                % tplot = tp - tadj;
+                tplot = tp;
+            else
+                % tplot = abs(ip) - tadj;
+                tplot = abs(ip);
+            end
 
-	% 999
-	if itcol ~= 0
-		currentColor = matlabColors{ifcol};
-	end
-	return;
+            if itcol == 1 || itcol == 2
+                if itcol == 1
+                    % ipcol = colour(mod(ip(1)-1,ncol)+1);
+                    ipcol = find(ivray == ip(1), 1);
+                else
+                    % ipcol = colour(mod(ii-1,ncol)+1);
+                    ipcol = ii;
+                end
+                currentColor = matlabColors{mod(ipcol, length(matlabColors)+1) + 1};
+            end
+
+            if itxbox ~= 0
+                filtIndex = find(xplot >= xbmin & xplot <= xbmax & tplot >= tbmin & tplot <= tbmax);
+                xplot = xplot(filtIndex);
+                tplot = tplot(filtIndex);
+                up = up(filtIndex);
+            end
+
+            lineStyle = '';
+            lineSymbol = 's';
+            markerSize = symht .* 5;
+
+            [~, idx] = min(abs(xshot(1:nshot) - xThisShot));
+            tag = sprintf('%.4f-%.1f', xshot(idx), ray_code);
+
+            if idata > 0
+                hline = plot(xplot,tplot,'Visible','off');
+                hline.UserData.tag = ['time/observe/', tag];
+                try
+                    hErrorbar = my_errorbar(xplot,tplot,1.*up,[lineStyle,lineSymbol]);
+                catch e
+                    hErrorbar = errorbar(xplot,tplot,1.*up,[lineStyle,lineSymbol]);
+                end
+                set(hErrorbar,'MarkerSize',markerSize,'Color',currentColor);
+            else
+                hline = plot(xplot,tplot,[lineStyle,lineSymbol],'Color',currentColor,'MarkerSize',markerSize);
+                hline.UserData.tag = ['time/observe/', tag];
+            end
+        end
+    end
+
+    % 绘制图例，颜色为线条颜色，标签为对应的 ray code
+    tmp_ray = ray(1:(find(ray == 0, 1)-1));
+    handles = [];
+    labels = {};
+    for ii = 1:numel(tmp_ray)
+        colour = matlabColors{mod(ii, length(matlabColors)+1) + 1};
+        label = sprintf('%3.1f', tmp_ray(ii));
+        dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 2);
+        handles = [handles, dummy];
+        labels = [labels, label];
+    end
+    % 阻止后续更新图像后图例自动更新
+    legend(handles, labels, 'AutoUpdate', 'off');
+
+    % 999
+    if itcol ~= 0
+        currentColor = matlabColors{ifcol};
+    end
+    return;
 
 end % fun_my_pltdat end

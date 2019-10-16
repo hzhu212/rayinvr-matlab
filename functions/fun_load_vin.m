@@ -1,8 +1,8 @@
 function [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,error]=fun_load_vin(filein)
 % <strong>fun_load_vin</strong> - load input file "v.in".
-% 
+%
 %   [model,LN,xmin,xmax,zmin,zmax,precision,xx,ZZ,error] = <strong>fun_load_vin</strong>(filein)
-%   
+%
 %   <strong>model</strong>: a structure with 3 fields: model.bd(layer top boundary), model.tv(top velocity) and model.bv(bottom velocity). each field is designed as a cell, which stores a 3-by-Nodes matrix for row(1): x, row(2): z or v, and row(3): partial derivative for each node
 %   <strong>LN</strong>: layer number of the model
 
@@ -40,7 +40,7 @@ xmax=value(end); % model right boundary
 % each cell is a 3xNodes matrix for (1) x, (2) z or v, and (3) partial derivative for each node
 fieldname={'bd','tv','bv'};
 fullfn={'top boundary depth','top velocity','bottom velocity'};
-model=struct(fieldname{1},{},fieldname{2},{},fieldname{3},{}); 
+model=struct(fieldname{1},{},fieldname{2},{},fieldname{3},{});
 pp=1;  % first line of the v.in
 xx=xmin:(xmax-xmin)/100:xmax;
 ZZ=zeros(LN,length(xx));
@@ -65,7 +65,7 @@ for i=1:LN-1;
             elseif vl(2)==vl(1)-1;
                 over10=0;
             elseif vl(2)==vl(1);
-                if vv{2}(1)==0, 
+                if vv{2}(1)==0,
                     over10=0;
                 end
             end
@@ -102,7 +102,7 @@ for i=1:LN-1;
         eval(['model(',num2str(i),').',fieldname{j},'=final;']);
     end
 end
-% model bottom 
+% model bottom
 value=sscanf(imdata{pp},'%f')';
 pp=pp+1;
 final=sscanf(imdata{pp},'%f')';

@@ -1,16 +1,20 @@
 % trc.f
-% [~,~,xfr,zfr,ifrpt,iflagf]
+% [xfr,zfr,ifrpt,iflagf]
 % called by: fun_trace;
 % call: none.
 
-function [ir,npt,xfr,zfr,ifrpt,iflagf] = fun_frefpt(ir,npt,xfr,zfr,ifrpt,iflagf)
+function [xfr,zfr,ifrpt,iflagf] = fun_frefpt(npt)
 % determine intersection point of ray with a floating reflector
+% 求当前射线前进的小线段与当前浮动界面的交点
+% npt: 当前节点在当前射线上的编号
+% xfr,zfr: 交点的 x 和 z 坐标(此处求的是直线交点，而非线段交点)
+% iflagf: 1-找到交点
+% ifrpt: 交点对应的浮动界面节点编号
 
-    % global file_rayinvr_par file_rayinvr_com;
-    % run(file_rayinvr_par);
-    % run(file_rayinvr_com);
-
-    global ifcbnd npfref ray xfrefl xr zfrefl zr;
+    % ifcbnd: 当前浮动边界的编号
+    % npfref: 数组，每个浮动边界的节点个数
+    % xfrefl,zfrefl: 浮动界面上每个节点的坐标
+    global ifcbnd npfref xfrefl xr zfrefl zr;
 
     a1 = zr(npt-1) - zr(npt);
     b1 = xr(npt) - xr(npt-1);
@@ -62,7 +66,7 @@ function [ir,npt,xfr,zfr,ifrpt,iflagf] = fun_frefpt(ir,npt,xfr,zfr,ifrpt,iflagf)
 
         if iflag1==1 & iflag2==1 & iflag3==1 & iflag4==1
             iflagf = 1;
-            ifrpt = 1;
+            ifrpt = ii;
             break; % go to 999
         end
     end % 10

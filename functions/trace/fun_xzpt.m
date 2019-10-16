@@ -14,6 +14,8 @@ function [layers,iblks,iflag] = fun_xzpt(xpt,zpt, b,nblk,nlayer,s,xbnd)
     % global b nblk nlayer s xbnd;
 
     iflag = 0;
+    layers = 0;
+    iblks = 0;
 
     for ii = 1:nlayer
         for jj = 1:nblk(ii)
