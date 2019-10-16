@@ -5,7 +5,7 @@
 
 function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmin,tbmax,itxbox,ida)
 % plot observed travel times
-% 绘制模型计算的走时，带 error bar
+% 绘制从地震数据拾取的标准走时，带 error bar
 
     global colour ifcol ilshot ipf ipinv isep itcol itx narinv ncol orig symht ...
         tpf tscale upf xmint xpf xscalt;
@@ -21,8 +21,10 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
     figure(hFigure2);
     % set(hFigure2,'CurrentAxes',gca());
 
-    nRayCodes = sum(ipf == 0);
-    for ii = 1:nRayCodes
+    rayGroupBeginIdx = find(ipf == 0) + 1;
+    nRayGroups = length(rayGroupBeginIdx);
+%     allRayIds = sort(unique(ipf(rayGroupBeginIdx)));
+    for ii = 1:nRayGroups
         thisShot = ilshot(ii);
         nextShot = ilshot(ii+1);
 
@@ -59,6 +61,17 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             ip = ipf(indexThisCode);
             % rayCode = ip(1);
 
+            % 仅绘制在 r.in 的 ivray 中指定的射线组
+            % ray groups not in ivray will not be observed
+            ray_idx = find(ivray == ip(1), 1);
+            if isempty(ray_idx)
+                continue;
+            end
+
+            % get current ray code and x coordinate of current shot for tag
+            % convert ray group to ray code. see r.in: ray, ivray
+            ray_code = ray(ray_idx);
+
             if iszero == 0
                 % xplot = xp - xmint;
                 xplot = xp;
@@ -77,7 +90,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             if itcol == 1 || itcol == 2
                 if itcol == 1
                     % ipcol = colour(mod(ip(1)-1,ncol)+1);
-                    ipcol = find(ivray == ip(1));
+                    ipcol = find(ivray == ip(1), 1);
                 else
                     % ipcol = colour(mod(ii-1,ncol)+1);
                     ipcol = ii;
@@ -95,15 +108,6 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
             lineStyle = '';
             lineSymbol = 's';
             markerSize = symht .* 5;
-
-            % get current ray code and x coordinate of current shot for tag
-            % convert ray group to ray code. see r.in: ray, ivray
-            ray_code = ray(find(ivray==ip(1), 1));
-
-            % ray groups not in ivray will not be observed
-            if ray_code == 0
-                continue;
-            end
 
             [~, idx] = min(abs(xshot(1:nshot) - xThisShot));
             tag = sprintf('%.4f-%.1f', xshot(idx), ray_code);
@@ -125,15 +129,15 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
     end
 
     % 绘制图例，颜色为线条颜色，标签为对应的 ray code
-    tmp_ray = ray(1:(find(ray == 0, 'first')-1));
+    tmp_ray = ray(1:(find(ray == 0, 1)-1));
     handles = [];
     labels = {};
     for ii = 1:numel(tmp_ray)
         colour = matlabColors{mod(ii, length(matlabColors)+1) + 1};
-        label = sprintf('%.1f', tmp_ray(ii));
-        dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour);
+        label = sprintf('%3.1f', tmp_ray(ii));
+        dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 2);
         handles = [handles, dummy];
-        labels = {labels, label};
+        labels = [labels, label];
     end
     % 阻止后续更新图像后图例自动更新
     legend(handles, labels, 'AutoUpdate', 'off');
