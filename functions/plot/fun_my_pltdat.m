@@ -31,6 +31,11 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
         xThisShot = xpf(thisShot);
         dThisShot = sign(tpf(thisShot));
 
+        % 仅绘制在 r.in 的 xshot 中指定的炮点，略过其他炮点
+        if isempty(find(abs(xshot - xThisShot) < 1e-3))
+            continue;
+        end
+
         % 要绘制的射线所在的行号
         index = thisShot+1:nextShot-1;
 
@@ -45,7 +50,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 
         % 如果待绘制的射线组为空，则进行下一组
         if isempty(index)
-            continue
+            continue;
         end
 
         codeChange = find(ipf(index(1:end-1)) ~= ipf(index(2:end)));
@@ -134,7 +139,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
     labels = {};
     for ii = 1:numel(tmp_ray)
         colour = matlabColors{mod(ii, length(matlabColors)+1) + 1};
-        label = sprintf('%3.1f', tmp_ray(ii));
+        label = sprintf('%4.1f', tmp_ray(ii));
         dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 2);
         handles = [handles, dummy];
         labels = [labels, label];
