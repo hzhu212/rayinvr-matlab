@@ -10,7 +10,7 @@ function [itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(is,
 %
 % for the travel time between two points a distance h apart
 
-    global fID_11 fID_ray fID_12;
+    global fID_11 fID_1111 fID_12;
     % global ar_ fid fid1 fidarr iblk id idray idump iwave layer ntt pi18 ...
     %   range_ rayid time timer_ tr tt vr vred xr xshtar zr;
 
@@ -64,12 +64,12 @@ function [itt, fidarr,ntt,range_,rayid,time,timer_,tr,tt,xshtar] = fun_ttime(is,
     fprintf(fID_11, '%4d%4d%9.3f%9.3f%9.3f%8.2f%8.3f%6d%6.1f\n',...
         is,nr,a1,a2,xr(npt),zr(npt),timer_,nptr,rayid(ntt));
 
-    % output to ray.out
+    % output to r1_ext.out
     [zturn, idx] = max(zr(1:npt));
     xturn = xr(idx);
-    % 'shot','code','#ray','xreceive','time','rtime','xturn','zturn','xturn2','zturn2'
-    fprintf(fID_ray,'%4d%5.1f%5d%9.3f%8.3f%8.3f%9.3f%9.3f%9.3f%9.3f\n',...
-        is,rayid(ntt),nr,xr(npt),time,timer_,xturn,zturn,-1,-1);
+    % shot  ray  i.angle  f.angle     dist    depth red.time  npts  code    xturn    zturn
+    fprintf(fID_1111, '%4d%5d%9.3f%9.3f%9.3f%9.3f%9.3f%6d%6.1f%9.3f%9.3f\n',...
+        is,nr,a1,a2,xr(npt),zr(npt),timer_,nptr,rayid(ntt),xturn,zturn);
 
     if vr(npt,2) ~= 0.0
         itt(ifam) = itt(ifam) + 1;

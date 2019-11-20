@@ -42,7 +42,7 @@ function [RMS, CHI] = main(options)
     % Set global values
     clear('global');
     global file_rayinvr_par file_rayinvr_com file_main_par;
-    global fID_11 fID_ray fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35 fID_63;
+    global fID_11 fID_1111 fID_12 fID_17 fID_19 fID_31 fID_32 fID_33 fID_35 fID_63;
     global file_iout file_nout;
     global fun_trace;
 
@@ -66,7 +66,7 @@ function [RMS, CHI] = main(options)
     file_fin = fullfile(pathIn,'f.in');
 
     file_r1out = fullfile(pathOut,'r1.out');
-    file_rayout = fullfile(pathOut,'ray.out');
+    file_rayout = fullfile(pathOut,'r1_ext.out');
     file_r2out = fullfile(pathOut,'r2.out');
     file_ra1out = fullfile(pathOut,'ra1.out');
     file_ra2out = fullfile(pathOut,'ra2.out');
@@ -190,7 +190,7 @@ function [RMS, CHI] = main(options)
     if iplot == 2, iplot = 0; end
 
     fID_11 = fopen(file_r1out,'w');
-    fID_ray = fopen(file_rayout,'w');
+    fID_1111 = fopen(file_rayout,'w');
     if idump == 1, fID_12 = fopen(file_r2out,'w'); end
     if itxout > 0, fID_17 = fopen(file_txout,'w'); end
     if iplot <= 0, fID_19 = fopen(file_pout,'w'); end
@@ -466,8 +466,7 @@ function [RMS, CHI] = main(options)
 
     % 35
     fprintf(fID_11,'shot  ray i.angle  f.angle   dist     depth red.time  npts code\n');
-    fprintf(fID_ray,'%4s%5s%5s%9s%8s%8s%9s%9s%9s%9s\n','shot','code','#ray',...
-        'xreceive','time','rtime','xturn','zturn','xturn2','zturn2');
+    fprintf(fID_1111,'shot  ray  i.angle  f.angle    xrecv    zrecv red.time  npts  code    xturn    zturn\n');
     if idump == 1
         % 45
         fprintf(fID_12,'\ngr ray npt   x       z      ang1    ang2    v1     v2  lyr bk id iw\n');
