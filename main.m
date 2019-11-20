@@ -586,7 +586,7 @@ function [RMS, CHI] = main(options)
         % 不是第一个炮点
         else
             % 如果当前炮点与上一个炮点是同一个(同一个炮点但 direction 不同当做 2 个炮点)
-            if abs(xshotr-xsec) < 0.001 && abs(zshotr-zsec) < 0.001
+            if abs(xshotr-xsec) < 0.0001 && abs(zshotr-zsec) < 0.0001
                 % 如果上一个炮点定位失败，则该炮点也不必再尝试，直接跳到下一个炮点
                 % “定位”是指找到炮点属于哪一层的哪个 block
                 if iflags == 1, continue; end % go to 60
@@ -770,7 +770,7 @@ function [RMS, CHI] = main(options)
                             xshotf = xf;
                             idf = sign(tf);
                             % 如果该行描述的炮点正是当前炮点
-                            if abs(xshotr-xshotf) < 0.001 && idr(is) == idf
+                            if abs(xshotr-xshotf) < 0.0001 && idr(is) == idf
                                 i2flag = 1;
                                 isf = isf + 1;
                             else
@@ -878,7 +878,7 @@ function [RMS, CHI] = main(options)
                         if irayf == 0
                             xshotf = xf;
                             idf = 1.0 .* sign(tf);
-                            if abs(xshotr-xshotf) < 9.9e-4 && idr(is) == idf
+                            if abs(xshotr-xshotf) < 0.0001 && idr(is) == idf
                                 i2flag = 1;
                                 isf = isf + 1;
                             else

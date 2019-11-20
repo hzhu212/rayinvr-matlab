@@ -34,7 +34,7 @@ function [xshotr,ig,iray,idr,ximax,iflagw,iszero,x2pt] = fun_calprt(xshotr,ig,ir
         if irayf == 0
             xshotf = xf;
             idf = 1.0 .* sign(tftf);
-            if abs(xshotr-xshotf) < 0.001 & idr == idf
+            if abs(xshotr-xshotf) < 0.0001 & idr == idf
                 iflag = 1;
                 npick = isf - nsfc;
                 isf = isf + 1;

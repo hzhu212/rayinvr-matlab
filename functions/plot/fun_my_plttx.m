@@ -144,10 +144,10 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
                     % ichold = -999999;
                     index = 1:narinv;
                     if isep == 2
-                        index = find(abs(xscalc(1:narinv)-xshota) < 0.001 & icalc(1:narinv).*fh(1) > 0.0);
+                        index = find(abs(xscalc(1:narinv)-xshota) < 0.0001 & icalc(1:narinv).*fh(1) > 0.0);
                     end
                     if isep == 3
-                        index = find(abs(xscalc(1:narinv)-xshota) < 0.001);
+                        index = find(abs(xscalc(1:narinv)-xshota) < 0.0001);
                     end
 
                     if itx >= 3
