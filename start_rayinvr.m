@@ -1,5 +1,5 @@
 function [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde)
-% [RMS, CHI] = start_main(pathIn, pathRin, pathVin, isUseOde)
+% [RMS, CHI] = start_rayinvr(pathIn, pathRin, pathVin, isUseOde)
 % Rayinvr forward calculating without GUI.
 
     if nargin < 1
