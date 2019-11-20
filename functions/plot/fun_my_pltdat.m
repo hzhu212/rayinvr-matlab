@@ -9,7 +9,7 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
 
     global colour ifcol ilshot ipf ipinv isep itcol itx narinv ncol orig symht ...
         tpf tscale upf xmint xpf xscalt;
-    global hFigure2 currentColor matlabColors;
+    global hFigure1 hFigure2 currentColor matlabColors;
 
     % 源程序中未声明以下2个变量，因为其不在 rayinvr.par 和 rayinvr.com 中
     global imod iray;
@@ -133,19 +133,27 @@ function fun_my_pltdat(iszero,idata,xshot,idr,nshot,tadj,xshota,xbmin,xbmax,tbmi
         end
     end
 
-    % 绘制图例，颜色为线条颜色，标签为对应的 ray code
-    tmp_ray = ray(1:(find(ray == 0, 1)-1));
-    handles = [];
+    % 采用 dummy plot 的形式，为 figure1 和 figure2 同时添加图例。
+    % 颜色为线条颜色，标签为对应的 ray code
+    ax1 = get(hFigure1, 'CurrentAxes');
+    ax2 = get(hFigure2, 'CurrentAxes');
+    hold(ax1, 'on');
+    hold(ax2, 'on');
+    valid_ray = ray(1:(find(ray == 0, 1)-1));
+    [handles1, handles2] = deal([]);
     labels = {};
-    for ii = 1:numel(tmp_ray)
+    for ii = 1:numel(valid_ray)
         colour = matlabColors{mod(ii, length(matlabColors)+1) + 1};
-        label = sprintf('%4.1f', tmp_ray(ii));
-        dummy = plot([NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 2);
-        handles = [handles, dummy];
+        label = sprintf('%4.1f', valid_ray(ii));
+        dummy1 = plot(ax1, [NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 0.5);
+        dummy2 = plot(ax2, [NaN, NaN], [NaN, NaN], 'Color', colour, 'LineWidth', 0.5);
+        handles1 = [handles1, dummy1];
+        handles2 = [handles2, dummy2];
         labels = [labels, label];
     end
-    % 阻止后续更新图像后图例自动更新
-    legend(handles, labels, 'AutoUpdate', 'off');
+    % 绘制图例，且阻止后续更新图像后图例自动更新
+    legend(ax1, handles1, labels, 'AutoUpdate', 'off');
+    legend(ax2, handles2, labels, 'AutoUpdate', 'off');
 
     % 999
     if itcol ~= 0
