@@ -45,7 +45,7 @@ if isempty(has_rayinvr_par_init)
     pnsmth = 500;     % points defining smooth layer boundary
     % papois = 50;      % blocks within which Poisson's ratio is altered
     pnvar = 400;      % model parameters varied in inversion
-    prayi = 25000;    % travel times used in inversion
+    prayi = 100000;   % travel times used in inversion
     ppvel = 300;      % points at which upper & lower layer velocities defined(must be a multiple of 10)
     pfrefl = 10;      % floating refectors
     ppfref = 10;      % points defining a single floating reflector
