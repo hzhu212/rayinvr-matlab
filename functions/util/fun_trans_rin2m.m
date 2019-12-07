@@ -78,6 +78,10 @@ function fileOut = fun_trans_rin2rm(file_rin)
         end
         currentLine = strjoin(split,replaced);
 
+        % 一些 Fortran 中的变量名与 MATLAB 的关键字有冲突，于是在 MATLAB 代码中进行了重命名。
+        % 但 r.in 需要保持对 Fortran 原版的兼容性，因此不能在 r.in 中直接改变量名，而是在此处做替换。
+        currentLine = strrep(currentLine, 'step', 'step_');
+
         fprintf(fout, [currentLine,'\n']);
         fprintf(fout, '%% &end\n\n');
     end
