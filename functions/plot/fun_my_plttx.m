@@ -37,7 +37,7 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
         % 创建一个新的 figure 对象
         hFigure2 = figure('NumberTitle','off','Name',['Travel Time - ',sprintf('%.2f',xshotr)],'Position',[220,100,900,500]);
         % 创建 axes 对象
-        axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+        axes('Position',[0.06,0.1,0.9,0.8]);
     else
         % set(hFigure2, 'Name', [get(hFigure2, 'Name'), ' - ', sprintf('%.2f',xshotr)]);
         figure(hFigure2);
@@ -109,8 +109,8 @@ function fun_my_plttx(ifam,npts,iszero,idata,iaxlab,xshot,idr,nshot,itxout,ibrka
 
                     % 绘制坐标轴
                     if iaxlab == 1
-                        xlabel('Distance (km)','FontName','Consolas','FontSize',11);
-                        ylabel(tlab,'FontName','Consolas','FontSize',11);
+                        xlabel('Distance (km)');
+                        ylabel(tlab);
                     end
 
                     % 显示图像区域边框

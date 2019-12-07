@@ -14,7 +14,7 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
         % 创建一个 figure 对象
         hFigure1 = figure('NumberTitle','off','Name','Ray Tracing','Position',[200,130,900,500]);
         % (在当前 figure 对象上)创建一个 axes 子对象
-        axes('FontName','Consolas','position',[0.06,0.1,0.9,0.8]);
+        axes('Position',[0.06,0.1,0.9,0.8]);
     else
         figure(hFigure1);
         % cla(gca(),'reset');
@@ -27,8 +27,8 @@ function fun_my_pltmod(ncont,ibnd,imod,iaxlab,ivel,velht,idash,ifrbnd,idata,irou
 
     % 绘制坐标轴标题
     if iaxlab == 1
-        xlabel('Distance (km)','FontName','Consolas','FontSize',11);
-        ylabel('Depth (km)','FontName','Consolas','FontSize',11);
+        xlabel('Distance (km)');
+        ylabel('Depth (km)');
     end
 
     % 绘制图像边框
