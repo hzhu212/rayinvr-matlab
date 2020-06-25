@@ -59,7 +59,7 @@ function fileOut = fun_trans_rin2rm(file_rin)
         currentLine = strrep(currentLine, '=', '(1)=['); % 为赋值的开头添加方括号，对所有的数组默认加上下标1(后面再根据赋值的长度作调整)
         currentLine = regexprep(currentLine, ',\n', ',...\n'); % 将数组折行处加上matlab折行语法
         % 处理*号
-        [tokens,split] = regexp(currentLine,'([\d\.]+)\*([\d\.]+)','tokens','split');
+        [tokens,split] = regexp(currentLine,'(\d+)\*(-?[\d\.]+)','tokens','split');
         replaced = {};
         for h = 1:length(tokens)
             num = str2num(tokens{h}{1});
